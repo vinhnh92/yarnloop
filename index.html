@@ -1,0 +1,2229 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#9B2335">
+<meta name="description" content="YarnLoop · by @lenmomam — Nhật ký đan & móc len / Your knit & crochet journal">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="YarnLoop">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<title>YarnLoop · by @lenmomam</title>
+<style>
+:root{--p:#9B2335;--pl:#C4687A;--pd:#7A1A28;--bg:#FDF6F7;--card:#FFFFFF;--soft:#FFF0F2;--bd:#E8C5CB;--bdl:#F2D8DC;--tx:#2D1B1E;--tx2:#7A4A52;--mu:#A67880;--ok:#6B9E78;--warn:#C4956A;--err:#B85C5C;--r:13px;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:14.5px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+a{color:var(--p)}
+h1,h2,h3,h4{margin:0 0 .45em;line-height:1.25}
+h2{font-size:17px}h3{font-size:15px}
+p{margin:.3em 0}
+button{font:inherit;cursor:pointer;color:inherit}
+input,select,textarea{font:inherit;color:inherit}
+img{max-width:100%}
+.nojs{max-width:460px;margin:15vh auto;padding:26px;background:#fff;border:1px solid var(--bd);border-radius:var(--r);text-align:center;box-shadow:0 8px 30px rgba(155,35,53,.08)}
+.nojs b{color:var(--p);font-size:18px}
+/* ---------- layout ---------- */
+.side{position:fixed;top:0;bottom:0;left:0;width:232px;background:#fff;border-right:1px solid var(--bdl);display:flex;flex-direction:column;padding:calc(14px + var(--sat)) 12px calc(12px + var(--sab)) calc(12px + var(--sal));overflow-y:auto;z-index:20}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 6px 8px;text-decoration:none;color:inherit}
+.brand svg{flex:none}
+.brand b{font-size:17px;display:block;line-height:1.15}
+.brand small{color:var(--mu);font-size:11.5px;display:block}
+.langsw{display:flex;gap:4px;margin:4px 6px 0;background:var(--soft);border-radius:9px;padding:3px}
+.langsw button{flex:1;border:0;background:transparent;border-radius:7px;padding:4px;font-size:12.5px;font-weight:600;color:var(--tx2)}
+.langsw button.on{background:#fff;color:var(--p);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.navgrp{margin-top:12px}
+.navgrp>div{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mu);padding:4px 10px;font-weight:600}
+.nav a{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;color:var(--tx2);text-decoration:none;font-weight:500}
+.nav a:hover{background:var(--soft)}
+.nav a.on{background:var(--soft);color:var(--p);font-weight:650}
+.nav a span{width:20px;text-align:center}
+.grow{flex:1}
+.tk{display:flex;gap:10px;align-items:center;margin-top:14px;padding:10px;border-radius:var(--r);background:linear-gradient(135deg,var(--soft),#fff);border:1px solid var(--bdl);text-decoration:none;color:var(--tx)}
+.tk .tki{width:34px;height:34px;border-radius:50%;background:var(--tx);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+.tk small{display:block;color:var(--mu);font-size:11.5px}
+.setcard{margin-top:10px;padding:10px;border:1px solid var(--bdl);border-radius:var(--r);background:var(--bg);text-align:left;width:100%;display:block}
+.setcard:hover{border-color:var(--bd)}
+.setcard small{display:block;color:var(--mu);font-size:11.5px}
+.main{margin-left:232px;min-height:100vh}
+.top{position:sticky;top:0;z-index:15;display:flex;align-items:center;gap:8px;padding:calc(10px + var(--sat)) calc(20px + var(--sar)) 10px 20px;background:rgba(253,246,247,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--bdl)}
+.top h1{font-size:19px;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search{width:260px;max-width:36vw}
+.mob{display:none!important}
+#view{padding:20px;max-width:1140px}
+.bnav{display:none}
+@media (max-width:820px){
+  .side{display:none}
+  .main{margin-left:0}
+  .mob{display:inline-flex!important}
+  .desk{display:none!important}
+  .top{padding:calc(8px + var(--sat)) calc(12px + var(--sar)) 8px calc(12px + var(--sal))}
+  .top h1{font-size:17px}
+  #view{padding:14px calc(12px + var(--sar)) calc(96px + var(--sab)) calc(12px + var(--sal))}
+  .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.97);border-top:1px solid var(--bdl);padding:6px calc(4px + var(--sar)) calc(6px + var(--sab)) calc(4px + var(--sal))}
+  .bnav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--mu);text-decoration:none;padding:3px 0;font-weight:500}
+  .bnav a span{font-size:20px;line-height:1.1}
+  .bnav a.on{color:var(--p);font-weight:700}
+  input,select,textarea{font-size:16px!important}
+  .ov{align-items:flex-end!important;padding:0!important}
+  .sheet{width:100%!important;max-width:none!important;border-radius:18px 18px 0 0!important;max-height:92vh!important;padding-bottom:calc(18px + var(--sab))!important;animation:up .22s ease}
+  #toast,#undo{bottom:calc(84px + var(--sab))!important}
+  #undo{bottom:calc(84px + var(--sab))!important}
+}
+@keyframes up{from{transform:translateY(50px);opacity:.3}to{transform:none;opacity:1}}
+/* ---------- components ---------- */
+.card{background:var(--card);border:1px solid var(--bdl);border-radius:var(--r);padding:16px;min-width:0}
+.stack>*+*{margin-top:14px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.g2{display:grid;gap:14px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
+@media (max-width:820px){.g2{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid var(--bd);background:#fff;color:var(--tx2);font-weight:600;text-decoration:none;white-space:nowrap;min-height:38px;line-height:1.2}
+.btn:hover{border-color:var(--pl);color:var(--p)}
+.btn.p{background:var(--p);border-color:var(--p);color:#fff}
+.btn.p:hover{background:var(--pd);border-color:var(--pd);color:#fff}
+.btn.danger{background:var(--err);border-color:var(--err);color:#fff}
+.btn.sm{padding:5px 10px;min-height:32px;font-size:13px}
+.btn.w{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.ib{border:0;background:transparent;padding:6px 8px;border-radius:8px;color:var(--tx2);min-width:34px;min-height:34px}
+.ib:hover{background:var(--soft);color:var(--p)}
+.linkbtn{border:0;background:none;padding:2px;text-decoration:underline;color:inherit;font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--soft);color:var(--tx2);border:1px solid var(--bdl);white-space:nowrap}
+.st-idea{background:#FFF6E9;color:#94642B;border-color:#F0DCBC}
+.st-wip{background:#FBE7EA;color:var(--p);border-color:#F0C3CB}
+.st-paused{background:#F2EEF0;color:#6E5D62;border-color:#E2DADD}
+.st-done{background:#EAF3EC;color:#4D7B59;border-color:#CBE2D1}
+.tag{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11.5px;background:var(--soft);color:var(--tx2);border:1px solid var(--bdl);white-space:nowrap}
+.tag.dk{background:var(--p);color:#fff;border-color:var(--p)}
+.mut{color:var(--mu)}.sub{color:var(--tx2)}.small{font-size:12.5px}.b{font-weight:650}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--err)}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;min-width:0}
+.field>span{font-size:12.5px;color:var(--tx2);font-weight:600}
+.inp{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;background:#fff;outline:none;min-height:40px}
+.inp:focus{border-color:var(--pl);box-shadow:0 0 0 3px rgba(196,104,122,.18)}
+textarea.inp{min-height:86px;resize:vertical;line-height:1.45}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.f3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 10px}
+@media (max-width:520px){.f3{grid-template-columns:1fr 1fr}}
+.errm{color:var(--err);font-size:13px;min-height:1.2em}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--bd);background:#fff;border-radius:999px;padding:5px 12px;font-size:13px;color:var(--tx2);font-weight:600}
+.chip.on{background:var(--p);border-color:var(--p);color:#fff}
+.chip.off{opacity:.5;text-decoration:line-through}
+.bar{height:7px;border-radius:9px;background:var(--bdl);overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--pl),var(--p));border-radius:9px}
+.empty{text-align:center;padding:26px 14px;color:var(--mu)}
+.empty .e-ic{font-size:36px}
+.alert{border-radius:var(--r);padding:12px 14px;border:1px solid}
+.alert.red{background:#FBEDED;border-color:#E9BDBD;color:#8C3434}
+.alert.amber{background:#FFF6EC;border-color:#EFD7BB;color:#7D5524}
+.alert.soft{background:var(--soft);border-color:var(--bdl);color:var(--tx2)}
+.tbl{width:100%;border-collapse:collapse}
+.tbl td,.tbl th{padding:7px 8px;border-bottom:1px solid var(--bdl);text-align:left;vertical-align:top}
+.tbl th{font-size:12px;color:var(--mu);font-weight:600}
+.tbl tr:last-child td{border-bottom:0}
+.kv td:first-child{color:var(--tx2);width:42%}
+.num{text-align:right!important;font-variant-numeric:tabular-nums}
+.scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+details>summary{cursor:pointer;font-weight:600;color:var(--tx2)}
+.sec-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.sec-h h2,.sec-h h3{margin:0}
+.hr{height:1px;background:var(--bdl);margin:12px 0}
+/* stats & resume */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:#fff;border:1px solid var(--bdl);border-radius:var(--r);padding:12px 14px;text-decoration:none;color:inherit;display:block}
+.stat b{font-size:24px;display:block;color:var(--p);line-height:1.2}
+.stat small{color:var(--mu)}
+.resume{background:linear-gradient(135deg,var(--pd),var(--p) 50%,var(--pl));color:#fff;border-radius:var(--r);padding:18px;box-shadow:0 10px 26px rgba(155,35,53,.22)}
+.resume .r-k{opacity:.85;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.resume h2{font-size:20px;margin:2px 0 8px}
+.resume .r-nums{display:flex;gap:18px;flex-wrap:wrap;margin:8px 0}
+.resume .r-nums b{font-size:22px;display:block}
+.resume .r-next{background:rgba(255,255,255,.95);color:var(--tx);border-radius:11px;padding:10px 12px;margin:10px 0}
+.resume .bar{background:rgba(255,255,255,.3)}.resume .bar>i{background:#fff}
+.btn.white{background:#fff;color:var(--p);border-color:#fff}
+.act li{list-style:none;padding:7px 0;border-bottom:1px solid var(--bdl);display:flex;gap:10px}
+.act{margin:0;padding:0}.act li:last-child{border-bottom:0}
+/* project cards */
+.pcard{display:flex;flex-direction:column;padding:0;overflow:hidden;text-decoration:none;color:inherit;transition:transform .12s,box-shadow .12s}
+.pcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(155,35,53,.1)}
+.pimg{width:100%;height:150px;object-fit:cover;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:40px}
+.pbody{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
+.ptop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ptop b{font-size:15px}
+.meta{font-size:12.5px;color:var(--tx2);display:flex;gap:4px 10px;flex-wrap:wrap}
+/* counter */
+.counter{background:linear-gradient(150deg,var(--pd),var(--p) 55%,var(--pl));color:#fff;border-radius:var(--r);padding:18px 16px;text-align:center;box-shadow:0 10px 26px rgba(155,35,53,.22)}
+.counter .c-k{font-size:12px;text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+.cnum{font-size:78px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;margin:4px 0}
+.c-sub{opacity:.9;font-size:13px}
+.cbtns{display:flex;gap:18px;align-items:center;justify-content:center;margin:14px 0 8px}
+.cbtn{width:62px;height:62px;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:rgba(255,255,255,.14);color:#fff;font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.cbtn.big{width:100px;height:100px;font-size:46px;background:#fff;color:var(--p);border-color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.cbtn:active{transform:scale(.94)}
+.counter .linkbtn{color:#fff;opacity:.85}
+.cnow{background:rgba(255,255,255,.96);color:var(--tx);border-radius:11px;padding:12px;text-align:left;margin-top:12px}
+.cnow h4{margin:0 0 6px;color:var(--p)}
+.cnow .cn-i+.cn-i{margin-top:8px;padding-top:8px;border-top:1px dashed var(--bd)}
+/* row notes */
+.rn{display:flex;gap:10px;padding:10px;border:1px solid var(--bdl);border-radius:11px;margin-top:8px;align-items:flex-start;background:#fff}
+.rn.cur{border:2px solid var(--p);background:var(--soft)}
+.rn.done .rn-t{opacity:.55}
+.rn input[type=checkbox]{width:20px;height:20px;accent-color:var(--p);margin:2px 0 0}
+.rn-b{flex:1;min-width:0}
+.rn-h{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px}
+.rn-h b{font-size:14px;color:var(--pd)}
+.rn-t{margin-top:4px;white-space:normal;word-break:break-word}
+.rn-a{display:flex;flex-direction:column}
+.posl{margin-top:6px;padding:6px 9px;border-radius:8px;background:#fff;border-left:3px solid var(--p);font-size:13px}
+.posl b{color:var(--p)}
+.fl{border:1px solid var(--bdl);border-radius:11px;padding:10px 12px;margin-top:8px}
+.fl ol{margin:6px 0;padding-left:22px}
+.fl li{margin:2px 0}
+/* images */
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.im{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--bdl);background:var(--soft)}
+.im img{width:100%;height:100%;object-fit:cover;cursor:zoom-in;display:block}
+.im button{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(45,27,30,.6);color:#fff;font-size:13px;line-height:1}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0!important}
+/* yarn */
+.ycard{display:flex;gap:12px;text-decoration:none;color:inherit;align-items:flex-start}
+.ycard:hover{border-color:var(--bd)}
+.ysw{width:46px;height:46px;border-radius:12px;flex:none;border:1px solid rgba(0,0,0,.08);box-shadow:inset 0 -6px 10px rgba(0,0,0,.08)}
+.ysw.lg{width:64px;height:64px;border-radius:16px}
+.ynums{margin-top:4px;font-size:13px}
+.ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.idea{border:1px solid var(--bdl);border-radius:11px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.idea img{width:100%;height:130px;object-fit:cover;cursor:zoom-in}
+.idea .ib-b{padding:8px 10px;display:flex;flex-direction:column;gap:6px;flex:1}
+.lib{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--bdl)}
+.lib:last-child{border-bottom:0}
+.tabs{display:flex;gap:4px;background:#fff;border:1px solid var(--bdl);border-radius:12px;padding:4px;overflow-x:auto}
+.tabs a{flex:1;text-align:center;padding:7px 10px;border-radius:9px;text-decoration:none;color:var(--tx2);font-weight:600;white-space:nowrap;font-size:13.5px}
+.tabs a.on{background:var(--p);color:#fff}
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(45,27,30,.42);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+.sheet{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow:auto;padding:18px;box-shadow:0 20px 50px rgba(45,27,30,.25);-webkit-overflow-scrolling:touch}
+.sheet.sm{max-width:410px}.sheet.lg{max-width:780px}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
+.mh h2{margin:0}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.cfm{text-align:center}
+.cfm .c-ic{font-size:40px}
+.cfm p{color:var(--tx2)}
+.cfm .acts{justify-content:center}
+.menu a,.menu button{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:12px;border:1px solid var(--bdl);border-radius:12px;background:#fff;margin-bottom:8px;text-decoration:none;color:var(--tx);font-weight:600}
+.menu a:hover,.menu button:hover{border-color:var(--pl);background:var(--soft)}
+.menu small{display:block;font-weight:400;color:var(--mu)}
+.menu .mi{font-size:22px;width:30px;text-align:center}
+.lb{background:transparent!important;box-shadow:none!important;text-align:center;padding:0!important;max-width:96vw!important}
+.lb img{max-width:100%;max-height:86vh;border-radius:10px;background:#fff}
+/* toast & undo */
+#toast{position:fixed;left:50%;bottom:calc(24px + var(--sab));transform:translateX(-50%) translateY(20px);background:var(--tx);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:200;max-width:92vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#undo{position:fixed;left:50%;bottom:calc(24px + var(--sab));transform:translateX(-50%);background:var(--tx);color:#fff;padding:8px 8px 8px 16px;border-radius:12px;display:none;gap:12px;align-items:center;z-index:199;max-width:94vw;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+#undo.show{display:flex}
+#undo button{background:var(--pl);color:#fff;border:0;border-radius:9px;padding:7px 12px;font-weight:700;white-space:nowrap}
+#undo i{display:block;height:3px;background:var(--pl);position:absolute;left:0;bottom:0;border-radius:3px;animation:shrink 10s linear forwards}
+@keyframes shrink{from{width:100%}to{width:0}}
+/* welcome */
+.welcome{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:calc(24px + var(--sat)) 18px calc(24px + var(--sab));background:radial-gradient(circle at 20% 10%,#FBE3E8,transparent 50%),radial-gradient(circle at 90% 90%,#F6D3DA,transparent 45%),var(--bg)}
+.wcard{max-width:450px;width:100%;background:#fff;border:1px solid var(--bdl);border-radius:20px;padding:26px 22px;text-align:center;box-shadow:0 16px 40px rgba(155,35,53,.12)}
+.wcard h1{font-size:28px;margin:12px 0 0;color:var(--p)}
+.wcard .langsw{max-width:220px;margin:14px auto}
+.wcard .btn{width:100%;margin-top:8px}
+.guide{text-align:left;font-size:13px;color:var(--tx2)}
+.guide li{margin:4px 0}
+/* studio */
+.studio{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.st-prev{position:sticky;top:76px;max-height:calc(100vh - 92px);overflow:auto;background:#fff;border:1px solid var(--bdl);border-radius:var(--r);padding:22px}
+@media (max-width:1000px){.studio{grid-template-columns:minmax(0,1fr)}.st-prev{position:static;max-height:none;padding:16px}}
+.secd{border:1px solid var(--bdl);border-radius:11px;padding:10px;margin-top:10px;background:var(--bg)}
+.secd .row{margin-bottom:6px}
+.secd .row .inp{flex:1;min-width:120px}
+.stbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chk{display:flex;gap:8px;align-items:center;margin:6px 0;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--p)}
+.out{background:var(--soft);border:1px dashed var(--bd);border-radius:10px;padding:8px 10px;font-weight:600;color:var(--pd)}
+#print-area{display:none}
+@media print{
+  body.printing>*:not(#print-area){display:none!important}
+  body.printing #print-area{display:block}
+  body.printing{background:#fff}
+  @page{margin:16mm}
+}
+</style>
+</head>
+<body>
+<div id="nojs" class="nojs">
+  <div style="font-size:42px">🧶</div>
+  <b>YarnLoop</b>
+  <p>App chưa chạy được, hãy mở bằng trình duyệt thật (Safari, Chrome…).</p>
+  <p style="color:#A67880;font-size:13px">The app can't run here — please open it in a real browser.</p>
+</div>
+<div id="app"></div>
+<div id="modals"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="undo"><span id="undoMsg"></span><button type="button" id="undoBtn">↩ Hoàn tác</button><i></i></div>
+<div id="print-area"></div>
+<script>
+'use strict';
+/* =====================================================================
+   BRAND
+   ===================================================================== */
+const BRAND = {
+  name: 'YarnLoop',
+  by: '@lenmomam',
+  display: 'YarnLoop · by @lenmomam',
+  tagVi: 'Nhật ký đan & móc len',
+  tagEn: 'Your knit & crochet journal',
+  tiktok: 'https://www.tiktok.com/@lenmomam',
+  version: '1.0.0'
+};
+
+/* =====================================================================
+   CONSTANTS
+   ===================================================================== */
+const DB_VERSION = 3;
+const WEIGHTS = [
+  { k: 'lace',       name: 'Lace (0)',             g: [33, 40], n: [1.5, 2.25] },
+  { k: 'fingering',  name: 'Fingering / 4ply (1)', g: [27, 32], n: [2.25, 3.25] },
+  { k: 'sport',      name: 'Sport / 5ply (2)',     g: [23, 26], n: [3.25, 3.75] },
+  { k: 'dk',         name: 'DK / 8ply (3)',        g: [21, 24], n: [3.75, 4.5] },
+  { k: 'worsted',    name: 'Worsted (4)',          g: [18, 20], n: [4.5, 5] },
+  { k: 'aran',       name: 'Aran / 10ply (4)',     g: [16, 18], n: [5, 5.5] },
+  { k: 'bulky',      name: 'Chunky / Bulky (5)',   g: [12, 15], n: [5.5, 8] },
+  { k: 'superbulky', name: 'Super Bulky (6)',      g: [7, 11],  n: [8, 12.75] }
+];
+const FIBERS = [
+  { k: 'cotton', vi: 'Cotton', en: 'Cotton' },
+  { k: 'milkcotton', vi: 'Milk cotton (len sữa)', en: 'Milk cotton' },
+  { k: 'merino', vi: 'Merino', en: 'Merino' },
+  { k: 'wool', vi: 'Wool', en: 'Wool' },
+  { k: 'alpaca', vi: 'Alpaca', en: 'Alpaca' },
+  { k: 'mohair', vi: 'Mohair', en: 'Mohair' },
+  { k: 'acrylic', vi: 'Acrylic', en: 'Acrylic' },
+  { k: 'cottonblend', vi: 'Cotton blend', en: 'Cotton blend' },
+  { k: 'woolblend', vi: 'Wool blend', en: 'Wool blend' },
+  { k: 'bamboo', vi: 'Bamboo', en: 'Bamboo' },
+  { k: 'linen', vi: 'Linen', en: 'Linen' },
+  { k: 'other', vi: 'Khác', en: 'Other' }
+];
+const NEEDLES = [1.5, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4, 4.5, 5, 5.5, 6, 6.5, 7, 8, 9, 10, 12];
+const STATUS = [
+  { k: 'idea', ic: '💡', vi: 'Ý tưởng', en: 'Idea' },
+  { k: 'wip', ic: '🧶', vi: 'Đang làm', en: 'In progress' },
+  { k: 'paused', ic: '⏸', vi: 'Tạm dừng', en: 'Paused' },
+  { k: 'done', ic: '✅', vi: 'Hoàn thành', en: 'Finished' }
+];
+const CRAFTS = [
+  { k: 'knit', ic: '🥢', vi: 'Knitting', en: 'Knitting' },
+  { k: 'crochet', ic: '🪝', vi: 'Crochet', en: 'Crochet' }
+];
+const SIZES = [
+  { k: '', vi: '—', en: '—' },
+  { k: 'XS', vi: 'XS', en: 'XS' }, { k: 'S', vi: 'S', en: 'S' }, { k: 'M', vi: 'M', en: 'M' },
+  { k: 'L', vi: 'L', en: 'L' }, { k: 'XL', vi: 'XL', en: 'XL' }, { k: 'XXL', vi: 'XXL', en: 'XXL' },
+  { k: 'free', vi: 'Free size', en: 'One size' },
+  { k: 'kids', vi: 'Trẻ em', en: 'Kids' },
+  { k: 'acc', vi: 'Phụ kiện', en: 'Accessory' },
+  { k: 'other', vi: 'Khác', en: 'Other' }
+];
+const RTYPES = [
+  { k: '', vi: '—', en: '—' },
+  { k: 'rs', vi: 'Mặt phải (RS)', en: 'Right side (RS)' },
+  { k: 'ws', vi: 'Mặt trái (WS)', en: 'Wrong side (WS)' },
+  { k: 'round', vi: 'Round', en: 'Round' },
+  { k: 'inc', vi: 'Tăng mũi (Increase)', en: 'Increase' },
+  { k: 'dec', vi: 'Giảm mũi (Decrease)', en: 'Decrease' },
+  { k: 'color', vi: 'Đổi màu', en: 'Color change' },
+  { k: 'split', vi: 'Chia thân/tay', en: 'Split body/sleeves' },
+  { k: 'other', vi: 'Khác', en: 'Other' }
+];
+/* nhãn ngắn dùng trong pattern xuất ra */
+const RTAG = {
+  inc: { vi: 'Tăng mũi', en: 'Increase' },
+  dec: { vi: 'Giảm mũi', en: 'Decrease' },
+  color: { vi: 'Đổi màu', en: 'Color change' },
+  split: { vi: 'Chia thân/tay', en: 'Split body/sleeves' }
+};
+const SECTIONS = [
+  { k: 'yoke', vi: 'Cầu vai', en: 'Yoke' },
+  { k: 'body', vi: 'Thân', en: 'Body' },
+  { k: 'sleeves', vi: 'Tay', en: 'Sleeves' },
+  { k: 'collar', vi: 'Cổ', en: 'Collar' },
+  { k: 'bands', vi: 'Nẹp/viền', en: 'Bands' },
+  { k: 'finishing', vi: 'Hoàn thiện', en: 'Finishing' },
+  { k: 'other', vi: 'Khác', en: 'Other' }
+];
+const DIFFS = [
+  { k: 'beginner', vi: 'Beginner · Mới bắt đầu', en: 'Beginner' },
+  { k: 'easy', vi: 'Easy · Dễ', en: 'Easy' },
+  { k: 'intermediate', vi: 'Intermediate · Trung bình', en: 'Intermediate' },
+  { k: 'experienced', vi: 'Experienced · Nâng cao', en: 'Experienced' }
+];
+const PTYPES = [
+  { k: 'personal', vi: 'Của tôi · chỉ dùng cá nhân', en: 'Mine · personal use only' },
+  { k: 'credit', vi: 'Của tôi · được chia sẻ, ghi nguồn', en: 'Mine · shareable with credit' },
+  { k: 'notes', vi: 'Ghi chú theo pattern của người khác', en: 'Notes on someone else’s pattern' }
+];
+/* Thư viện len có sẵn: g = gauge sts/10cm [min,max], n = que mm [min,max] */
+const LIB = [
+  { id: 'l1', brand: 'Drops', name: 'Baby Merino', weight: 'fingering', fiber: 'merino', g: [24, 24], n: [3, 3], gr: 50, m: 175, vi: '', en: '' },
+  { id: 'l2', brand: 'Drops', name: 'Alpaca', weight: 'fingering', fiber: 'alpaca', g: [24, 24], n: [3, 3], gr: 50, m: 167, vi: '', en: '' },
+  { id: 'l3', brand: 'Drops', name: 'Kid-Silk', weight: 'lace', fiber: 'mohair', g: [23, 23], n: [3.5, 3.5], gr: 25, m: 210, vi: 'Thường đan kèm 1 sợi khác', en: 'Usually held together with another yarn' },
+  { id: 'l4', brand: 'Drops', name: 'Nepal', weight: 'aran', fiber: 'woolblend', g: [17, 17], n: [5, 5], gr: 50, m: 75, vi: '', en: '' },
+  { id: 'l5', brand: 'Drops', name: 'Air', weight: 'aran', fiber: 'alpaca', g: [17, 17], n: [5, 5], gr: 50, m: 150, vi: 'Sợi thổi khí, rất nhẹ', en: 'Airy blown yarn, very light' },
+  { id: 'l6', brand: 'Sandnes Garn', name: 'Tynn Merinoull', weight: 'fingering', fiber: 'merino', g: [27, 27], n: [3, 3], gr: 50, m: 175, vi: '', en: '' },
+  { id: 'l7', brand: 'Paintbox Yarns', name: 'Simply DK', weight: 'dk', fiber: 'acrylic', g: [22, 22], n: [4, 4], gr: 50, m: 125, vi: '', en: '' },
+  { id: 'l8', brand: 'Lion Brand', name: 'Wool-Ease', weight: 'worsted', fiber: 'woolblend', g: [18, 18], n: [5, 5], gr: 85, m: 180, vi: '', en: '' },
+  { id: 'l9', brand: 'Malabrigo', name: 'Rios', weight: 'worsted', fiber: 'merino', g: [18, 20], n: [4.5, 5], gr: 100, m: 192, vi: '', en: '' },
+  { id: 'l10', brand: 'Scheepjes', name: 'Catona', weight: 'fingering', fiber: 'cotton', g: [26, 28], n: [2.5, 3], gr: 50, m: 125, vi: '', en: '' },
+  { id: 'l11', brand: 'Len sữa', name: 'Milk cotton 5 sợi', weight: 'sport', fiber: 'milkcotton', g: [22, 26], n: [3, 4], gr: 50, m: '', vi: 'Hay dùng móc thú bông, áo trẻ em', en: 'Popular for amigurumi & kids wear' },
+  { id: 'l12', brand: 'Acrylic', name: 'Len acrylic sợi to', weight: 'bulky', fiber: 'acrylic', g: [12, 15], n: [6, 8], gr: 100, m: '', vi: 'Đan nhanh, hợp khăn/mũ', en: 'Quick knit, great for scarves/hats' }
+];
+/* Viết tắt: tự nhận ra trong nội dung (dò trên bản đã bỏ dấu tiếng Việt) */
+const ABBR = [
+  { k: '*', re: /\*/, vi: 'lặp lại phần sau dấu * theo hướng dẫn', en: 'repeat instructions following *' },
+  { k: 'K', re: /\b[Kk]\d*\b/, vi: 'knit – mũi lên (mũi thường)', en: 'knit' },
+  { k: 'P', re: /\b[Pp]\d*\b/, vi: 'purl – mũi xuống (mũi ngược)', en: 'purl' },
+  { k: 'k2tog', re: /\bk2tog\b/i, vi: 'đan chung 2 mũi (giảm 1, nghiêng phải)', en: 'knit 2 together (right-leaning decrease)' },
+  { k: 'ssk', re: /\bssk\b/i, vi: 'trượt, trượt, đan chung (giảm 1, nghiêng trái)', en: 'slip, slip, knit (left-leaning decrease)' },
+  { k: 'p2tog', re: /\bp2tog\b/i, vi: 'đan purl chung 2 mũi (giảm 1)', en: 'purl 2 together' },
+  { k: 'yo', re: /\byo\b/i, vi: 'vòng sợi lên que (tạo lỗ, tăng 1)', en: 'yarn over' },
+  { k: 'M1L', re: /\bM1L\b/i, vi: 'tăng 1 mũi nghiêng trái', en: 'make 1 left' },
+  { k: 'M1R', re: /\bM1R\b/i, vi: 'tăng 1 mũi nghiêng phải', en: 'make 1 right' },
+  { k: 'M1', re: /\bM1\b/i, vi: 'tăng 1 mũi', en: 'make 1' },
+  { k: 'kfb', re: /\bkfb\b/i, vi: 'đan chân trước rồi chân sau cùng 1 mũi (tăng 1)', en: 'knit front and back (increase 1)' },
+  { k: 'tbl', re: /\btbl\b/i, vi: 'đan vào chân sau mũi', en: 'through the back loop' },
+  { k: 'sl', re: /\bsl\b(?!\s*st)/i, vi: 'trượt mũi (không đan)', en: 'slip' },
+  { k: 'pm', re: /\bpm\b/i, vi: 'đặt marker', en: 'place marker' },
+  { k: 'sm', re: /\bsm\b/i, vi: 'chuyển marker', en: 'slip marker' },
+  { k: 'BOR', re: /\bBOR\b/, vi: 'đầu vòng (beginning of round)', en: 'beginning of round' },
+  { k: 'CO', re: /\bCO\b/, vi: 'lên mũi (cast on)', en: 'cast on' },
+  { k: 'BO', re: /\bBO\b/, vi: 'kết thúc / chốt mũi (bind off)', en: 'bind off' },
+  { k: 'RS', re: /\bRS\b/, vi: 'mặt phải', en: 'right side' },
+  { k: 'WS', re: /\bWS\b/, vi: 'mặt trái', en: 'wrong side' },
+  { k: 'st(s)', re: /\bsts?\b/i, vi: 'mũi', en: 'stitch(es)' },
+  { k: 'rnd(s)', re: /\brnds?\b/i, vi: 'vòng (đan/móc vòng tròn)', en: 'round(s)' },
+  { k: 'rep', re: /\brep\b/i, vi: 'lặp lại', en: 'repeat' },
+  { k: 'inc', re: /\binc\b/i, vi: 'tăng mũi', en: 'increase' },
+  { k: 'dec', re: /\bdec\b/i, vi: 'giảm mũi', en: 'decrease' },
+  { k: 'MR', re: /\bMR\b/, vi: 'vòng tròn ma thuật (magic ring)', en: 'magic ring' },
+  { k: 'ch', re: /\bch\d*\b/, vi: 'mũi bính / mũi xích (chain)', en: 'chain' },
+  { k: 'sl st', re: /\bsl\s*st\b/i, vi: 'mũi trượt (móc)', en: 'slip stitch' },
+  { k: 'sc', re: /\bsc\d*\b/, vi: 'mũi đơn / mũi X (single crochet)', en: 'single crochet' },
+  { k: 'sc2tog', re: /\bsc2tog\b/i, vi: 'móc chụm 2 mũi đơn (giảm 1)', en: 'single crochet 2 together' },
+  { k: 'hdc', re: /\bhdc\b/i, vi: 'mũi nửa kép (half double crochet)', en: 'half double crochet' },
+  { k: 'dc', re: /\bdc\b/, vi: 'mũi kép / mũi F (double crochet)', en: 'double crochet' },
+  { k: 'tr', re: /\btr\b/, vi: 'mũi kép đôi (treble crochet)', en: 'treble crochet' },
+  { k: 'BLO', re: /\bBLO\b/i, vi: 'chỉ móc vào chân sau', en: 'back loop only' },
+  { k: 'FLO', re: /\bFLO\b/i, vi: 'chỉ móc vào chân trước', en: 'front loop only' },
+  { k: 'FO', re: /\bFO\b/, vi: 'hoàn thành, cắt sợi (fasten off)', en: 'fasten off' }
+];
+
+/* =====================================================================
+   I18N
+   ===================================================================== */
+let L = /^vi/i.test(navigator.language || '') ? 'vi' : 'en';
+const t = (vi, en) => (L === 'vi' ? vi : en);
+const lb = (o, lang) => (o ? ((lang || L) === 'vi' ? o.vi : o.en) : '');
+const findK = (list, k) => list.find(x => x.k === k);
+const lbl = (list, k, lang) => { const o = findK(list, k); return o ? lb(o, lang) : (k || ''); };
+const W = k => WEIGHTS.find(w => w.k === k);
+const wName = k => (W(k) ? W(k).name : '');
+const stIc = k => (findK(STATUS, k) || {}).ic || '';
+const crIc = k => (findK(CRAFTS, k) || {}).ic || '';
+
+/* =====================================================================
+   UTILS
+   ===================================================================== */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nl2br = s => esc(s).replace(/\n/g, '<br>');
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const num = v => { if (v === '' || v == null) return ''; const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : ''; };
+const fmt = (n, d = 1) => { if (n === '' || n == null || !isFinite(n)) return ''; const f = Math.pow(10, d); return String(Math.round(n * f) / f); };
+const clone = o => JSON.parse(JSON.stringify(o));
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const listNums = s => String(s || '').split(/[;,\s]+/).map(x => parseFloat(x)).filter(n => isFinite(n) && n > 0);
+const stripVN = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+const safeHex = h => (/^#[0-9a-f]{3,8}$/i.test(h || '') ? h : '#E8C5CB');
+const safeUrl = u => (/^https?:\/\//i.test(String(u || '').trim()) ? String(u).trim() : '');
+const isImg = s => /^data:image\//.test(s || '');
+const slug = s => stripVN(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'project';
+function ago(ts) {
+  const s = (Date.now() - ts) / 1000;
+  if (s < 60) return t('vừa xong', 'just now');
+  const m = Math.floor(s / 60); if (m < 60) return t(`${m} phút trước`, `${m} min ago`);
+  const h = Math.floor(m / 60); if (h < 24) return t(`${h} giờ trước`, `${h} h ago`);
+  const d = Math.floor(h / 24); if (d < 30) return t(`${d} ngày trước`, `${d} day${d > 1 ? 's' : ''} ago`);
+  return new Date(ts).toLocaleDateString(L === 'vi' ? 'vi-VN' : 'en-US');
+}
+function fmtDate(s) { if (!s) return ''; const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString(L === 'vi' ? 'vi-VN' : 'en-US'); }
+let _lg = 0;
+function logo(size) {
+  const id = 'ylg' + (++_lg);
+  return `<svg viewBox="0 0 64 64" width="${size || 40}" height="${size || 40}" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C4687A"/><stop offset=".55" stop-color="#9B2335"/><stop offset="1" stop-color="#7A1A28"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#${id})"/><g fill="none" stroke="#F9D5DC" stroke-width="2.6" stroke-linecap="round"><circle cx="31" cy="30" r="17"/><path d="M17.5 22.5c6 4.5 21 5 28.5-1.5"/><path d="M14.3 30.5c8 5 25 5 33.2-1"/><path d="M17.5 39.5c7 3.5 19 3.5 26-2.5"/><path d="M26.5 13.8c-6.5 8-6.5 24 1.5 32.8"/><path d="M36 13.8c5.5 9 4.5 24-3.5 32.8"/><path d="M45 41c4 5 8 9.5 12.5 9.5"/></g></svg>`;
+}
+
+/* =====================================================================
+   STORAGE  (IndexedDB key-value → localStorage → cảnh báo)
+   ===================================================================== */
+const LS_KEY = 'yarnloop-db';
+const STORE = { mode: null, idb: null };
+let db = null;
+
+function openIDB() {
+  return new Promise((res, rej) => {
+    if (!('indexedDB' in window) || !window.indexedDB) return rej(new Error('no idb'));
+    let r;
+    try { r = indexedDB.open('yarnloop', 1); } catch (e) { return rej(e); }
+    r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains('kv')) r.result.createObjectStore('kv'); };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+    r.onblocked = () => rej(new Error('blocked'));
+  });
+}
+function idbGet(k) {
+  return new Promise((res, rej) => {
+    const q = STORE.idb.transaction('kv', 'readonly').objectStore('kv').get(k);
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+}
+function idbSet(k, v) {
+  return new Promise((res, rej) => {
+    const tx = STORE.idb.transaction('kv', 'readwrite');
+    tx.objectStore('kv').put(v, k);
+    tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+  });
+}
+function lsGet() { try { return localStorage.getItem(LS_KEY); } catch (e) { return null; } }
+async function storeInit() {
+  try { STORE.idb = await openIDB(); await idbSet('_probe', 1); STORE.mode = 'idb'; }
+  catch (e) {
+    try { localStorage.setItem('_yl_probe', '1'); localStorage.removeItem('_yl_probe'); STORE.mode = 'ls'; }
+    catch (e2) { STORE.mode = null; }
+  }
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch (e) {}
+}
+async function storeLoad() {
+  let raw = null;
+  try {
+    if (STORE.mode === 'idb') raw = await idbGet('db');
+    if (!raw) raw = lsGet();
+    if (typeof raw === 'string') raw = JSON.parse(raw);
+  } catch (e) { console.warn('load failed', e); raw = null; }
+  return raw;
+}
+let saveT = null;
+function save() { clearTimeout(saveT); saveT = setTimeout(flush, 250); }
+async function flush() {
+  clearTimeout(saveT); saveT = null;
+  if (!STORE.mode || !db) return;
+  try {
+    const s = JSON.stringify(db);
+    if (STORE.mode === 'idb') await idbSet('db', s); else localStorage.setItem(LS_KEY, s);
+  } catch (e) {
+    console.warn('save failed', e);
+    toast(t('⚠️ Không lưu được — bộ nhớ có thể đã đầy', '⚠️ Could not save — storage may be full'));
+  }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+window.addEventListener('pagehide', () => flush());
+
+/* ---------- data model ---------- */
+const P_DEF = () => ({
+  id: uid(), name: '', craft: 'knit', status: 'wip', patternName: '', patternUrl: '', yarnId: '', needle: '', size: '',
+  pGaugeSts: '', pGaugeRows: '', myGaugeSts: '', myGaugeRows: '', totalRows: '', gramsUsed: '', startDate: '', endDate: '',
+  counter: 0, rows: [], formulas: [], notes: '', patternImgs: [], photos: [], updated: Date.now(),
+  design: false, example: false, pat: null, yarnInfo: null, sharedFrom: ''
+});
+const Y_DEF = () => ({
+  id: uid(), brand: '', name: '', weight: '', fiber: '', color: '', hex: '#E8C5CB', skeins: '', gramsPerSkein: '',
+  metersPerSkein: '', gramsLeft: '', gaugeSts: '', needle: '', shop: '', note: '', ideas: []
+});
+const emptyDB = () => ({ v: DB_VERSION, settings: { name: '', lang: null, onboarded: false, lastBackup: null }, log: [], customLib: [], yarns: [], projects: [] });
+
+function normRow(r) {
+  r = Object.assign({ from: '', to: '', sec: '', sts: '', rtype: '', f: '', t: '', done: false }, r || {});
+  if ((r.from === '' || r.from == null) && r.n != null) {
+    const s = String(r.n);
+    const m = s.match(/(\d+)\s*(?:[-–—]|to|đến|->)\s*(\d+)/i);
+    if (m) { r.from = +m[1]; r.to = +m[2]; }
+    else { const m2 = s.match(/\d+/); if (m2) { r.from = +m2[0]; r.to = +m2[0]; } }
+  }
+  delete r.n;
+  if (!r.t && (r.text || r.note)) r.t = r.text || r.note;
+  delete r.text; delete r.note;
+  r.from = Math.max(1, parseInt(r.from) || 1);
+  r.to = parseInt(r.to) || r.from;
+  if (r.to < r.from) r.to = r.from;
+  r.sts = r.sts === '' || r.sts == null ? '' : (parseInt(r.sts) || '');
+  r.t = String(r.t || '');
+  r.done = !!r.done;
+  return r;
+}
+function sortRows(p) { p.rows.sort((a, b) => a.from - b.from || a.to - b.to); }
+function normProject(p) {
+  p = Object.assign(P_DEF(), p || {});
+  ['rows', 'formulas', 'patternImgs', 'photos'].forEach(k => { if (!Array.isArray(p[k])) p[k] = []; });
+  p.rows = p.rows.map(normRow); sortRows(p);
+  p.formulas = p.formulas.map((f, i) => Object.assign({ id: uid(), name: String.fromCharCode(65 + (i % 26)), text: '' }, f));
+  p.counter = Math.max(0, parseInt(p.counter) || 0);
+  if (!findK(STATUS, p.status)) p.status = 'wip';
+  if (!findK(CRAFTS, p.craft)) p.craft = 'knit';
+  p.patternImgs = p.patternImgs.filter(isImg); p.photos = p.photos.filter(isImg);
+  p.design = !!p.design; p.example = !!p.example;
+  if (!p.updated) p.updated = Date.now();
+  return p;
+}
+function normYarn(y) {
+  y = Object.assign(Y_DEF(), y || {});
+  if (!Array.isArray(y.ideas)) y.ideas = [];
+  y.ideas = y.ideas.map(i => Object.assign({ img: '', t: '', u: '' }, i));
+  return y;
+}
+function normalize(d) {
+  d = d && typeof d === 'object' ? d : {};
+  const base = emptyDB();
+  d.v = DB_VERSION;
+  d.settings = Object.assign(base.settings, d.settings || {});
+  d.log = Array.isArray(d.log) ? d.log.filter(x => x && x.ts).slice(0, 30) : [];
+  d.customLib = Array.isArray(d.customLib) ? d.customLib : [];
+  d.yarns = (Array.isArray(d.yarns) ? d.yarns : []).map(normYarn);
+  d.projects = (Array.isArray(d.projects) ? d.projects : []).map(normProject);
+  return d;
+}
+
+/* ---------- helpers on data ---------- */
+const P = id => db.projects.find(p => p.id === id);
+const Y = id => db.yarns.find(y => y.id === id);
+function yarnOf(p) { return (p.yarnId && Y(p.yarnId)) || null; }
+function yarnGrams(y) { const g = num(y.gramsLeft); if (g !== '') return g; const s = num(y.skeins), gp = num(y.gramsPerSkein); return s !== '' && gp !== '' ? s * gp : 0; }
+function yarnMeters(y) { const g = yarnGrams(y), gp = num(y.gramsPerSkein), mp = num(y.metersPerSkein); return gp && mp ? Math.round(g / gp * mp) : ''; }
+function yarnTitle(y) { return [y.brand, y.name].filter(Boolean).join(' ') + (y.color ? ' – ' + y.color : ''); }
+function progress(p) { const tr = num(p.totalRows); return tr ? Math.min(100, Math.round(p.counter / tr * 100)) : null; }
+function formulaLines(f) { return String(f && f.text || '').split('\n').map(s => s.trim()).filter(Boolean); }
+function fOf(p, id) { return id ? p.formulas.find(f => f.id === id) : null; }
+/* Vị trí trong công thức: dòng = ((X − from) mod k) + 1, lượt = floor((X − from)/k) + 1, tổng = ceil(n/k) */
+function formulaPos(p, r, X) {
+  const f = fOf(p, r.f); if (!f) return null;
+  const lines = formulaLines(f), k = lines.length; if (!k) return null;
+  const off = X - r.from;
+  return { f, k, line: (off % k) + 1, rep: Math.floor(off / k) + 1, total: Math.ceil((r.to - r.from + 1) / k), text: lines[off % k] };
+}
+function rowsAt(p, X) { return p.rows.filter(r => X >= r.from && X <= r.to); }
+function addLog(ic, text, extra) {
+  extra = extra || {};
+  const top = db.log[0];
+  if (extra.k === 'count' && top && top.k === 'count' && top.pid === extra.pid) { top.ts = Date.now(); top.t = text; return; }
+  db.log.unshift(Object.assign({ ts: Date.now(), ic, t: text }, extra));
+  db.log = db.log.slice(0, 30);
+}
+function touch(p) { p.updated = Date.now(); }
+
+/* ---------- images: thu nhỏ bằng canvas, JPEG 0.75 ---------- */
+function readImage(file, max) {
+  return new Promise((res, rej) => {
+    if (!file || !/^image\//.test(file.type)) return rej(new Error('not image'));
+    const fr = new FileReader();
+    fr.onerror = () => rej(fr.error);
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = () => rej(new Error('decode'));
+      img.onload = () => {
+        let w = img.naturalWidth, h = img.naturalHeight;
+        const sc = Math.min(1, max / Math.max(w, h));
+        w = Math.max(1, Math.round(w * sc)); h = Math.max(1, Math.round(h * sc));
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(img, 0, 0, w, h);
+        res(c.toDataURL('image/jpeg', 0.75));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+async function readImages(files, max) {
+  const out = [];
+  for (const f of Array.from(files || [])) { try { out.push(await readImage(f, max)); } catch (e) { console.warn(e); } }
+  return out;
+}
+
+/* =====================================================================
+   SAMPLE DATA  (dữ liệu mẫu + cardigan ví dụ)
+   ===================================================================== */
+const svgURL = s => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+function cardiganSVG() {
+  return svgURL(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="#FDF6F7"/><circle cx="330" cy="72" r="44" fill="#FBE3E8"/><circle cx="70" cy="330" r="30" fill="#FBE3E8"/>
+<path d="M152 64 L118 76 L62 196 L40 318 L82 330 L112 222 L114 352 L286 352 L288 222 L318 330 L360 318 L338 196 L282 76 L248 64 L200 188 Z" fill="#F6EFE4" stroke="#CDB89F" stroke-width="3" stroke-linejoin="round"/>
+<path d="M118 76 L150 200 M282 76 L250 200" stroke="#E4D6C3" stroke-width="3" fill="none"/>
+<path d="M152 64 L200 188 L248 64" fill="none" stroke="#E9DDCB" stroke-width="12" stroke-linejoin="round"/>
+<path d="M200 188 L200 352" stroke="#E9DDCB" stroke-width="12"/>
+<g fill="#A8743F" stroke="#7C5229" stroke-width="2"><circle cx="200" cy="206" r="6"/><circle cx="200" cy="236" r="6"/><circle cx="200" cy="266" r="6"/><circle cx="200" cy="296" r="6"/><circle cx="200" cy="326" r="6"/><circle cx="214" cy="160" r="6"/></g>
+<g stroke="#E2D3BF" stroke-width="2.5">${Array.from({ length: 22 }, (_, i) => `<line x1="${118 + i * 8}" y1="326" x2="${118 + i * 8}" y2="350"/>`).join('')}${Array.from({ length: 4 }, (_, i) => `<line x1="${44 + i * 9}" y1="296" x2="${40 + i * 9}" y2="320"/><line x1="${330 + i * 9}" y1="300" x2="${334 + i * 9}" y2="322"/>`).join('')}</g>
+<text x="200" y="388" font-family="Georgia,serif" font-size="15" fill="#9B2335" text-anchor="middle">raglan V-neck · YarnLoop</text></svg>`);
+}
+function shawlSVG() {
+  return svgURL(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220"><rect width="300" height="220" fill="#FFF0F2"/><path d="M30 40 L270 40 L150 190 Z" fill="#F4C9D2" stroke="#C4687A" stroke-width="3" stroke-linejoin="round"/>${Array.from({ length: 8 }, (_, i) => `<path d="M${60 + i * 25} 55 l8 14 l8 -14" fill="none" stroke="#fff" stroke-width="2.5"/>`).join('')}${Array.from({ length: 5 }, (_, i) => `<circle cx="${95 + i * 28}" cy="95" r="4" fill="#fff"/>`).join('')}<text x="150" y="212" font-family="Georgia,serif" font-size="13" fill="#9B2335" text-anchor="middle">lace shawl idea</text></svg>`);
+}
+function exampleProject() {
+  const A = uid(), B = uid(), C = uid();
+  const vi = L === 'vi';
+  return normProject({
+    name: vi ? 'Cardigan raglan cổ V (ví dụ)' : 'Raglan V-neck cardigan (example)',
+    craft: 'knit', status: 'done', design: true, example: true, size: 'M', needle: 4,
+    pGaugeSts: 22, pGaugeRows: 30, myGaugeSts: 22, myGaugeRows: 30, totalRows: 327, gramsUsed: 590, counter: 327,
+    startDate: '2026-09-01', endDate: '2026-10-20',
+    yarnInfo: { brand: 'Drops', name: 'Merino Extra Fine', color: vi ? '01 trắng ngà' : '01 off white', weight: 'dk', fiber: 'merino', gramsPerSkein: 50, metersPerSkein: 105, gaugeSts: 21, needle: 4 },
+    formulas: [
+      { id: A, name: 'A', text: 'RS: K2, *P2, K2; rep from * to end\nWS: P2, *K2, P2; rep from * to end' },
+      { id: B, name: 'B', text: vi
+        ? 'RS (tăng 10): K1, M1L, *knit to 1 st before m, M1R, K1, sm, K1, M1L; rep from * 3 more times, knit to last st, M1R, K1\nWS: Purl\nRS (tăng 8): *knit to 1 st before m, M1R, K1, sm, K1, M1L; rep from * 3 more times, knit to end\nWS: Purl'
+        : 'RS (inc 10): K1, M1L, *knit to 1 st before m, M1R, K1, sm, K1, M1L; rep from * 3 more times, knit to last st, M1R, K1\nWS: Purl\nRS (inc 8): *knit to 1 st before m, M1R, K1, sm, K1, M1L; rep from * 3 more times, knit to end\nWS: Purl' },
+      { id: C, name: 'C', text: 'K1, k2tog, knit to last 3 sts, ssk, K1\nKnit\nKnit\nKnit\nKnit\nKnit\nKnit\nKnit' }
+    ],
+    rows: [
+      { from: 1, to: 1, sec: 'yoke', rtype: 'ws', sts: 60, t: vi ? 'CO 60 sts. Đặt 4 marker chia: 3 (thân trước) / 12 (tay) / 30 (thân sau) / 12 (tay) / 3 (thân trước). Purl hết row.' : 'CO 60 sts. Place 4 markers: 3 (front) / 12 (sleeve) / 30 (back) / 12 (sleeve) / 3 (front). Purl to end.' },
+      { from: 2, to: 65, sec: 'yoke', rtype: 'inc', f: B, sts: 348, t: vi ? 'Tăng raglan + cổ V. Kết thúc: thân trước 51, tay 76, thân sau 94 sts.' : 'Raglan and V-neck increases. You now have 51 sts each front, 76 sts each sleeve, 94 sts back.' },
+      { from: 66, to: 66, sec: 'body', rtype: 'split', sts: 212, t: vi ? 'Chia thân/tay: đưa 76 sts mỗi tay ra sợi chờ, CO 8 sts nách mỗi bên. Thân: 51 + 8 + 94 + 8 + 51.' : 'Divide for body and sleeves: put 76 sts of each sleeve on waste yarn, CO 8 underarm sts each side. Body: 51 + 8 + 94 + 8 + 51.' },
+      { from: 67, to: 158, sec: 'body', rtype: '', sts: 212, t: vi ? 'Stockinette (RS knit, WS purl) đến khi thân dài 31 cm tính từ nách.' : 'Work Stockinette (knit RS, purl WS) until body measures 31 cm from underarm.' },
+      { from: 159, to: 159, sec: 'body', rtype: 'ws', sts: 214, t: vi ? 'Purl, tăng đều 2 sts (M1) để chia hết bo gân.' : 'Purl, increasing 2 sts evenly (M1) to fit the rib.' },
+      { from: 160, to: 183, sec: 'body', rtype: '', f: A, sts: 214, t: vi ? 'Bo gân 2x2, 8 cm.' : '2x2 rib for 8 cm.' },
+      { from: 184, to: 184, sec: 'body', rtype: '', t: vi ? 'BO lỏng tay theo kiểu bo gân.' : 'BO loosely in pattern.' },
+      { from: 185, to: 185, sec: 'sleeves', rtype: 'round', sts: 84, t: vi ? 'Đưa 76 sts tay lên que vòng, nhặt 8 sts ở nách, pm đánh dấu BOR ở giữa nách.' : 'Place 76 sleeve sts on DPNs, pick up 8 sts at underarm, pm for BOR at centre of underarm.' },
+      { from: 186, to: 297, sec: 'sleeves', rtype: 'dec', f: C, sts: 56, t: vi ? 'Giảm 2 sts mỗi 8 rnds, 14 lần (tay dài 37 cm).' : 'Decrease 2 sts every 8 rnds 14 times (sleeve measures 37 cm).' },
+      { from: 298, to: 315, sec: 'sleeves', rtype: 'round', sts: 56, t: vi ? 'Bo gân cổ tay 2x2 (K2, P2) 6 cm.' : '2x2 rib cuff (K2, P2) for 6 cm.' },
+      { from: 316, to: 316, sec: 'sleeves', rtype: '', t: vi ? 'BO. Tay thứ 2 làm giống hệt.' : 'BO. Work second sleeve the same.' },
+      { from: 317, to: 317, sec: 'bands', rtype: 'rs', sts: 306, t: vi ? 'Nhặt 306 sts dọc nẹp trước và cổ V.' : 'Pick up 306 sts along fronts and V-neck.' },
+      { from: 318, to: 326, sec: 'bands', rtype: '', f: A, sts: 306, t: vi ? 'Bo gân 2x2 cho nẹp.' : '2x2 rib for the band.' },
+      { from: 321, to: 321, sec: 'bands', rtype: 'rs', t: vi ? 'Làm 6 khuyết cúc ở nẹp phải: (yo, k2tog) cách đều.' : 'Make 6 buttonholes on the right band: (yo, k2tog) evenly spaced.' },
+      { from: 327, to: 327, sec: 'bands', rtype: '', t: vi ? 'BO lỏng tay theo kiểu bo gân.' : 'BO loosely in pattern.' }
+    ].map(r => Object.assign({ done: true }, r)),
+    notes: vi
+      ? 'Khâu 6 cúc gỗ 18 mm. Wet blocking: ngâm nước, vắt nhẹ, phơi phẳng theo kích thước.\nLần sau: tay hơi dài → giảm 13 lần, đan 34 cm.\nTổng len dùng: 590 g.'
+      : 'Sew on 6 wooden buttons (18 mm). Wet block: soak, squeeze gently, lay flat to measurements.\nNext time: sleeves a bit long → decrease 13 times, knit 34 cm.\nTotal yarn used: 590 g.',
+    photos: [cardiganSVG()],
+    updated: Date.now() - 86400000 * 30
+  });
+}
+function sampleData() {
+  const vi = L === 'vi';
+  const y1 = normYarn({ brand: 'Drops', name: 'Baby Merino', color: vi ? '05 hồng phấn' : '05 light pink', hex: '#F4C2CC', weight: 'fingering', fiber: 'merino', skeins: 8, gramsPerSkein: 50, metersPerSkein: 175, gaugeSts: 24, needle: 3, shop: '', note: vi ? 'Mềm, hợp áo sát da' : 'Soft, great next to skin',
+    ideas: [{ img: shawlSVG(), t: vi ? 'Khăn choàng tam giác hoa văn lỗ' : 'Triangle lace shawl', u: 'https://www.ravelry.com/' }] });
+  const y2 = normYarn({ brand: 'Scheepjes', name: 'Catona', color: 'Tangerine', hex: '#F0884A', weight: 'fingering', fiber: 'cotton', skeins: 4, gramsPerSkein: 50, metersPerSkein: 125, gaugeSts: 27, needle: 2.5 });
+  const y3 = normYarn({ brand: 'Malabrigo', name: 'Rios', color: 'Burgundy', hex: '#7A1A28', weight: 'worsted', fiber: 'merino', skeins: 3, gramsPerSkein: 100, metersPerSkein: 192, gaugeSts: 19, needle: 5 });
+  const A = uid();
+  const p1 = normProject({
+    name: vi ? 'Cardigan cổ V mùa thu' : 'Autumn V-neck cardigan', craft: 'knit', status: 'wip', yarnId: y1.id, needle: 3, size: 'M',
+    patternName: 'Autumn Lace Cardigan', patternUrl: 'https://www.ravelry.com/',
+    pGaugeSts: 23, pGaugeRows: 30, myGaugeSts: 25, myGaugeRows: 33, totalRows: 180, counter: 7, startDate: today(),
+    formulas: [{ id: A, name: 'A', text: 'RS: K1, *yo, k2tog, K2; rep from * to last st, K1\nWS: Purl\nRS: K3, *yo, k2tog, K2; rep from * to last st, K1\nWS: Purl' }],
+    rows: [
+      { from: 1, to: 6, sec: 'body', rtype: '', sts: 204, t: vi ? 'Bo gân 1x1 (K1, P1), 6 rows.' : '1x1 rib (K1, P1) for 6 rows.', done: true },
+      { from: 7, to: 7, sec: 'body', rtype: 'rs', t: vi ? 'Knit hết row. Đặt marker 2 bên sườn (pm).' : 'Knit to end. Place side markers (pm).' },
+      { from: 8, to: 8, sec: 'body', rtype: 'inc', sts: 212, t: vi ? 'Tăng đều 8 sts: *P25, M1; rep from * 8 lần, purl hết.' : 'Increase 8 sts evenly: *P25, M1; rep from * 8 times, purl to end.' },
+      { from: 10, to: 20, sec: 'body', rtype: '', f: A, t: vi ? 'Hoa văn lỗ theo công thức A.' : 'Eyelet lace following Stitch pattern A.' }
+    ],
+    notes: vi ? 'Đan swatch xong: 25 sts/10cm → chặt hơn pattern, đã tính lại số mũi.' : 'Swatched: 25 sts/10cm → tighter than pattern, stitch counts recalculated.',
+    updated: Date.now() - 3600000 * 2
+  });
+  const p2 = normProject({
+    name: vi ? 'Cáo amigurumi' : 'Amigurumi fox', craft: 'crochet', status: 'paused', yarnId: y2.id, needle: 2.5, size: 'acc', totalRows: 85, counter: 42,
+    rows: [
+      { from: 1, to: 1, sec: 'other', rtype: 'round', sts: 6, t: 'MR, 6 sc.', done: true },
+      { from: 2, to: 2, sec: 'other', rtype: 'inc', sts: 12, t: vi ? '6 inc (2 sc vào mỗi mũi).' : 'inc in each st around.', done: true },
+      { from: 3, to: 14, sec: 'other', rtype: 'round', sts: 36, t: vi ? 'Tăng dần đến 36 sts rồi móc thẳng (đầu cáo).' : 'Increase to 36 sts then work even (head).', done: true },
+      { from: 40, to: 48, sec: 'other', rtype: 'dec', sts: 18, t: vi ? 'Giảm: *sc 4, sc2tog* — nhồi bông trước khi khép.' : 'Decrease: *sc 4, sc2tog* — stuff before closing.' }
+    ],
+    updated: Date.now() - 86400000 * 3
+  });
+  const p3 = normProject({
+    name: vi ? 'Khăn quàng gân' : 'Ribbed scarf', craft: 'knit', status: 'done', yarnId: y3.id, needle: 5, size: 'acc', totalRows: 300, counter: 300, gramsUsed: 240,
+    pGaugeSts: 19, myGaugeSts: 19, startDate: '2026-10-01', endDate: '2026-10-28',
+    rows: [
+      { from: 1, to: 1, sec: 'other', rtype: '', sts: 42, t: 'CO 42 sts.', done: true },
+      { from: 2, to: 299, sec: 'other', rtype: '', sts: 42, t: vi ? 'Bo gân 2x2 đến khi khăn dài 160 cm.' : '2x2 rib until scarf measures 160 cm.', done: true },
+      { from: 300, to: 300, sec: 'finishing', rtype: '', t: vi ? 'BO lỏng tay, giấu đầu sợi.' : 'BO loosely, weave in ends.', done: true }
+    ],
+    notes: vi ? 'Khăn 2 mặt giống nhau, không bị quăn mép.' : 'Reversible, edges do not curl.',
+    updated: Date.now() - 86400000 * 20
+  });
+  p3.pat = Object.assign(patDefaults(p3), {
+    diff: 'beginner', ptype: 'credit',
+    intro: vi ? 'Khăn bo gân 2x2 đơn giản, ấm và hai mặt giống nhau — hợp người mới.' : 'A simple, warm, reversible 2x2 ribbed scarf — perfect for beginners.',
+    measure: vi ? 'Rộng 22 cm × dài 160 cm' : '22 cm wide × 160 cm long',
+    sections: [{ id: uid(), title: vi ? 'Hướng dẫn' : 'Instructions', body: vi
+      ? 'CO 42 sts.\nRow 1 (RS): K2, *P2, K2; rep from * to end.\nRow 2 (WS): P2, *K2, P2; rep from * to end.\nLặp lại row 1–2 đến khi khăn dài 160 cm.\nBO lỏng tay theo kiểu bo gân. Giấu đầu sợi.'
+      : 'CO 42 sts.\nRow 1 (RS): K2, *P2, K2; rep from * to end.\nRow 2 (WS): P2, *K2, P2; rep from * to end.\nRepeat rows 1–2 until scarf measures 160 cm.\nBO loosely in pattern. Weave in ends.' }]
+  });
+  const ex = exampleProject();
+  const now = Date.now();
+  const log = [
+    { ts: now - 3600000 * 2, ic: '🧶', t: (vi ? 'Đếm row: ' : 'Counted row: ') + p1.name + ' → 7', k: 'count', pid: p1.id },
+    { ts: now - 86400000 * 3, ic: '⏸', t: (vi ? 'Tạm dừng: ' : 'Paused: ') + p2.name },
+    { ts: now - 86400000 * 5, ic: '🧺', t: (vi ? 'Thêm len: ' : 'Added yarn: ') + 'Drops Baby Merino' },
+    { ts: now - 86400000 * 20, ic: '✅', t: (vi ? 'Hoàn thành: ' : 'Finished: ') + p3.name }
+  ];
+  return { yarns: [y1, y2, y3], projects: [p1, p2, p3, ex], log };
+}
+
+/* =====================================================================
+   UI CORE: toast, modal, confirm (xoá an toàn), undo
+   ===================================================================== */
+let toastT = null;
+function toast(msg) {
+  const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2600);
+}
+function modal(html, opts) {
+  opts = opts || {};
+  const ov = document.createElement('div');
+  ov.className = 'ov';
+  ov.innerHTML = `<div class="sheet ${opts.cls || ''}" role="dialog" aria-modal="true">${html}</div>`;
+  let closed = false;
+  ov._close = v => { if (closed) return; closed = true; ov.remove(); if (opts.onClose) opts.onClose(v); };
+  ov.addEventListener('mousedown', e => { if (e.target === ov) ov._down = true; });
+  ov.addEventListener('click', e => { if (e.target === ov && ov._down) ov._close(); ov._down = false; });
+  $('#modals').appendChild(ov);
+  const f = ov.querySelector('[autofocus]'); if (f && matchMedia('(min-width:821px)').matches) setTimeout(() => f.focus(), 30);
+  return ov;
+}
+function topModal() { const a = $$('#modals .ov'); return a[a.length - 1]; }
+function closeAll() { $$('#modals .ov').forEach(o => o._close()); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { const m = topModal(); if (m) { e.preventDefault(); m._close(); } } });
+const mHead = title => `<div class="mh"><h2>${title}</h2><button class="ib" type="button" data-a="close" aria-label="close">✕</button></div>`;
+
+/* Hộp thoại xác nhận riêng (không dùng confirm()). word = phải gõ chữ này mới bấm được */
+function ask(o) {
+  return new Promise(res => {
+    const ov = modal(`<div class="cfm"><div class="c-ic">${o.ic || '🗑'}</div><h2>${esc(o.title)}</h2>${o.desc ? `<p>${o.desc}</p>` : ''}
+      ${o.word ? `<p class="small">${t('Gõ', 'Type')} <b>${o.word}</b> ${t('để xác nhận', 'to confirm')}</p><input class="inp" id="cfmWord" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-align:center">` : ''}
+      <div class="acts"><button class="btn" type="button" data-x="no">${t('Huỷ', 'Cancel')}</button><button class="btn ${o.safe ? 'p' : 'danger'}" type="button" data-x="yes" ${o.word ? 'disabled' : ''}>${esc(o.ok || t('Xoá', 'Delete'))}</button></div></div>`,
+      { cls: 'sm', onClose: v => res(v === true) });
+    ov.querySelector('[data-x=no]').onclick = () => ov._close(false);
+    const yes = ov.querySelector('[data-x=yes]');
+    yes.onclick = () => { if (!yes.disabled) ov._close(true); };
+    if (o.word) {
+      const i = ov.querySelector('#cfmWord');
+      i.oninput = () => { yes.disabled = i.value.trim().toUpperCase() !== o.word; };
+      i.onkeydown = e => { if (e.key === 'Enter' && !yes.disabled) ov._close(true); };
+      setTimeout(() => i.focus(), 50);
+    } else setTimeout(() => yes.focus(), 30);
+  });
+}
+/* Thực hiện thao tác xoá kèm bản chụp → thanh "↩ Hoàn tác" 10 giây */
+let undoSnap = null, undoT = null;
+function doWithUndo(msg, fn) {
+  const snap = JSON.stringify(db);
+  fn();
+  save(); render();
+  undoSnap = snap;
+  const bar = $('#undo');
+  $('#undoMsg').textContent = msg;
+  $('#undoBtn').textContent = t('↩ Hoàn tác', '↩ Undo');
+  const old = bar.querySelector('i'); const ni = document.createElement('i'); old.replaceWith(ni);
+  bar.classList.add('show');
+  clearTimeout(undoT); undoT = setTimeout(hideUndo, 10000);
+}
+function hideUndo() { $('#undo').classList.remove('show'); undoSnap = null; }
+$('#undoBtn').onclick = () => {
+  if (!undoSnap) return;
+  const oldLang = db.settings.lang, oldOn = db.settings.onboarded;
+  db = normalize(JSON.parse(undoSnap));
+  hideUndo(); clearTimeout(undoT); save();
+  if (db.settings.lang !== oldLang || db.settings.onboarded !== oldOn) { if (db.settings.lang) L = db.settings.lang; shell(); }
+  render(); toast(t('Đã khôi phục ✓', 'Restored ✓'));
+};
+
+/* =====================================================================
+   ROUTER
+   ===================================================================== */
+const state = { route: { name: 'home', id: '' }, q: '', pf: 'all', wf: '', g: {}, cUndo: {}, deferredPrompt: null, findG: '' };
+function parseHash() {
+  const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
+  const parts = h.split('/');
+  return { name: parts[0] || 'home', id: parts[1] || '' };
+}
+function go(path) { if (location.hash === '#/' + path) render(); else location.hash = '#/' + path; }
+window.addEventListener('hashchange', () => { const prev = state.route.name + state.route.id; state.route = parseHash(); closeAll(); render(); if (prev !== state.route.name + state.route.id) window.scrollTo(0, 0); });
+
+/* =====================================================================
+   SHELL (sidebar, top bar, bottom nav)
+   ===================================================================== */
+const NAV = () => [
+  { grp: t('Chính', 'Main'), items: [
+    { r: 'home', ic: '🏠', l: t('Tổng quan', 'Overview') },
+    { r: 'projects', ic: '🧶', l: t('Dự án', 'Projects') },
+    { r: 'counter', ic: '🔢', l: 'Row Counter' }] },
+  { grp: t('Kho', 'Stash'), items: [
+    { r: 'stash', ic: '🧺', l: 'Yarn Stash' },
+    { r: 'stash/lib', ic: '📚', l: t('Thư viện len', 'Yarn library') }] },
+  { grp: t('Công cụ', 'Tools'), items: [
+    { r: 'gauge', ic: '📐', l: 'Gauge Converter' },
+    { act: 'design', ic: '✏️', l: t('Tự thiết kế pattern', 'Design a pattern') }] }
+];
+function langSw() { return `<div class="langsw"><button type="button" class="${L === 'vi' ? 'on' : ''}" data-a="setLang" data-l="vi">Tiếng Việt</button><button type="button" class="${L === 'en' ? 'on' : ''}" data-a="setLang" data-l="en">English</button></div>`; }
+function tiktokCard() { return `<a class="tk" href="${BRAND.tiktok}" target="_blank" rel="noopener"><span class="tki">♪</span><span><b>${BRAND.by}</b><small>${t('Mẹo đan móc trên TikTok', 'Knit & crochet tips on TikTok')}</small></span></a>`; }
+function shell() {
+  document.documentElement.lang = L;
+  if (!db.settings.onboarded) { $('#app').innerHTML = '<div id="view"></div>'; return; }
+  const nav = NAV().map(g => `<div class="navgrp"><div>${g.grp}</div><nav class="nav">${g.items.map(i => i.act ? `<a role="button" tabindex="0" style="cursor:pointer" data-a="${i.act}"><span>${i.ic}</span>${i.l}</a>` : `<a href="#/${i.r}" data-r="${i.r}"><span>${i.ic}</span>${i.l}</a>`).join('')}</nav></div>`).join('');
+  $('#app').innerHTML = `
+  <aside class="side">
+    <a class="brand" href="#/home">${logo(42)}<span><b>${BRAND.name}</b><small>by ${BRAND.by}</small></span></a>
+    ${langSw()}
+    ${nav}
+    <div class="grow"></div>
+    <button class="btn sm w" type="button" id="installBtn" data-a="install" style="display:none;margin-top:12px">📲 ${t('Cài app', 'Install app')}</button>
+    ${tiktokCard()}
+    <button class="setcard" type="button" data-a="settings"><b>⚙️ ${t('Cài đặt & sao lưu', 'Settings & backup')}</b><small id="sideBackup"></small></button>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <a class="mob" href="#/home" style="display:none">${logo(30)}</a>
+      <h1 id="pageTitle"></h1>
+      <input class="inp search desk" id="topSearch" type="search" placeholder="🔍 ${t('Tìm dự án, len, ghi chú…', 'Search projects, yarn, notes…')}" autocomplete="off">
+      <a class="ib mob" href="#/search" aria-label="search">🔍</a>
+      <button class="ib mob" type="button" data-a="toggleLang" style="font-weight:700;font-size:13px">${L === 'vi' ? 'EN' : 'VI'}</button>
+      <button class="ib mob" type="button" data-a="settings" aria-label="settings">⚙️</button>
+      <button class="btn p" type="button" data-a="newMenu">+ ${t('Mới', 'New')}</button>
+    </header>
+    <main id="view"></main>
+  </div>
+  <nav class="bnav">
+    <a href="#/home" data-r="home"><span>🏠</span>${t('Tổng quan', 'Overview')}</a>
+    <a href="#/projects" data-r="projects"><span>🧶</span>${t('Dự án', 'Projects')}</a>
+    <a href="#/counter" data-r="counter"><span>🔢</span>${t('Đếm', 'Count')}</a>
+    <a href="#/stash" data-r="stash"><span>🧺</span>${t('Kho len', 'Stash')}</a>
+    <a href="#/gauge" data-r="gauge"><span>📐</span>Gauge</a>
+  </nav>`;
+  const s = $('#topSearch');
+  s.value = state.q;
+  s.addEventListener('input', () => { state.q = s.value; if (state.route.name !== 'search') { if (state.q.trim()) go('search'); } else renderView(); });
+  updateInstallBtn();
+}
+function updateInstallBtn() { const b = $('#installBtn'); if (b) b.style.display = state.deferredPrompt ? '' : 'none'; const b2 = $('#installBtn2'); if (b2) b2.style.display = state.deferredPrompt ? '' : 'none'; }
+
+const VIEWS = {};
+function render() {
+  if (!db.settings.onboarded) { if (!$('#view') || $('.side')) shell(); $('#view').innerHTML = viewWelcome(); return; }
+  if (!$('.side')) shell();
+  renderView();
+}
+function renderView() {
+  const r = state.route;
+  const fn = VIEWS[r.name] || VIEWS.home;
+  let out;
+  try { out = fn(r.id); } catch (e) { console.error(e); out = { title: 'YarnLoop', html: `<div class="alert red">${esc(e.message)}</div>` }; }
+  if (!out) return;
+  $('#view').innerHTML = out.html;
+  $('#pageTitle').textContent = out.title;
+  document.title = out.title + ' · YarnLoop';
+  const key = out.nav || r.name;
+  $$('[data-r]').forEach(a => a.classList.toggle('on', a.dataset.r === key || (!!a.closest('.bnav') && key.split('/')[0] === a.dataset.r)));
+  const sb = $('#sideBackup'); if (sb) sb.textContent = backupLabel();
+  if (out.after) out.after();
+}
+function backupLabel() {
+  const lb = db.settings.lastBackup;
+  if (!lb) return t('Chưa sao lưu lần nào', 'Never backed up');
+  return t('Sao lưu: ', 'Backup: ') + ago(lb);
+}
+
+/* =====================================================================
+   VIEWS — shared bits
+   ===================================================================== */
+const badge = k => `<span class="pill st-${k}">${stIc(k)} ${lbl(STATUS, k)}</span>`;
+const sel = (name, list, val, opts) => `<select class="inp" name="${name}" ${opts || ''}>${list.map(o => `<option value="${esc(o.k)}" ${String(o.k) === String(val == null ? '' : val) ? 'selected' : ''}>${esc(o.l != null ? o.l : lb(o))}</option>`).join('')}</select>`;
+const needleList = (empty) => [{ k: '', l: empty || '—' }].concat(NEEDLES.map(n => ({ k: n, l: n + ' mm' })));
+const fld = (label, inner, cls) => `<label class="field ${cls || ''}"><span>${label}</span>${inner}</label>`;
+const inp = (name, val, attrs) => `<input class="inp" name="${name}" value="${esc(val == null ? '' : val)}" ${attrs || ''}>`;
+const imgGrid = (arr, kind, pid) => arr.length ? `<div class="imgs">${arr.map((s, i) => `<div class="im"><img src="${esc(s)}" alt="" loading="lazy" data-a="zoom"><button type="button" data-a="imgDel" data-kind="${kind}" data-i="${i}" data-id="${pid}" aria-label="delete">✕</button></div>`).join('')}</div>` : '';
+const fileBtn = (label, attrs) => `<label class="btn sm filebtn">${label}<input type="file" accept="image/*" ${attrs}></label>`;
+function gaugeStr(s, r) { return s ? `${s}${r ? '×' + r : ''}` : ''; }
+function projCard(p) {
+  const img = p.photos[0] || p.patternImgs[0];
+  const y = yarnOf(p) || p.yarnInfo;
+  const pr = progress(p);
+  const g = gaugeStr(p.myGaugeSts || p.pGaugeSts, p.myGaugeRows || p.pGaugeRows);
+  return `<a class="card pcard" href="#/project/${p.id}">
+    ${img ? `<img class="pimg" src="${esc(img)}" alt="" loading="lazy">` : `<div class="pimg">${crIc(p.craft)}</div>`}
+    <div class="pbody">
+      <div class="ptop"><b>${esc(p.name)}</b>${badge(p.status)}</div>
+      ${p.patternName ? `<div class="small mut">📄 ${esc(p.patternName)}</div>` : ''}
+      ${pr != null ? `<div class="small sub">Row ${p.counter}/${esc(p.totalRows)} · ${pr}%</div><div class="bar"><i style="width:${pr}%"></i></div>` : (p.counter ? `<div class="small sub">Row ${p.counter}</div>` : '')}
+      <div class="meta">${y ? `<span>🧶 ${esc([y.brand, y.name].filter(Boolean).join(' '))}</span>` : ''}${p.needle ? `<span>🪡 ${esc(p.needle)} mm</span>` : ''}${g ? `<span>📐 ${esc(g)}</span>` : ''}</div>
+      ${p.design || p.pat ? `<div class="row">${p.design ? '<span class="tag dk">Design</span>' : ''}${p.pat ? '<span class="tag">📄 Pattern</span>' : ''}</div>` : ''}
+    </div></a>`;
+}
+function emptyBox(ic, msg, btn) { return `<div class="empty"><div class="e-ic">${ic}</div><p>${msg}</p>${btn || ''}</div>`; }
+
+/* =====================================================================
+   VIEW: Tổng quan
+   ===================================================================== */
+VIEWS.home = () => {
+  const ps = db.projects;
+  const cnt = k => ps.filter(p => p.status === k).length;
+  const grams = db.yarns.reduce((s, y) => s + (yarnGrams(y) || 0), 0);
+  const skeins = db.yarns.reduce((s, y) => s + (num(y.skeins) || 0), 0);
+  const h = new Date().getHours();
+  const greet = h < 11 ? t('Chào buổi sáng', 'Good morning') : h < 14 ? t('Chào buổi trưa', 'Good afternoon') : h < 18 ? t('Chào buổi chiều', 'Good afternoon') : t('Chào buổi tối', 'Good evening');
+  const nm = db.settings.name ? ', ' + esc(db.settings.name) : '';
+  let warn = '';
+  if (!STORE.mode) warn += `<div class="alert red"><b>⛔ ${t('Trình duyệt không cho lưu dữ liệu', 'This browser does not allow saving data')}</b><br>${t('Mọi thay đổi sẽ mất khi đóng trang. Hãy tắt chế độ ẩn danh hoặc mở bằng Safari/Chrome thường.', 'Changes will be lost when you close the page. Turn off private mode or use regular Safari/Chrome.')}</div>`;
+  const hasData = ps.length || db.yarns.length;
+  const lbk = db.settings.lastBackup;
+  const days = lbk ? Math.floor((Date.now() - lbk) / 86400000) : null;
+  if (hasData && (lbk == null || days > 14)) warn += `<div class="alert amber row between"><span>💾 ${lbk == null ? t('Bạn chưa sao lưu dữ liệu lần nào.', 'You have never backed up your data.') : t(`Đã ${days} ngày chưa sao lưu.`, `${days} days since your last backup.`)}</span><button class="btn sm" type="button" data-a="backup">${t('Sao lưu ngay', 'Back up now')}</button></div>`;
+  const wip = ps.filter(p => p.status === 'wip').sort((a, b) => b.updated - a.updated)[0];
+  let resume = '';
+  if (wip) {
+    const pr = progress(wip);
+    const X = Math.max(1, wip.counter);
+    const rs = rowsAt(wip, X);
+    let next = '';
+    if (rs.length) {
+      next = rs.map(r => { const fp = formulaPos(wip, r, X); return fp ? `<div><b>${t('Công thức', 'Stitch pattern')} ${esc(fp.f.name)} · ${t('dòng', 'line')} ${fp.line}/${fp.k}:</b> ${esc(fp.text)}</div>${r.t ? `<div class="small sub">${nl2br(r.t)}</div>` : ''}` : `<div>${nl2br(r.t)}</div>`; }).join('');
+    } else next = `<span class="mut">${t('Chưa có ghi chú cho row này.', 'No note for this row yet.')}</span>`;
+    resume = `<div class="resume"><div class="r-k">⚡ Quick Resume</div><h2>${esc(wip.name)}</h2>
+      <div class="r-nums"><div><b>${wip.counter}</b><small>${t('row hiện tại', 'current row')}</small></div>${wip.needle ? `<div><b>${esc(wip.needle)}</b><small>mm</small></div>` : ''}${pr != null ? `<div><b>${pr}%</b><small>${t('tiến độ', 'progress')}</small></div>` : ''}</div>
+      ${pr != null ? `<div class="bar"><i style="width:${pr}%"></i></div>` : ''}
+      <div class="r-next"><div class="small mut b">${t('Bước tiếp theo', 'Next step')} · Row ${X}</div>${next}</div>
+      <a class="btn white" href="#/counter/${wip.id}">🔢 ${t('Mở Row Counter', 'Open Row Counter')}</a></div>`;
+  }
+  const act = db.log.slice(0, 5);
+  const active = ps.filter(p => p.status === 'wip' || p.status === 'paused').sort((a, b) => b.updated - a.updated);
+  return { title: t('Tổng quan', 'Overview'), html: `<div class="stack">
+    ${warn}
+    <div><h2 style="font-size:22px;margin:0">${greet}${nm} 👋</h2><div class="mut">${t(BRAND.tagVi, BRAND.tagEn)}</div></div>
+    <div class="stats">
+      <a class="stat" href="#/projects" data-a="pf" data-f="wip"><b>${cnt('wip')}</b><small>🧶 ${t('Đang làm', 'In progress')}</small></a>
+      <a class="stat" href="#/projects" data-a="pf" data-f="paused"><b>${cnt('paused')}</b><small>⏸ ${t('Tạm dừng', 'Paused')}</small></a>
+      <a class="stat" href="#/projects" data-a="pf" data-f="done"><b>${cnt('done')}</b><small>✅ ${t('Hoàn thành', 'Finished')}</small></a>
+      <a class="stat" href="#/stash"><b>${fmt(grams / 1000, 2)} kg</b><small>🧺 Yarn Stash · ${db.yarns.length} ${t('loại', 'types')} · ${fmt(skeins, 1)} ${t('cuộn', 'skeins')}</small></a>
+    </div>
+    ${resume || (!ps.length ? `<div class="card">${emptyBox('🧶', t('Chưa có dự án nào. Bắt đầu dự án đầu tiên nhé!', 'No projects yet. Start your first one!'), `<div class="row" style="justify-content:center"><button class="btn p" type="button" data-a="newProject">+ ${t('Dự án mới', 'New project')}</button><button class="btn" type="button" data-a="addExample">🧥 ${t('Xem ví dụ', 'See example')}</button></div>`)}</div>` : '')}
+    <div class="g2">
+      <div class="card"><h3>🕒 ${t('Hoạt động gần đây', 'Recent activity')}</h3>${act.length ? `<ul class="act">${act.map(a => `<li><span>${esc(a.ic)}</span><span style="flex:1">${esc(a.t)}</span><span class="small mut" style="white-space:nowrap">${ago(a.ts)}</span></li>`).join('')}</ul>` : `<p class="mut">${t('Chưa có hoạt động.', 'Nothing yet.')}</p>`}</div>
+      <div class="card"><h3>💡 ${t('Mẹo', 'Tip')}</h3><p class="sub small">${t('Ghi chú từng row + công thức lặp giúp bạn biết chính xác row đang đếm cần làm gì. Khi xong dự án, bấm "📄 Pattern" để xuất pattern của riêng bạn.', 'Row notes + repeat formulas tell you exactly what to do on the row you are counting. When finished, tap "📄 Pattern" to export your own pattern.')}</p><a class="btn sm" href="#/gauge">📐 Gauge Converter</a></div>
+    </div>
+    ${active.length ? `<div><div class="sec-h"><h2>🧶 ${t('Đang làm & tạm dừng', 'In progress & paused')}</h2><a class="btn sm" href="#/projects">${t('Tất cả', 'All')} →</a></div><div class="grid">${active.map(projCard).join('')}</div></div>` : ''}
+  </div>` };
+};
+
+/* =====================================================================
+   VIEW: Danh sách dự án
+   ===================================================================== */
+VIEWS.projects = () => {
+  const ps = db.projects.slice().sort((a, b) => b.updated - a.updated);
+  const f = state.pf;
+  const list = f === 'all' ? ps : ps.filter(p => p.status === f);
+  const hasEx = ps.some(p => p.example);
+  const chips = [{ k: 'all', l: t('Tất cả', 'All'), n: ps.length }].concat(STATUS.map(s => ({ k: s.k, l: s.ic + ' ' + lb(s), n: ps.filter(p => p.status === s.k).length })));
+  return { title: t('Dự án', 'Projects'), html: `<div class="stack">
+    <div class="row between">
+      <div class="chips">${chips.map(c => `<button type="button" class="chip ${f === c.k ? 'on' : ''}" data-a="pf" data-f="${c.k}">${c.l} · ${c.n}</button>`).join('')}</div>
+      <div class="row">${hasEx ? '' : `<button class="btn sm" type="button" data-a="addExample">🧥 ${t('Ví dụ', 'Example')}</button>`}<button class="btn sm" type="button" data-a="design">✏️ ${t('Tự thiết kế pattern', 'Design a pattern')}</button><button class="btn sm p" type="button" data-a="newProject">+ ${t('Dự án mới', 'New project')}</button></div>
+    </div>
+    ${list.length ? `<div class="grid">${list.map(projCard).join('')}</div>` : `<div class="card">${emptyBox('🧶', t('Không có dự án nào ở đây.', 'No projects here.'))}</div>`}
+  </div>` };
+};
+
+/* =====================================================================
+   VIEW: Chi tiết dự án
+   ===================================================================== */
+function rowLabel(r) { return 'R' + r.from + (r.to > r.from ? '–' + r.to : ''); }
+function nowBox(p) {
+  const X = Math.max(1, p.counter);
+  const rs = rowsAt(p, X);
+  const body = rs.length ? rs.map(r => {
+    const fp = formulaPos(p, r, X);
+    return `<div class="cn-i"><div class="small"><b>${rowLabel(r)}</b>${r.sec ? ` · ${esc(lbl(SECTIONS, r.sec))}` : ''}${r.rtype ? ` · ${esc(lbl(RTYPES, r.rtype))}` : ''}${r.sts ? ` · → ${r.sts} sts` : ''}</div>
+      ${fp ? `<div class="posl">▶ <b>Row ${X}</b> = ${t('dòng', 'line')} ${fp.line}/${fp.k} ${t('của công thức', 'of stitch pattern')} ${esc(fp.f.name)} · ${t('lượt', 'repeat')} ${fp.rep}/${fp.total}<div>${esc(fp.text)}</div></div>` : ''}
+      ${r.t ? `<div class="rn-t">${nl2br(r.t)}</div>` : ''}</div>`;
+  }).join('') : `<div class="mut small">${t('Chưa có ghi chú cho row này. Thêm ở mục "Ghi chú từng row".', 'No note for this row yet. Add one under "Row notes".')}</div>`;
+  return `<div class="cnow"><h4>📌 Row ${X} ${t('làm gì', '— what to do')}</h4>${body}</div>`;
+}
+function counterBox(p, big) {
+  const pr = progress(p);
+  return `<div class="counter">
+    <div class="c-k">Row Counter${big ? ' · ' + esc(p.name) : ''}</div>
+    <div class="cnum" id="cnum">${p.counter}</div>
+    <div class="c-sub">${pr != null ? `/ ${esc(p.totalRows)} rows · ${pr}%` : 'rows'}</div>
+    <div class="cbtns">
+      <button class="cbtn" type="button" data-a="cnt" data-d="-1" data-id="${p.id}" aria-label="minus">−</button>
+      <button class="cbtn big" type="button" data-a="cnt" data-d="1" data-id="${p.id}" aria-label="plus">+</button>
+      <button class="cbtn" type="button" data-a="cntUndo" data-id="${p.id}" aria-label="undo" title="${t('Hoàn tác 1 bước', 'Undo one step')}">↩</button>
+    </div>
+    <button class="linkbtn" type="button" data-a="cntReset" data-id="${p.id}">${t('Đặt lại về 0', 'Reset to 0')}</button>
+    ${nowBox(p)}
+  </div>`;
+}
+function infoTable(p) {
+  const y = yarnOf(p);
+  const rows = [
+    [t('Loại', 'Craft'), crIc(p.craft) + ' ' + esc(lbl(CRAFTS, p.craft))],
+    [t('Trạng thái', 'Status'), badge(p.status)],
+    p.patternName || p.patternUrl ? ['Pattern', (safeUrl(p.patternUrl) ? `<a href="${esc(safeUrl(p.patternUrl))}" target="_blank" rel="noopener">${esc(p.patternName || p.patternUrl)} ↗</a>` : esc(p.patternName))] : null,
+    y ? [t('Len', 'Yarn'), `<a href="#/yarn/${y.id}">${esc(yarnTitle(y))}</a>`] : null,
+    !y && p.yarnInfo ? [t('Len gốc (người gửi dùng)', 'Original yarn (sender used)'), esc(yarnTitle(p.yarnInfo)) + (p.yarnInfo.weight ? ' · ' + esc(wName(p.yarnInfo.weight)) : '') + (p.yarnInfo.metersPerSkein ? ` · ${esc(p.yarnInfo.gramsPerSkein)}g/${esc(p.yarnInfo.metersPerSkein)}m` : '')] : null,
+    p.needle ? [t('Que / kim', 'Needle / hook'), esc(p.needle) + ' mm'] : null,
+    p.size ? ['Size', esc(lbl(SIZES, p.size))] : null,
+    p.pGaugeSts ? [t('Gauge pattern', 'Pattern gauge'), `${esc(p.pGaugeSts)} sts${p.pGaugeRows ? ' × ' + esc(p.pGaugeRows) + ' rows' : ''} / 10 cm`] : null,
+    p.myGaugeSts ? [t('Gauge của tôi', 'My gauge'), `${esc(p.myGaugeSts)} sts${p.myGaugeRows ? ' × ' + esc(p.myGaugeRows) + ' rows' : ''} / 10 cm`] : null,
+    p.totalRows ? [t('Tổng số rows', 'Total rows'), esc(p.totalRows)] : null,
+    p.gramsUsed ? [t('Đã dùng', 'Yarn used'), esc(p.gramsUsed) + ' g'] : null,
+    p.startDate ? [t('Bắt đầu', 'Started'), fmtDate(p.startDate)] : null,
+    p.endDate ? [t('Kết thúc', 'Finished'), fmtDate(p.endDate)] : null,
+    p.sharedFrom ? [t('Được chia sẻ bởi', 'Shared by'), '🎁 ' + esc(p.sharedFrom)] : null
+  ].filter(Boolean);
+  let gauge = '';
+  const ps = num(p.pGaugeSts), ms = num(p.myGaugeSts);
+  if (ps && ms) {
+    const f = ms / ps;
+    gauge = `<div class="alert soft" style="margin-top:10px"><b>📐 ${t('Hệ số quy đổi', 'Conversion factor')} ×${fmt(f, 3)}</b><br>Cast-On 100 → ${t('cần', 'needs')} ~${Math.round(100 * f)} sts<br><button class="linkbtn" type="button" data-a="gaugeFrom" data-id="${p.id}">→ Gauge Converter</button></div>`;
+  }
+  return `<table class="tbl kv">${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>${gauge}`;
+}
+function rowNotes(p) {
+  const X = Math.max(1, p.counter);
+  if (!p.rows.length) return `<p class="mut small">${t('Chưa có ghi chú row. Ghi lại row nào làm gì để lần sau không phải nhớ.', 'No row notes yet. Write down what happens on each row so you never have to remember.')}</p>`;
+  return p.rows.map((r, i) => {
+    const cur = X >= r.from && X <= r.to;
+    const f = fOf(p, r.f);
+    const n = r.to - r.from + 1;
+    const fp = cur ? formulaPos(p, r, X) : null;
+    return `<div class="rn ${cur ? 'cur' : ''} ${r.done ? 'done' : ''}">
+      <input type="checkbox" data-c="rowDone" data-i="${i}" data-id="${p.id}" ${r.done ? 'checked' : ''} aria-label="done">
+      <div class="rn-b">
+        <div class="rn-h"><b>${rowLabel(r)}</b>${r.sec ? `<span class="tag">${esc(lbl(SECTIONS, r.sec))}</span>` : ''}${r.rtype ? `<span class="tag">${esc(lbl(RTYPES, r.rtype))}</span>` : ''}<span class="mut">${n} row${n > 1 ? 's' : ''}</span>${r.sts ? `<span class="b">→ ${r.sts} sts</span>` : ''}${f ? `<span class="tag dk">🔁 ${esc(f.name)}</span>` : ''}</div>
+        ${fp ? `<div class="posl">▶ <b>Row ${X}</b> = ${t('dòng', 'line')} ${fp.line}/${fp.k} ${t('của công thức', 'of stitch pattern')} ${esc(fp.f.name)} · ${t('lượt', 'repeat')} ${fp.rep}/${fp.total}<div>${esc(fp.text)}</div></div>` : ''}
+        ${r.t ? `<div class="rn-t">${nl2br(r.t)}</div>` : ''}
+      </div>
+      <div class="rn-a"><button class="ib" type="button" data-a="rowEdit" data-i="${i}" data-id="${p.id}" aria-label="edit">✏️</button><button class="ib" type="button" data-a="rowDel" data-i="${i}" data-id="${p.id}" aria-label="delete">✕</button></div>
+    </div>`;
+  }).join('');
+}
+function formulaList(p) {
+  if (!p.formulas.length) return `<p class="mut small">${t('Công thức lặp = một nhóm row lặp lại (VD hoa văn 4 dòng). Gắn vào ghi chú row để app tự tính bạn đang ở dòng mấy.', 'A repeat formula is a group of rows that repeats (e.g. a 4-row lace). Attach it to a row note and the app tells you which line you are on.')}</p>`;
+  return p.formulas.map(f => {
+    const lines = formulaLines(f);
+    const used = p.rows.filter(r => r.f === f.id).map(rowLabel);
+    return `<div class="fl"><div class="row between"><b>🔁 ${t('Công thức', 'Stitch pattern')} ${esc(f.name)} <span class="mut small">· ${lines.length} ${t('dòng', 'lines')}</span></b><span><button class="ib" type="button" data-a="fEdit" data-f="${f.id}" data-id="${p.id}">✏️</button><button class="ib" type="button" data-a="fDel" data-f="${f.id}" data-id="${p.id}">✕</button></span></div>
+      <ol>${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ol>
+      <div class="small mut">${used.length ? t('Dùng ở: ', 'Used in: ') + used.join(', ') : t('Chưa dùng ở row nào', 'Not used yet')}</div></div>`;
+  }).join('');
+}
+VIEWS.project = id => {
+  const p = P(id);
+  if (!p) return { title: t('Không tìm thấy', 'Not found'), nav: 'projects', html: `<div class="card">${emptyBox('🔍', t('Dự án không tồn tại hoặc đã bị xoá.', 'This project does not exist or was deleted.'), '<a class="btn" href="#/projects">←</a>')}</div>` };
+  return { title: p.name, nav: 'projects', html: `<div class="stack">
+    <div class="row between">
+      <div class="row">${badge(p.status)}<span class="pill">${crIc(p.craft)} ${esc(lbl(CRAFTS, p.craft))}</span>${p.design ? '<span class="tag dk">Design</span>' : ''}${p.sharedFrom ? `<span class="pill">🎁 ${t('Được chia sẻ bởi', 'Shared by')} ${esc(p.sharedFrom)}</span>` : ''}</div>
+      <div class="row">
+        <button class="btn sm" type="button" data-a="editProject" data-id="${p.id}">✏️ ${t('Sửa', 'Edit')}</button>
+        <button class="btn sm" type="button" data-a="reknit" data-id="${p.id}">🔁 ${t('Đan lại', 'Make again')}</button>
+        <a class="btn sm" href="#/studio/${p.id}">📄 Pattern</a>
+        <button class="btn sm" type="button" data-a="shareProject" data-id="${p.id}">📤 ${t('Chia sẻ', 'Share')}</button>
+        <button class="btn sm" type="button" data-a="delProject" data-id="${p.id}">🗑 ${t('Xoá', 'Delete')}</button>
+      </div>
+    </div>
+    ${p.status === 'done' ? `<div class="alert soft row between"><span>🎉 <b>${t('Hoàn thành rồi!', 'Finished!')}</b> ${p.pat ? t('Pattern đã có — mở để xem hoặc xuất file.', 'Your pattern is ready — open it to view or export.') : t('Lưu lại cách làm thành pattern của riêng bạn nhé.', 'Turn your notes into your own pattern.')}</span><a class="btn sm p" href="#/studio/${p.id}">📄 ${p.pat ? t('Mở pattern', 'Open pattern') : t('Tạo pattern', 'Create pattern')}</a></div>` : ''}
+    <div class="g2">
+      <div class="stack">${counterBox(p)}</div>
+      <div class="stack">
+        <div class="card"><h3>ℹ️ ${t('Thông tin', 'Details')}</h3>${infoTable(p)}</div>
+        <div class="card"><div class="sec-h"><h3>🔁 ${t('Công thức lặp', 'Repeat formulas')}</h3><button class="btn sm" type="button" data-a="fNew" data-id="${p.id}">+ ${t('Công thức', 'Formula')}</button></div>${formulaList(p)}</div>
+      </div>
+    </div>
+    <div class="card"><div class="sec-h"><h3>📝 ${t('Ghi chú từng row', 'Row notes')}</h3><button class="btn sm p" type="button" data-a="rowNew" data-id="${p.id}">+ ${t('Ghi chú row', 'Row note')}</button></div>${rowNotes(p)}</div>
+    <div class="g2">
+      <div class="card"><div class="sec-h"><h3>📄 ${t('Ảnh pattern / sơ đồ', 'Pattern / chart images')}</h3>${fileBtn('+ ' + t('Ảnh', 'Image'), `multiple data-c="addImg" data-kind="patternImgs" data-id="${p.id}"`)}</div>${imgGrid(p.patternImgs, 'patternImgs', p.id) || `<p class="mut small">${t('Chụp trang pattern / sơ đồ để xem nhanh khi đan.', 'Snap your pattern pages or charts for quick reference.')}</p>`}</div>
+      <div class="card"><div class="sec-h"><h3>📸 ${t('Ảnh tiến độ / thành phẩm', 'Progress / finished photos')}</h3>${fileBtn('+ ' + t('Ảnh', 'Photo'), `multiple data-c="addImg" data-kind="photos" data-id="${p.id}"`)}</div>${imgGrid(p.photos, 'photos', p.id) || `<p class="mut small">${t('Ảnh đầu tiên sẽ làm ảnh bìa dự án.', 'The first photo becomes the cover.')}</p>`}</div>
+    </div>
+    <div class="card"><h3>🗒 ${t('Ghi chú chung', 'General notes')}</h3><textarea class="inp" rows="5" data-i="projNotes" data-id="${p.id}" placeholder="${t('Swatch, chỉnh sửa, lưu ý cho lần sau…', 'Swatch, modifications, notes for next time…')}">${esc(p.notes)}</textarea></div>
+  </div>` };
+};
+
+/* =====================================================================
+   VIEW: Row Counter (mobile tab "Đếm")
+   ===================================================================== */
+VIEWS.counter = id => {
+  let p = id && P(id);
+  const cands = db.projects.filter(x => x.status === 'wip' || x.status === 'paused').sort((a, b) => b.updated - a.updated);
+  if (!p) p = cands[0] || db.projects.slice().sort((a, b) => b.updated - a.updated)[0];
+  if (!p) return { title: 'Row Counter', html: `<div class="card">${emptyBox('🔢', t('Chưa có dự án để đếm.', 'No project to count yet.'), `<button class="btn p" type="button" data-a="newProject">+ ${t('Dự án mới', 'New project')}</button>`)}</div>` };
+  const opts = cands.slice(); if (!opts.includes(p)) opts.unshift(p);
+  return { title: 'Row Counter', nav: 'counter', html: `<div class="stack" style="max-width:620px;margin:0 auto">
+    <div class="row">${opts.length > 1 ? `<select class="inp" data-c="cntPick" style="flex:1">${opts.map(o => `<option value="${o.id}" ${o === p ? 'selected' : ''}>${stIc(o.status)} ${esc(o.name)}</option>`).join('')}</select>` : `<b style="flex:1">${esc(p.name)}</b>`}<a class="btn sm" href="#/project/${p.id}">${t('Mở dự án', 'Open project')} →</a></div>
+    ${counterBox(p, false)}
+  </div>` };
+};
+
+/* =====================================================================
+   VIEW: Yarn Stash (Kho của tôi / Thư viện len / Tìm len theo gauge)
+   ===================================================================== */
+function allLib() { return LIB.concat(db.customLib.map(x => Object.assign({ custom: true }, x))); }
+const rng = a => (a && a.length ? (a[0] === a[1] || a[1] == null || a[1] === '' ? String(a[0]) : a[0] + '-' + a[1]) : '');
+function libDist(item, g) { const lo = num(item.g[0]), hi = num(item.g[1]) || lo; return g < lo ? lo - g : g > hi ? g - hi : 0; }
+function weightsFor(g) {
+  let ws = WEIGHTS.filter(w => g >= w.g[0] && g <= w.g[1]);
+  if (!ws.length) ws = WEIGHTS.slice().sort((a, b) => Math.min(Math.abs(a.g[0] - g), Math.abs(a.g[1] - g)) - Math.min(Math.abs(b.g[0] - g), Math.abs(b.g[1] - g))).slice(0, 1);
+  return ws;
+}
+function suggestBlock(g) {
+  if (!g) return `<p class="mut small">${t('Nhập gauge (sts / 10 cm) để xem gợi ý.', 'Enter a gauge (sts / 10 cm) to see suggestions.')}</p>`;
+  const ws = weightsFor(g);
+  const wk = ws.map(w => w.k);
+  const stash = db.yarns.filter(y => (num(y.gaugeSts) && Math.abs(num(y.gaugeSts) - g) <= 2) || wk.includes(y.weight));
+  const lib = allLib().map(x => ({ x, d: libDist(x, g) })).sort((a, b) => a.d - b.d).slice(0, 6);
+  return `<div class="small">
+    <p><b>Weight:</b> ${ws.map(w => `<span class="pill">${esc(w.name)} · ${w.g[0]}-${w.g[1]} sts · ${t('que', 'needle')} ${w.n[0]}-${w.n[1]} mm</span>`).join(' ')}</p>
+    <p class="b" style="margin-top:10px">🧺 ${t('Trong kho của bạn', 'In your stash')}</p>
+    ${stash.length ? stash.map(y => `<div class="row" style="margin:4px 0"><span class="ysw" style="width:18px;height:18px;border-radius:5px;background:${safeHex(y.hex)}"></span><a href="#/yarn/${y.id}">${esc(yarnTitle(y))}</a><span class="mut">${y.gaugeSts ? esc(y.gaugeSts) + ' sts' : ''} · ${fmt(yarnGrams(y), 0)} g</span></div>`).join('') : `<p class="mut">${t('Không có len phù hợp trong kho.', 'Nothing matching in your stash.')}</p>`}
+    <p class="b" style="margin-top:10px">📚 ${t('Trong thư viện len', 'From the yarn library')}</p>
+    ${lib.map(({ x, d }) => `<div style="margin:3px 0">${d === 0 ? '✅' : '≈'} <b>${esc(x.brand)} ${esc(x.name)}</b> <span class="mut">· ${esc(wName(x.weight))} · ${rng(x.g)} sts · ${rng(x.n)} mm</span></div>`).join('')}
+    <p style="margin-top:10px"><span class="pill">🤖 AI · ${t('sắp có', 'coming soon')}</span></p></div>`;
+}
+function yarnCard(y) {
+  const g = yarnGrams(y), m = yarnMeters(y);
+  return `<a class="card ycard" href="#/yarn/${y.id}"><span class="ysw" style="background:${safeHex(y.hex)}"></span><div style="min-width:0;flex:1">
+    <b>${esc(yarnTitle(y)) || t('(chưa đặt tên)', '(untitled)')}</b>
+    <div class="small mut">${[y.fiber ? lbl(FIBERS, y.fiber) : '', wName(y.weight), y.metersPerSkein && y.gramsPerSkein ? `${y.gramsPerSkein}g/${y.metersPerSkein}m` : ''].filter(Boolean).map(esc).join(' · ')}</div>
+    <div class="small sub">${y.gaugeSts ? `📐 ${esc(y.gaugeSts)} sts` : ''}${y.needle ? ` · 🪡 ${esc(y.needle)} mm` : ''}${y.ideas.length ? ` · 💡 ${y.ideas.length}` : ''}</div>
+    <div class="ynums"><b>${fmt(g, 0)} g</b> ${t('còn lại', 'left')} · ${esc(y.skeins || 0)} ${t('cuộn', 'skeins')}${m ? ` · ~${m} m` : ''}</div></div></a>`;
+}
+function weightTable() {
+  return `<details class="card"><summary>📏 ${t('Bảng Yarn Weight chuẩn', 'Standard yarn weight chart')}</summary><div class="scrollx" style="margin-top:8px"><table class="tbl small"><tr><th>Weight</th><th>Gauge sts/10cm</th><th>${t('Que', 'Needle')} mm</th></tr>${WEIGHTS.map(w => `<tr><td>${esc(w.name)}</td><td>${w.g[0]}-${w.g[1]}</td><td>${w.n[0]}-${w.n[1]}</td></tr>`).join('')}</table></div><p class="small mut">${t('Số liệu chỉ để tham khảo — luôn đan swatch để chắc chắn.', 'Figures are for reference only — always knit a swatch.')}</p></details>`;
+}
+VIEWS.stash = tab => {
+  tab = tab || 'mine';
+  const totalG = db.yarns.reduce((s, y) => s + yarnGrams(y), 0);
+  const ideas = db.yarns.reduce((s, y) => s + y.ideas.length, 0);
+  const tabs = `<div class="tabs"><a href="#/stash" class="${tab === 'mine' ? 'on' : ''}">🧺 ${t('Kho của tôi', 'My stash')}</a><a href="#/stash/lib" class="${tab === 'lib' ? 'on' : ''}">📚 ${t('Thư viện len', 'Yarn library')}</a><a href="#/stash/find" class="${tab === 'find' ? 'on' : ''}">🔎 ${t('Tìm len theo gauge', 'Find yarn by gauge')}</a></div>`;
+  const wchips = `<div class="chips"><button type="button" class="chip ${!state.wf ? 'on' : ''}" data-a="wf" data-w="">${t('Tất cả', 'All')}</button>${WEIGHTS.map(w => `<button type="button" class="chip ${state.wf === w.k ? 'on' : ''}" data-a="wf" data-w="${w.k}">${esc(w.name.split(' ')[0])}</button>`).join('')}</div>`;
+  let body = '';
+  if (tab === 'mine') {
+    const ys = db.yarns.filter(y => !state.wf || y.weight === state.wf);
+    body = `<div class="row between">${wchips}<button class="btn p sm" type="button" data-a="newYarn">+ ${t('Thêm len', 'Add yarn')}</button></div>
+      ${ys.length ? `<div class="grid">${ys.map(yarnCard).join('')}</div>` : `<div class="card">${emptyBox('🧺', db.yarns.length ? t('Không có len weight này.', 'No yarn of this weight.') : t('Kho len trống. Thêm len bạn đang có, hoặc lấy từ thư viện.', 'Your stash is empty. Add yarn you own, or pick from the library.'), `<button class="btn p" type="button" data-a="newYarn">+ ${t('Thêm len', 'Add yarn')}</button>`)}</div>`}`;
+  } else if (tab === 'lib') {
+    const items = allLib().filter(x => !state.wf || x.weight === state.wf);
+    body = `<div class="row between">${wchips}<button class="btn sm" type="button" data-a="newLib">+ ${t('Thêm vào thư viện', 'Add to library')}</button></div>
+      <div class="card">${items.map(x => `<div class="lib"><div style="min-width:0"><b>${esc(x.brand)} ${esc(x.name)}</b>${x.custom ? ` <span class="tag">${t('tự thêm', 'custom')}</span>` : ''}
+        <div class="small mut">${esc(wName(x.weight))} · ${esc(lbl(FIBERS, x.fiber))} · 📐 ${rng(x.g)} sts · 🪡 ${rng(x.n)} mm${x.gr ? ` · ${esc(x.gr)} g` : ''}${x.m ? ` / ${esc(x.m)} m` : ''}</div>
+        ${lb(x) ? `<div class="small sub">${esc(lb(x))}</div>` : ''}</div>
+        <div class="row" style="flex-wrap:nowrap"><button class="btn sm" type="button" data-a="libToStash" data-l="${esc(x.id)}">+ ${t('Vào kho', 'To stash')}</button>${x.custom ? `<button class="ib" type="button" data-a="libDel" data-l="${esc(x.id)}">✕</button>` : ''}</div></div>`).join('') || `<p class="mut">${t('Không có len weight này.', 'No yarn of this weight.')}</p>`}</div>
+      ${weightTable()}`;
+  } else {
+    body = `<div class="card"><div class="f2">${fld(t('Gauge bạn cần (sts / 10 cm)', 'Gauge you need (sts / 10 cm)'), `<input class="inp" type="number" inputmode="decimal" step="0.5" id="findG" data-i="findG" value="${esc(state.findG)}" placeholder="22">`)}</div><div id="findRes">${suggestBlock(num(state.findG))}</div></div>${weightTable()}`;
+  }
+  return { title: 'Yarn Stash', nav: tab === 'lib' ? 'stash/lib' : 'stash', html: `<div class="stack">
+    <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><b>${db.yarns.length}</b><small>${t('loại len', 'yarns')}</small></div><div class="stat"><b>${fmt(totalG / 1000, 2)} kg</b><small>${t('tổng', 'total')}</small></div><div class="stat"><b>${ideas}</b><small>💡 ${t('ý tưởng', 'ideas')}</small></div></div>
+    ${tabs}${body}</div>` };
+};
+
+/* =====================================================================
+   VIEW: Chi tiết len
+   ===================================================================== */
+VIEWS.yarn = id => {
+  const y = Y(id);
+  if (!y) return { title: t('Không tìm thấy', 'Not found'), nav: 'stash', html: `<div class="card">${emptyBox('🔍', t('Len không tồn tại hoặc đã bị xoá.', 'This yarn does not exist or was deleted.'), '<a class="btn" href="#/stash">←</a>')}</div>` };
+  const w = W(y.weight);
+  const used = db.projects.filter(p => p.yarnId === y.id);
+  const rows = [
+    [t('Hãng', 'Brand'), esc(y.brand)], [t('Tên', 'Name'), esc(y.name)], [t('Màu', 'Color'), esc(y.color)],
+    ['Weight', esc(wName(y.weight))], [t('Chất liệu', 'Fiber'), esc(y.fiber ? lbl(FIBERS, y.fiber) : '')],
+    [t('Mỗi cuộn', 'Per skein'), y.gramsPerSkein ? `${esc(y.gramsPerSkein)} g${y.metersPerSkein ? ' / ' + esc(y.metersPerSkein) + ' m' : ''}` : ''],
+    [t('Số cuộn', 'Skeins'), esc(y.skeins)], [t('Còn lại', 'Remaining'), `${fmt(yarnGrams(y), 0)} g${yarnMeters(y) ? ' · ~' + yarnMeters(y) + ' m' : ''}`],
+    [t('Gauge nhãn', 'Label gauge'), y.gaugeSts ? esc(y.gaugeSts) + ' sts / 10 cm' : ''], [t('Que', 'Needle'), y.needle ? esc(y.needle) + ' mm' : ''],
+    [t('Mua ở', 'Shop'), esc(y.shop)], [t('Ghi chú', 'Note'), nl2br(y.note)]
+  ].filter(r => r[1]);
+  return { title: yarnTitle(y) || 'Yarn', nav: 'stash', html: `<div class="stack">
+    <div class="row between"><div class="row"><span class="ysw lg" style="background:${safeHex(y.hex)}"></span><div><h2 style="margin:0">${esc(yarnTitle(y))}</h2><div class="mut small">${esc(wName(y.weight))}</div></div></div>
+      <div class="row"><button class="btn sm" type="button" data-a="editYarn" data-id="${y.id}">✏️ ${t('Sửa', 'Edit')}</button><button class="btn sm" type="button" data-a="delYarn" data-id="${y.id}">🗑 ${t('Xoá', 'Delete')}</button></div></div>
+    ${w ? `<div class="alert soft">💡 ${t(`Len ${esc(w.name.split(' ')[0])} hợp pattern gauge ${w.g[0]}-${w.g[1]} sts, que ${w.n[0]}-${w.n[1]} mm.`, `${esc(w.name.split(' ')[0])} yarn suits patterns with gauge ${w.g[0]}-${w.g[1]} sts, needles ${w.n[0]}-${w.n[1]} mm.`)}</div>` : ''}
+    <div class="g2">
+      <div class="card"><h3>ℹ️ ${t('Thông tin', 'Details')}</h3><table class="tbl kv">${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table></div>
+      <div class="card"><h3>🧶 ${t('Dự án đã dùng len này', 'Projects using this yarn')}</h3>${used.length ? used.map(p => `<div class="row" style="margin:6px 0"><a href="#/project/${p.id}">${esc(p.name)}</a>${badge(p.status)}</div>`).join('') : `<p class="mut small">${t('Chưa có.', 'None yet.')}</p>`}</div>
+    </div>
+    <div class="card"><div class="sec-h"><h3>💡 ${t('Ý tưởng cho len này', 'Ideas for this yarn')}</h3><button class="btn sm p" type="button" data-a="newIdea" data-id="${y.id}">+ ${t('Ý tưởng', 'Idea')}</button></div>
+      ${y.ideas.length ? `<div class="ideas">${y.ideas.map((d, i) => `<div class="idea">${d.img ? `<img src="${esc(d.img)}" alt="" data-a="zoom" loading="lazy">` : ''}<div class="ib-b">${d.t ? `<div class="small">${nl2br(d.t)}</div>` : ''}${safeUrl(d.u) ? `<a class="small" href="${esc(safeUrl(d.u))}" target="_blank" rel="noopener">🔗 ${esc(safeUrl(d.u).replace(/^https?:\/\/(www\.)?/, '').slice(0, 34))}</a>` : ''}<div class="grow"></div><div class="row between"><button class="btn sm p" type="button" data-a="ideaToProject" data-id="${y.id}" data-i="${i}">→ ${t('Tạo dự án', 'Start project')}</button><span><button class="ib" type="button" data-a="editIdea" data-id="${y.id}" data-i="${i}">✏️</button><button class="ib" type="button" data-a="delIdea" data-id="${y.id}" data-i="${i}">✕</button></span></div></div></div>`).join('')}</div>`
+      : `<p class="mut small">${t('Lưu ảnh, mô tả, link Pinterest / Ravelry / TikTok cho len này.', 'Save pictures, notes and Pinterest / Ravelry / TikTok links for this yarn.')}</p>`}</div>
+  </div>` };
+};
+
+/* =====================================================================
+   VIEW: Gauge Converter
+   ===================================================================== */
+function roundMult(x, mult, edge) {
+  mult = num(mult) || 0; edge = num(edge) || 0;
+  if (mult > 1) { const k = Math.max(1, Math.round((x - edge) / mult)); return k * mult + edge; }
+  return Math.round(x);
+}
+function gaugeResults() {
+  const g = state.g;
+  const pS = num(g.pS), pR = num(g.pR), mS = num(g.mS), mR = num(g.mR);
+  let out = '';
+  if (g.mode === 2) {
+    const s = mS || pS, r = mR || pR;
+    const ws = listNums(g.widths), ls = listNums(g.lengths);
+    if (!s && !r) out = `<p class="mut">${t('Nhập gauge của bạn (hoặc gauge pattern) để tính.', 'Enter your gauge (or the pattern gauge) to calculate.')}</p>`;
+    else {
+      if (ws.length && s) out += `<h3>${t('Chiều rộng → Stitches', 'Width → Stitches')}</h3><div class="scrollx"><table class="tbl"><tr><th>${t('Rộng', 'Width')}</th><th class="num">Stitches</th></tr>${ws.map(w => `<tr><td>${fmt(w)} cm</td><td class="num b">${roundMult(w / 10 * s, g.mult, g.edge)} sts</td></tr>`).join('')}</table></div>`;
+      if (ls.length && r) out += `<h3 style="margin-top:12px">${t('Chiều dài → Rows', 'Length → Rows')}</h3><div class="scrollx"><table class="tbl"><tr><th>${t('Dài', 'Length')}</th><th class="num">Rows</th></tr>${ls.map(l => `<tr><td>${fmt(l)} cm</td><td class="num b">${Math.round(l / 10 * r)} rows</td></tr>`).join('')}</table></div>`;
+      if (!out) out = `<p class="mut">${t('Nhập chiều rộng / chiều dài (cm), cách nhau bằng dấu phẩy.', 'Enter widths / lengths (cm), separated by commas.')}</p>`;
+      out = `<p class="small sub">${t('Tính theo gauge', 'Using gauge')}: ${s ? fmt(s) + ' sts' : '—'} × ${r ? fmt(r) + ' rows' : '—'} / 10 cm</p>` + out;
+    }
+  } else if (!pS || !mS) {
+    out = `<p class="mut">${t('Nhập gauge pattern và gauge swatch của bạn (sts / 10 cm).', 'Enter the pattern gauge and your swatch gauge (sts / 10 cm).')}</p>`;
+  } else {
+    const f = mS / pS, diff = (mS - pS) / pS * 100, ad = Math.abs(diff);
+    let msg;
+    if (ad < 2) msg = `<div class="alert soft ok">✓ ${t(`Gauge khớp (lệch ${fmt(ad)}%) — giữ nguyên số mũi pattern.`, `Gauge matches (off by ${fmt(ad)}%) — keep the pattern stitch counts.`)}</div>`;
+    else {
+      msg = `<div class="alert ${ad > 12 ? 'red' : 'amber'}">${diff > 0
+        ? t(`Bạn đan <b>chặt hơn ${fmt(ad)}%</b> → cần <b>nhiều mũi hơn</b> (×${fmt(f, 3)}), hoặc đổi que <b>to hơn +0.5 mm</b>.`, `You knit <b>${fmt(ad)}% tighter</b> → you need <b>more stitches</b> (×${fmt(f, 3)}), or go <b>up 0.5 mm</b> in needle size.`)
+        : t(`Bạn đan <b>lỏng hơn ${fmt(ad)}%</b> → cần <b>ít mũi hơn</b> (×${fmt(f, 3)}), hoặc đổi que <b>nhỏ hơn −0.5 mm</b>.`, `You knit <b>${fmt(ad)}% looser</b> → you need <b>fewer stitches</b> (×${fmt(f, 3)}), or go <b>down 0.5 mm</b> in needle size.`)}
+        ${ad > 12 ? `<br>⚠️ ${t('Lệch nhiều — nên đổi len hoặc que thay vì chỉ tính lại số mũi.', 'Big difference — consider changing yarn or needles rather than just recalculating.')}` : ''}</div>`;
+    }
+    let sizes = listNums(g.sizes); if (!sizes.length) sizes = [100];
+    out += `<div style="font-size:20px;margin:4px 0 8px"><b>×${fmt(f, 3)}</b> <span class="small mut">(${fmt(mS)} ÷ ${fmt(pS)})</span></div>${msg}
+      <h3 style="margin-top:12px">Stitches</h3><div class="scrollx"><table class="tbl"><tr><th>Pattern</th><th class="num">${t('Rộng', 'Width')}</th><th class="num">${t('Bạn cần Cast-On', 'You Cast-On')}</th><th class="num">${t('Rộng nếu giữ số mũi', 'Width if unchanged')}</th></tr>
+      ${sizes.map(s => `<tr><td>${fmt(s)} sts</td><td class="num">${fmt(s / pS * 10)} cm</td><td class="num b">${roundMult(s * f, g.mult, g.edge)} sts</td><td class="num">${fmt(s / mS * 10)} cm</td></tr>`).join('')}</table></div>`;
+    if (pR && mR) {
+      const fr = mR / pR;
+      const rows = listNums(g.rows);
+      out += `<h3 style="margin-top:12px">Rows <span class="small mut">×${fmt(fr, 3)}</span></h3>${rows.length ? `<div class="scrollx"><table class="tbl"><tr><th>Pattern</th><th class="num">${t('Dài', 'Length')}</th><th class="num">${t('Bạn cần', 'You need')}</th><th class="num">${t('Dài nếu giữ số rows', 'Length if unchanged')}</th></tr>
+        ${rows.map(r => `<tr><td>${fmt(r)} rows</td><td class="num">${fmt(r / pR * 10)} cm</td><td class="num b">${Math.round(r * fr)} rows</td><td class="num">${fmt(r / mR * 10)} cm</td></tr>`).join('')}</table></div>` : `<p class="small mut">${t('Nhập số rows của pattern để quy đổi.', 'Enter pattern row counts to convert.')}</p>`}`;
+    }
+  }
+  return out;
+}
+VIEWS.gauge = () => {
+  const g = state.g;
+  const gi = (f, ph, extra) => `<input class="inp" data-i="g" data-f="${f}" value="${esc(g[f] == null ? '' : g[f])}" placeholder="${ph}" ${extra || 'type="number" inputmode="decimal" step="0.5"'}>`;
+  const projOpts = db.projects.filter(p => p.pGaugeSts);
+  const yarnOpts = db.yarns.filter(y => y.gaugeSts);
+  return { title: 'Gauge Converter', html: `<div class="stack">
+    <div class="g2">
+      <div class="card"><h3>📄 ${t('Gauge pattern', 'Pattern gauge')} <span class="small mut">/ 10 cm</span></h3>
+        <div class="f2">${fld('Stitches', gi('pS', '23'))}${fld('Rows', gi('pR', '30'))}</div>
+        ${projOpts.length ? `<select class="inp" data-c="gFromProj"><option value="">↳ ${t('Lấy từ dự án…', 'Take from project…')}</option>${projOpts.map(p => `<option value="${p.id}">${esc(p.name)} (${esc(gaugeStr(p.pGaugeSts, p.pGaugeRows))})</option>`).join('')}</select>` : ''}
+      </div>
+      <div class="card"><h3>🧶 ${t('Swatch của bạn', 'Your swatch')} <span class="small mut">/ 10 cm</span></h3>
+        <div class="f2">${fld('Stitches', gi('mS', '25'))}${fld('Rows', gi('mR', '33'))}</div>
+        ${yarnOpts.length ? `<select class="inp" data-c="gFromYarn"><option value="">↳ ${t('Lấy gauge nhãn từ kho len…', 'Use label gauge from stash…')}</option>${yarnOpts.map(y => `<option value="${y.id}">${esc(yarnTitle(y))} (${esc(y.gaugeSts)} sts)</option>`).join('')}</select>` : ''}
+      </div>
+    </div>
+    <div class="tabs"><a href="javascript:void 0" role="button" data-a="gMode" data-m="1" class="${g.mode !== 2 ? 'on' : ''}">${t('Theo số stitches pattern', 'By pattern stitch count')}</a><a href="javascript:void 0" role="button" data-a="gMode" data-m="2" class="${g.mode === 2 ? 'on' : ''}">${t('Theo kích thước cm', 'By measurement (cm)')}</a></div>
+    <div class="g2">
+      <div class="card">
+        ${g.mode === 2
+          ? `${fld(t('Chiều rộng (cm) — nhiều giá trị', 'Widths (cm) — several values'), gi('widths', '45, 50, 55', 'inputmode="decimal"'))}${fld(t('Chiều dài (cm)', 'Lengths (cm)'), gi('lengths', '40, 60', 'inputmode="decimal"'))}`
+          : `${fld(t('Số stitches pattern (nhiều size)', 'Pattern stitch counts (several sizes)'), gi('sizes', '88, 96, 104', 'inputmode="decimal"'))}${fld(t('Số rows pattern', 'Pattern row counts'), gi('rows', '60, 120', 'inputmode="decimal"'))}`}
+        <div class="f2">${fld(t('Bội số hoa văn', 'Stitch multiple'), gi('mult', '4', 'type="number" inputmode="numeric"'))}${fld(t('Mũi biên', 'Edge stitches'), gi('edge', '2', 'type="number" inputmode="numeric"'))}</div>
+        <p class="small mut">${t('Bội số: VD hoa văn "bội số 4 + 2" → số mũi luôn = 4×k + 2.', 'Multiple: e.g. "multiple of 4 + 2" → stitch count is always 4×k + 2.')}</p>
+      </div>
+      <div class="card"><h3>📊 ${t('Kết quả', 'Result')}</h3><div id="gRes">${gaugeResults()}</div></div>
+    </div>
+    <div class="g2">
+      <div class="card"><h3>🧺 ${t('Gợi ý len', 'Yarn suggestions')}</h3><div id="gSug">${suggestBlock(num(g.mS) || num(g.pS))}</div></div>
+      <div class="card"><h3>🧮 ${t('Công thức', 'How it works')}</h3><div class="small sub">
+        <p>${t('Hệ số = gauge của bạn ÷ gauge pattern.', 'Factor = your gauge ÷ pattern gauge.')}</p>
+        <p>${t('Số mũi bạn cần = số mũi pattern × hệ số.', 'Your stitches = pattern stitches × factor.')}</p>
+        <p><b>${t('Ví dụ', 'Example')}:</b> ${t('pattern 23 sts, bạn đan 25 sts / 10 cm → ×1.087. Pattern CO 100 → 100 × 1.087 = 108.7 ≈ <b>CO 109</b>.', 'pattern 23 sts, you get 25 sts / 10 cm → ×1.087. Pattern CO 100 → 100 × 1.087 = 108.7 ≈ <b>CO 109</b>.')}</p>
+        <p>${t('Có bội số: làm tròn (số mũi − mũi biên) về bội số gần nhất rồi cộng lại mũi biên.', 'With a multiple: round (stitches − edge) to the nearest multiple, then add the edge stitches back.')}</p>
+        <p>${t('Lệch < 2% coi như khớp; lệch > 12% nên đổi len hoặc que.', 'Under 2% counts as a match; over 12% → change yarn or needles.')}</p>
+      </div></div>
+    </div>
+  </div>` };
+};
+
+/* =====================================================================
+   VIEW: Tìm kiếm
+   ===================================================================== */
+VIEWS.search = () => {
+  const q = stripVN(state.q.trim().toLowerCase());
+  const has = s => stripVN(String(s || '').toLowerCase()).includes(q);
+  let res = '';
+  if (q) {
+    const ps = db.projects.filter(p => has(p.name) || has(p.patternName) || has(p.notes) || p.rows.some(r => has(r.t)) || p.formulas.some(f => has(f.text) || has(f.name)) || (p.pat && (has(p.pat.title) || has(p.pat.intro) || has(p.pat.notes) || (p.pat.sections || []).some(s => has(s.title) || has(s.body)))));
+    const ys = db.yarns.filter(y => has(y.brand) || has(y.name) || has(y.color) || has(y.fiber ? lbl(FIBERS, y.fiber) : '') || has(y.note) || y.ideas.some(i => has(i.t)));
+    res = `<div class="card"><h3>🧶 ${t('Dự án', 'Projects')} (${ps.length})</h3>${ps.length ? `<div class="grid">${ps.map(projCard).join('')}</div>` : `<p class="mut">—</p>`}</div>
+      <div class="card"><h3>🧺 ${t('Len', 'Yarn')} (${ys.length})</h3>${ys.length ? `<div class="grid">${ys.map(yarnCard).join('')}</div>` : `<p class="mut">—</p>`}</div>`;
+  }
+  return { title: t('Tìm kiếm', 'Search'), html: `<div class="stack">
+    <input class="inp mob" id="mSearch" type="search" data-i="search" value="${esc(state.q)}" placeholder="🔍 ${t('Tìm dự án, len, ghi chú…', 'Search projects, yarn, notes…')}" style="width:100%">
+    ${q ? res : `<div class="card">${emptyBox('🔍', t('Tìm trong tên, pattern, ghi chú, ghi chú row, công thức, len và ý tưởng.', 'Search names, patterns, notes, row notes, formulas, yarn and ideas.'))}</div>`}
+  </div>`, after: () => { const m = $('#mSearch'); if (m && getComputedStyle(m).display !== 'none' && document.activeElement !== m && !state.q) m.focus(); } };
+};
+
+/* =====================================================================
+   VIEW: Màn hình chào
+   ===================================================================== */
+function installGuide() {
+  return `<ul class="guide">
+    <li>📱 <b>iPhone / iPad:</b> ${t('Safari → nút Chia sẻ ⬆️ → "Thêm vào MH chính".', 'Safari → Share ⬆️ → "Add to Home Screen".')}</li>
+    <li>🤖 <b>Android:</b> ${t('Chrome → ⋮ → "Cài đặt ứng dụng".', 'Chrome → ⋮ → "Install app".')}</li>
+    <li>💻 <b>${t('Máy tính', 'Desktop')}:</b> ${t('bấm biểu tượng ⊕ trên thanh địa chỉ Chrome/Edge.', 'click the ⊕ icon in the Chrome/Edge address bar.')}</li></ul>`;
+}
+function viewWelcome() {
+  return `<div class="welcome"><div class="wcard">
+    ${logo(84)}
+    <h1>${BRAND.name}</h1>
+    <div>by <a href="${BRAND.tiktok}" target="_blank" rel="noopener">${BRAND.by}</a></div>
+    <p class="sub" style="font-size:16px">${t(BRAND.tagVi, BRAND.tagEn)}</p>
+    ${langSw()}
+    <label class="field" style="text-align:left"><span>${t('Tên của bạn (tuỳ chọn)', 'Your name (optional)')}</span><input class="inp" id="wName" value="${esc(db.settings.name)}" placeholder="${t('VD: Mây', 'e.g. Mia')}" autocomplete="given-name"></label>
+    <button class="btn p" type="button" data-a="startSample">🧶 ${t('Xem thử với dữ liệu mẫu', 'Try with sample data')}</button>
+    <button class="btn" type="button" data-a="startEmpty">${t('Bắt đầu', 'Start')} →</button>
+    <button class="btn sm" type="button" id="installBtn2" data-a="install" style="display:${state.deferredPrompt ? '' : 'none'}">📲 ${t('Cài app', 'Install app')}</button>
+    <details style="margin-top:14px;text-align:left"><summary>📲 ${t('Cài YarnLoop như app', 'Install YarnLoop as an app')}</summary>${installGuide()}</details>
+    <p class="small mut" style="margin-top:14px">🔒 ${t('Dữ liệu chỉ lưu trên máy bạn. Không đăng nhập, không quảng cáo.', 'Your data stays on your device. No login, no ads.')}</p>
+  </div></div>`;
+}
+
+/* =====================================================================
+   Cài đặt & sao lưu (modal)
+   ===================================================================== */
+async function openSettings() {
+  const hasEx = db.projects.some(p => p.example);
+  const ov = modal(`${mHead('⚙️ ' + t('Cài đặt & sao lưu', 'Settings & backup'))}
+    <div class="field"><span>${t('Ngôn ngữ', 'Language')}</span>${langSw()}</div>
+    ${fld(t('Tên của bạn', 'Your name'), `<input class="inp" id="setName" value="${esc(db.settings.name)}" autocomplete="given-name">`)}
+    <div class="card" style="background:var(--bg)"><div class="small sub">💾 ${t('Dung lượng', 'Storage')}: <b id="setUsage">…</b></div>
+      <div class="small sub">🕒 ${t('Sao lưu gần nhất', 'Last backup')}: <b>${db.settings.lastBackup ? new Date(db.settings.lastBackup).toLocaleString(L === 'vi' ? 'vi-VN' : 'en-US') : t('chưa có', 'never')}</b></div>
+      <div class="small sub">🗄 ${t('Kiểu lưu', 'Storage type')}: <b>${STORE.mode === 'idb' ? 'IndexedDB' : STORE.mode === 'ls' ? 'localStorage' : '⛔ ' + t('không lưu được', 'not available')}</b></div></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn p" type="button" data-a="backup">⬇️ ${t('Xuất file sao lưu', 'Export backup')}</button>
+      <label class="btn filebtn">⬆️ ${t('Nhập file', 'Import file')}<input type="file" accept=".json,application/json" data-c="importFile"></label>
+      ${hasEx ? '' : `<button class="btn" type="button" data-a="addExample">🧥 ${t('Thêm dự án ví dụ', 'Add example project')}</button>`}
+    </div>
+    <p class="small mut">${t('Nhập file tự nhận ra: file sao lưu (thay toàn bộ dữ liệu) hoặc file dự án bạn bè chia sẻ (thêm vào).', 'Import detects: a backup file (replaces all data) or a shared project file (adds it).')}</p>
+    <div class="hr"></div>
+    <details><summary>📲 ${t('Cài app lên máy', 'Install the app')}</summary>${installGuide()}<button class="btn sm" type="button" data-a="install" style="display:${state.deferredPrompt ? '' : 'none'}">📲 ${t('Cài app', 'Install app')}</button></details>
+    <div class="hr"></div>
+    ${tiktokCard()}
+    <div class="hr"></div>
+    <button class="btn sm" type="button" data-a="wipeAll" style="color:var(--err);border-color:#E9BDBD">🗑 ${t('Xoá hết dữ liệu', 'Delete all data')}</button>
+    <p class="small mut" style="text-align:center;margin-top:14px">${BRAND.name} v${BRAND.version} · by ${BRAND.by} · ${t('miễn phí · không quảng cáo', 'free · no ads')}</p>`);
+  const n = ov.querySelector('#setName');
+  n.addEventListener('input', () => { db.settings.name = n.value.trim(); save(); });
+  try {
+    if (navigator.storage && navigator.storage.estimate) {
+      const e = await navigator.storage.estimate();
+      const mb = b => fmt(b / 1048576, 1) + ' MB';
+      const u = ov.querySelector('#setUsage'); if (u) u.textContent = `${mb(e.usage || 0)} / ${mb(e.quota || 0)}`;
+    } else { const u = ov.querySelector('#setUsage'); if (u) u.textContent = fmt(JSON.stringify(db).length / 1048576, 2) + ' MB'; }
+  } catch (e) {}
+}
+
+/* =====================================================================
+   FORMS (modal)
+   ===================================================================== */
+function formData(form) { const o = {}; new FormData(form).forEach((v, k) => { o[k] = typeof v === 'string' ? v.trim() : v; }); return o; }
+
+function projectForm(p, prefill) {
+  const isNew = !p;
+  const d = Object.assign(P_DEF(), isNew ? { status: 'wip', startDate: today() } : p, prefill || {});
+  const yOpts = [{ k: '', l: '—' }].concat(db.yarns.map(y => ({ k: y.id, l: yarnTitle(y) })));
+  const ov = modal(`${mHead(isNew ? '+ ' + t('Dự án mới', 'New project') : '✏️ ' + t('Sửa dự án', 'Edit project'))}
+    <form id="pForm" novalidate>
+      ${fld(t('Tên dự án', 'Project name') + ' *', inp('name', d.name, 'required autofocus maxlength="120"'))}
+      <div class="f2">${fld(t('Loại', 'Craft'), sel('craft', CRAFTS.map(c => ({ k: c.k, l: c.ic + ' ' + lb(c) })), d.craft))}${fld(t('Trạng thái', 'Status'), sel('status', STATUS.map(s => ({ k: s.k, l: s.ic + ' ' + lb(s) })), d.status))}</div>
+      <div class="f2">${fld(t('Tên pattern', 'Pattern name'), inp('patternName', d.patternName))}${fld(t('Link pattern', 'Pattern link'), inp('patternUrl', d.patternUrl, 'type="url" inputmode="url" placeholder="https://"'))}</div>
+      ${fld(t('Len (từ kho)', 'Yarn (from stash)'), sel('yarnId', yOpts, d.yarnId))}
+      <div class="f2">${fld(t('Que / kim', 'Needle / hook'), sel('needle', needleList(), d.needle))}${fld('Size', sel('size', SIZES, d.size))}</div>
+      <div class="f2">${fld(t('Gauge pattern · sts', 'Pattern gauge · sts'), inp('pGaugeSts', d.pGaugeSts, 'type="number" inputmode="decimal" step="0.5"'))}${fld(t('Gauge pattern · rows', 'Pattern gauge · rows'), inp('pGaugeRows', d.pGaugeRows, 'type="number" inputmode="decimal" step="0.5"'))}</div>
+      <div class="f2">${fld(t('Gauge của tôi · sts', 'My gauge · sts'), inp('myGaugeSts', d.myGaugeSts, 'type="number" inputmode="decimal" step="0.5"'))}${fld(t('Gauge của tôi · rows', 'My gauge · rows'), inp('myGaugeRows', d.myGaugeRows, 'type="number" inputmode="decimal" step="0.5"'))}</div>
+      <div class="f2">${fld(t('Tổng số rows', 'Total rows'), inp('totalRows', d.totalRows, 'type="number" inputmode="numeric" min="0"'))}${fld(t('Số gram đã dùng', 'Grams used'), inp('gramsUsed', d.gramsUsed, 'type="number" inputmode="decimal" min="0"'))}</div>
+      <div class="f2">${fld(t('Ngày bắt đầu', 'Start date'), inp('startDate', d.startDate, 'type="date"'))}${fld(t('Ngày kết thúc', 'End date'), inp('endDate', d.endDate, 'type="date"'))}</div>
+      <div class="errm" id="pErr"></div>
+      <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="submit">${t('Lưu', 'Save')}</button></div>
+    </form>`);
+  ov.querySelector('form').onsubmit = e => {
+    e.preventDefault();
+    const f = formData(e.target);
+    if (!f.name) { $('#pErr').textContent = t('Hãy nhập tên dự án.', 'Please enter a project name.'); return; }
+    ['pGaugeSts', 'pGaugeRows', 'myGaugeSts', 'myGaugeRows', 'totalRows', 'gramsUsed', 'needle'].forEach(k => { f[k] = num(f[k]); });
+    let target;
+    const wasDone = p && p.status === 'done';
+    if (isNew) {
+      target = normProject(Object.assign({}, prefill || {}, f));
+      db.projects.push(target);
+      addLog('🧶', t('Dự án mới: ', 'New project: ') + target.name);
+    } else {
+      target = p; Object.assign(p, f);
+    }
+    if (target.status === 'done' && !wasDone) {
+      if (!target.endDate) target.endDate = today();
+      addLog('✅', t('Hoàn thành: ', 'Finished: ') + target.name);
+    }
+    touch(target); save(); ov._close();
+    if (isNew) go('project/' + target.id); else render();
+    if (target.status === 'done' && !wasDone) setTimeout(() => toast(t('🎉 Hoàn thành! Bấm "📄 Pattern" để tạo pattern lưu lại cách làm.', '🎉 Finished! Tap "📄 Pattern" to turn it into a pattern.')), 300);
+    else toast(t('Đã lưu ✓', 'Saved ✓'));
+  };
+}
+
+function yarnForm(y, prefill) {
+  const isNew = !y;
+  const d = Object.assign(Y_DEF(), y || {}, prefill || {});
+  const ov = modal(`${mHead(isNew ? '+ ' + t('Thêm len', 'Add yarn') : '✏️ ' + t('Sửa len', 'Edit yarn'))}
+    <form novalidate>
+      <div class="f2">${fld(t('Hãng', 'Brand'), inp('brand', d.brand, 'autofocus'))}${fld(t('Tên len', 'Yarn name') + ' *', inp('name', d.name))}</div>
+      <div class="f2">${fld(t('Màu', 'Color'), inp('color', d.color))}${fld(t('Mã màu', 'Swatch color'), `<input class="inp" type="color" name="hex" value="${esc(safeHex(d.hex).length === 7 ? safeHex(d.hex) : '#E8C5CB')}" style="padding:4px;height:40px">`)}</div>
+      <div class="f2">${fld('Weight', sel('weight', [{ k: '', l: '—' }].concat(WEIGHTS.map(w => ({ k: w.k, l: w.name }))), d.weight))}${fld(t('Chất liệu', 'Fiber'), sel('fiber', [{ k: '', l: '—' }].concat(FIBERS), d.fiber))}</div>
+      <div class="f3">${fld(t('Số cuộn', 'Skeins'), inp('skeins', d.skeins, 'type="number" inputmode="decimal" min="0" step="0.5"'))}${fld(t('Gram / cuộn', 'Grams / skein'), inp('gramsPerSkein', d.gramsPerSkein, 'type="number" inputmode="decimal" min="0"'))}${fld(t('Mét / cuộn', 'Meters / skein'), inp('metersPerSkein', d.metersPerSkein, 'type="number" inputmode="decimal" min="0"'))}</div>
+      <div class="f3">${fld(t('Gram còn lại', 'Grams left'), inp('gramsLeft', d.gramsLeft, `type="number" inputmode="decimal" min="0" placeholder="${t('= cuộn × gram', '= skeins × g')}"`))}${fld(t('Gauge nhãn (sts)', 'Label gauge (sts)'), inp('gaugeSts', d.gaugeSts, 'type="number" inputmode="decimal" step="0.5"'))}${fld(t('Que', 'Needle'), sel('needle', needleList(), d.needle))}</div>
+      ${fld(t('Mua ở', 'Shop'), inp('shop', d.shop))}
+      ${fld(t('Ghi chú', 'Note'), `<textarea class="inp" name="note" rows="2">${esc(d.note)}</textarea>`)}
+      <div class="errm" id="yErr"></div>
+      <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="submit">${t('Lưu', 'Save')}</button></div>
+    </form>`);
+  ov.querySelector('form').onsubmit = e => {
+    e.preventDefault();
+    const f = formData(e.target);
+    if (!f.name && !f.brand) { ov.querySelector('#yErr').textContent = t('Hãy nhập tên len.', 'Please enter a yarn name.'); return; }
+    ['skeins', 'gramsPerSkein', 'metersPerSkein', 'gramsLeft', 'gaugeSts', 'needle'].forEach(k => { f[k] = num(f[k]); });
+    let target;
+    if (isNew) { target = normYarn(f); db.yarns.push(target); addLog('🧺', t('Thêm len: ', 'Added yarn: ') + yarnTitle(target)); }
+    else { target = y; Object.assign(y, f); }
+    save(); ov._close();
+    if (isNew) go('yarn/' + target.id); else render();
+    toast(t('Đã lưu ✓', 'Saved ✓'));
+  };
+}
+
+function ideaForm(y, i) {
+  const isNew = i == null;
+  const d = Object.assign({ img: '', t: '', u: '' }, isNew ? {} : y.ideas[i]);
+  let img = d.img;
+  const ov = modal(`${mHead('💡 ' + (isNew ? t('Ý tưởng mới', 'New idea') : t('Sửa ý tưởng', 'Edit idea')))}
+    <form novalidate>
+      <div class="field"><span>${t('Ảnh', 'Image')}</span><div class="row"><img id="ideaPrev" src="${esc(img)}" alt="" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--bdl);${img ? '' : 'display:none'}">${fileBtn('📷 ' + t('Chọn ảnh', 'Pick image'), 'id="ideaImg"')}</div></div>
+      ${fld(t('Mô tả', 'Description'), `<textarea class="inp" name="t" rows="3" placeholder="${t('VD: Khăn choàng tam giác hoa văn lỗ', 'e.g. Triangle lace shawl')}">${esc(d.t)}</textarea>`)}
+      ${fld('Link (Pinterest / Ravelry / TikTok)', inp('u', d.u, 'type="url" inputmode="url" placeholder="https://"'))}
+      <div class="errm" id="iErr"></div>
+      <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="submit">${t('Lưu', 'Save')}</button></div>
+    </form>`);
+  ov.querySelector('#ideaImg').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { img = await readImage(f, 900); const pv = ov.querySelector('#ideaPrev'); pv.src = img; pv.style.display = ''; } catch (er) { toast(t('Không đọc được ảnh', 'Could not read image')); }
+  };
+  ov.querySelector('form').onsubmit = e => {
+    e.preventDefault();
+    const f = formData(e.target);
+    if (!img && !f.t && !f.u) { ov.querySelector('#iErr').textContent = t('Thêm ảnh, mô tả hoặc link.', 'Add an image, a description or a link.'); return; }
+    const it = { img, t: f.t, u: f.u };
+    if (isNew) y.ideas.push(it); else y.ideas[i] = it;
+    save(); ov._close(); render(); toast(t('Đã lưu ✓', 'Saved ✓'));
+  };
+}
+
+function libForm() {
+  const ov = modal(`${mHead('📚 ' + t('Thêm len vào thư viện', 'Add yarn to library'))}
+    <form novalidate>
+      <div class="f2">${fld(t('Hãng', 'Brand') + ' *', inp('brand', '', 'autofocus'))}${fld(t('Tên len', 'Yarn name') + ' *', inp('name', ''))}</div>
+      <div class="f2">${fld('Weight', sel('weight', WEIGHTS.map(w => ({ k: w.k, l: w.name })), 'dk'))}${fld(t('Chất liệu', 'Fiber'), sel('fiber', FIBERS, 'wool'))}</div>
+      <div class="f2">${fld('Gauge min (sts)', inp('g0', '', 'type="number" inputmode="decimal"'))}${fld('Gauge max (sts)', inp('g1', '', 'type="number" inputmode="decimal"'))}</div>
+      <div class="f2">${fld(t('Que min (mm)', 'Needle min (mm)'), sel('n0', needleList(), ''))}${fld(t('Que max (mm)', 'Needle max (mm)'), sel('n1', needleList(), ''))}</div>
+      <div class="f2">${fld(t('Gram / cuộn', 'Grams / skein'), inp('gr', '', 'type="number" inputmode="decimal"'))}${fld(t('Mét / cuộn', 'Meters / skein'), inp('m', '', 'type="number" inputmode="decimal"'))}</div>
+      ${fld(t('Ghi chú', 'Note'), inp('note', ''))}
+      <div class="errm" id="lErr"></div>
+      <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="submit">${t('Lưu', 'Save')}</button></div>
+    </form>`);
+  ov.querySelector('form').onsubmit = e => {
+    e.preventDefault();
+    const f = formData(e.target);
+    if (!f.brand || !f.name) { ov.querySelector('#lErr').textContent = t('Hãy nhập hãng và tên len.', 'Enter brand and name.'); return; }
+    const g0 = num(f.g0), g1 = num(f.g1) || g0, n0 = num(f.n0), n1 = num(f.n1) || n0;
+    if (!g0) { ov.querySelector('#lErr').textContent = t('Hãy nhập gauge.', 'Enter a gauge.'); return; }
+    db.customLib.push({ id: 'c' + uid(), brand: f.brand, name: f.name, weight: f.weight, fiber: f.fiber, g: [g0, g1], n: [n0, n1], gr: num(f.gr), m: num(f.m), vi: f.note, en: f.note });
+    save(); ov._close(); render(); toast(t('Đã thêm vào thư viện ✓', 'Added to library ✓'));
+  };
+}
+
+function rowForm(p, i) {
+  const isNew = i == null;
+  const last = p.rows[p.rows.length - 1];
+  const maxTo = p.rows.reduce((m, r) => Math.max(m, r.to), 0);
+  const d = isNew ? { from: maxTo + 1, to: '', sec: last ? last.sec : '', sts: '', rtype: '', f: '', t: '' } : Object.assign({}, p.rows[i]);
+  if (!isNew && d.to === d.from) d.to = '';
+  const fOpts = [{ k: '', l: '—' }].concat(p.formulas.map(f => ({ k: f.id, l: `${t('Công thức', 'Stitch pattern')} ${f.name} (${formulaLines(f).length} ${t('dòng', 'lines')})` })));
+  const ov = modal(`${mHead('📝 ' + (isNew ? t('Ghi chú row', 'Row note') : t('Sửa ghi chú row', 'Edit row note')))}
+    <form novalidate>
+      <div class="f2">${fld(t('Từ row', 'From row') + ' *', inp('from', d.from, 'type="number" inputmode="numeric" min="1" autofocus'))}${fld(t('Đến row (trống = 1 row)', 'To row (empty = 1 row)'), inp('to', d.to, 'type="number" inputmode="numeric" min="1"'))}</div>
+      <div class="f2">${fld(t('Phần', 'Section'), sel('sec', [{ k: '', l: '—' }].concat(SECTIONS), d.sec))}${fld(t('Số mũi sau row', 'Stitch count after'), inp('sts', d.sts, 'type="number" inputmode="numeric" min="0" placeholder="sts"'))}</div>
+      <div class="f2">${fld(t('Loại row', 'Row type'), sel('rtype', RTYPES, d.rtype))}${fld(t('Lặp công thức', 'Repeat formula'), sel('f', fOpts, d.f))}</div>
+      ${fld(t('Ghi chú', 'Note'), `<textarea class="inp" name="t" rows="4" placeholder="${t('VD: K2, *P2, K2; rep from * — hoặc mô tả bằng lời', 'e.g. K2, *P2, K2; rep from * — or describe in words')}">${esc(d.t)}</textarea>`)}
+      ${p.formulas.length ? '' : `<p class="small mut">${t('Chưa có công thức lặp — tạo ở mục "Công thức lặp" của dự án.', 'No repeat formulas yet — create one under "Repeat formulas".')}</p>`}
+      <div class="errm" id="rErr"></div>
+      <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="submit">${t('Lưu', 'Save')}</button></div>
+    </form>`);
+  ov.querySelector('form').onsubmit = e => {
+    e.preventDefault();
+    const f = formData(e.target);
+    const from = parseInt(f.from), to = f.to === '' ? from : parseInt(f.to);
+    const err = m => { ov.querySelector('#rErr').textContent = m; };
+    if (!(from >= 1)) return err(t('"Từ row" phải ≥ 1.', '"From row" must be ≥ 1.'));
+    if (!(to >= from)) return err(t('"Đến row" phải ≥ "Từ row".', '"To row" must be ≥ "From row".'));
+    if (!f.t && !f.f) return err(t('Cần có ghi chú hoặc chọn công thức.', 'Add a note or pick a formula.'));
+    const r = normRow({ from, to, sec: f.sec, sts: f.sts, rtype: f.rtype, f: f.f, t: f.t, done: isNew ? false : p.rows[i].done });
+    if (isNew) p.rows.push(r); else p.rows[i] = r;
+    sortRows(p); touch(p); save(); ov._close(); render(); toast(t('Đã lưu ghi chú ✓', 'Note saved ✓'));
+  };
+}
+
+function formulaForm(p, fid) {
+  const f0 = fid ? fOf(p, fid) : null;
+  const used = p.formulas.map(f => f.name);
+  const next = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').find(c => !used.includes(c)) || String(p.formulas.length + 1);
+  const ov = modal(`${mHead('🔁 ' + (f0 ? t('Sửa công thức', 'Edit formula') : t('Công thức lặp mới', 'New repeat formula')))}
+    <form novalidate>
+      ${fld(t('Tên', 'Name'), inp('name', f0 ? f0.name : next, 'maxlength="20"'))}
+      ${fld(t('Mỗi dòng = 1 row của công thức', 'One line = one row of the repeat'), `<textarea class="inp" name="text" rows="7" autofocus placeholder="RS: K1, *yo, k2tog, K2; rep from *\nWS: Purl\nRS: K3, *yo, k2tog, K2; rep from *\nWS: Purl">${esc(f0 ? f0.text : '')}</textarea>`)}
+      <div class="errm" id="fErr"></div>
+      <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="submit">${t('Lưu', 'Save')}</button></div>
+    </form>`);
+  ov.querySelector('form').onsubmit = e => {
+    e.preventDefault();
+    const f = formData(e.target);
+    const text = String(f.text || '').split('\n').map(s => s.trim()).filter(Boolean).join('\n');
+    if (!text) { ov.querySelector('#fErr').textContent = t('Nhập ít nhất 1 dòng.', 'Enter at least one line.'); return; }
+    if (f0) { f0.name = f.name || f0.name; f0.text = text; }
+    else p.formulas.push({ id: uid(), name: f.name || next, text });
+    touch(p); save(); ov._close(); render(); toast(t('Đã lưu công thức ✓', 'Formula saved ✓'));
+  };
+}
+
+function newMenu() {
+  const ov = modal(`${mHead('+ ' + t('Tạo mới', 'Create'))}<div class="menu">
+    <button type="button" data-a="newProject"><span class="mi">🧶</span><span>${t('Dự án mới', 'New project')}<small>${t('Bắt đầu đan / móc và đếm row', 'Start knitting / crocheting and count rows')}</small></span></button>
+    <button type="button" data-a="newYarn"><span class="mi">🧺</span><span>${t('Thêm len vào kho', 'Add yarn to stash')}<small>${t('Lưu len bạn đang có', 'Keep track of yarn you own')}</small></span></button>
+    <button type="button" data-a="design"><span class="mi">✏️</span><span>${t('Tự thiết kế pattern', 'Design a pattern')}<small>Pattern Studio</small></span></button>
+    <label class="filebtn" style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--bdl);border-radius:12px;background:#fff;font-weight:600;cursor:pointer"><span class="mi">📂</span><span>${t('Mở file dự án bạn bè gửi', 'Open a project file from a friend')}<small style="display:block;font-weight:400;color:var(--mu)">.json</small></span><input type="file" accept=".json,application/json" data-c="importFile"></label>
+  </div>`, { cls: 'sm' });
+  return ov;
+}
+
+/* =====================================================================
+   SHARE / EXPORT HELPERS
+   ===================================================================== */
+async function shareOrDownload(blob, filename, title) {
+  try {
+    const file = new File([blob], filename, { type: blob.type });
+    if (navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: title || filename });
+      return true;
+    }
+  } catch (e) { if (e && e.name === 'AbortError') return false; console.warn(e); }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  return true;
+}
+async function copyText(txt) {
+  try { await navigator.clipboard.writeText(txt); return true; }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e2) {} ta.remove(); return ok;
+  }
+}
+async function backupNow() {
+  const blob = new Blob([JSON.stringify({ type: 'yarnloop-backup', v: DB_VERSION, app: BRAND.display, exported: new Date().toISOString(), db })], { type: 'application/json' });
+  const ok = await shareOrDownload(blob, `yarnloop-backup-${today()}.json`, 'YarnLoop backup');
+  if (ok) { db.settings.lastBackup = Date.now(); save(); render(); toast(t('Đã xuất file sao lưu ✓', 'Backup exported ✓')); }
+}
+function shareForm(p) {
+  const ov = modal(`${mHead('📤 ' + t('Chia sẻ dự án', 'Share project'))}
+    <p class="sub">${t('Tạo file', 'Creates file')} <b>yarnloop-${esc(slug(p.name))}.json</b> ${t('— bạn bè mở bằng "+ Mới → Mở file dự án bạn bè gửi".', '— friends open it via "+ New → Open a project file from a friend".')}</p>
+    <p class="small mut">${t('Luôn kèm: thông tin dự án, ghi chú row, công thức, thông tin len cơ bản, tên người gửi.', 'Always included: project details, row notes, formulas, basic yarn info, your name.')}</p>
+    <label class="chk"><input type="checkbox" id="shPat" ${p.patternImgs.length ? '' : 'disabled'}> ${t('Kèm ảnh pattern', 'Include pattern images')} (${p.patternImgs.length})</label>
+    <label class="chk"><input type="checkbox" id="shPho" ${p.photos.length ? 'checked' : 'disabled'}> ${t('Kèm ảnh thành phẩm', 'Include finished photos')} (${p.photos.length})</label>
+    <label class="chk"><input type="checkbox" id="shNot" ${p.notes ? 'checked' : 'disabled'}> ${t('Kèm ghi chú chung', 'Include general notes')}</label>
+    ${fld(t('Tên người gửi', 'Sender name'), `<input class="inp" id="shFrom" value="${esc(db.settings.name)}">`)}
+    <div class="alert amber small">⚠️ ${t('Bản quyền: pattern mua thường KHÔNG được chia sẻ lại. Chỉ kèm ảnh pattern nếu pattern miễn phí hoặc do bạn tự thiết kế.', 'Copyright: purchased patterns usually may NOT be shared. Only include pattern images if the pattern is free or your own design.')}</div>
+    <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="button" id="shGo">📤 ${t('Chia sẻ', 'Share')}</button></div>`);
+  ov.querySelector('#shGo').onclick = async () => {
+    const from = ov.querySelector('#shFrom').value.trim();
+    const c = clone(p);
+    delete c.yarnId;
+    if (!ov.querySelector('#shPat').checked) c.patternImgs = [];
+    if (!ov.querySelector('#shPho').checked) c.photos = [];
+    if (!ov.querySelector('#shNot').checked) c.notes = '';
+    const y = yarnOf(p);
+    const yarn = y ? { brand: y.brand, name: y.name, color: y.color, weight: y.weight, fiber: y.fiber, gramsPerSkein: y.gramsPerSkein, metersPerSkein: y.metersPerSkein, gaugeSts: y.gaugeSts, needle: y.needle, hex: y.hex } : (p.yarnInfo || null);
+    const blob = new Blob([JSON.stringify({ type: 'yarnloop-project', v: DB_VERSION, from, at: new Date().toISOString(), project: c, yarn })], { type: 'application/json' });
+    const ok = await shareOrDownload(blob, `yarnloop-${slug(p.name)}.json`, p.name);
+    if (ok) { ov._close(); toast(t('Đã tạo file chia sẻ ✓', 'Share file created ✓')); }
+  };
+}
+async function importFile(file) {
+  let data;
+  try { data = JSON.parse(await file.text()); } catch (e) { toast(t('File không hợp lệ', 'Invalid file')); return; }
+  const type = data && data.type;
+  if (['yarnloop-project', 'looplog-project', 'lenNote-project'].includes(type) && data.project) {
+    const p = normProject(Object.assign({}, data.project, { id: uid() }));
+    p.counter = 0; p.status = 'idea'; p.rows.forEach(r => { r.done = false; }); p.yarnId = '';
+    p.yarnInfo = data.yarn || data.project.yarnInfo || null;
+    p.sharedFrom = data.from || data.sender || t('bạn bè', 'a friend');
+    p.example = false; p.updated = Date.now(); p.startDate = ''; p.endDate = '';
+    db.projects.push(p);
+    addLog('🎁', t('Nhận dự án: ', 'Received project: ') + p.name);
+    save(); closeAll(); go('project/' + p.id);
+    toast(t('Đã thêm dự án được chia sẻ ✓', 'Shared project added ✓'));
+    return;
+  }
+  const incoming = type === 'yarnloop-backup' || type === 'looplog-backup' ? data.db : (data && Array.isArray(data.projects) && Array.isArray(data.yarns) ? data : null);
+  if (!incoming) { toast(t('Không nhận ra file này', 'Unrecognised file')); return; }
+  const n = (incoming.projects || []).length, m = (incoming.yarns || []).length;
+  const word = t('THAY', 'REPLACE');
+  const ok = await ask({ ic: '♻️', title: t('Thay toàn bộ dữ liệu?', 'Replace all data?'), desc: t(`File sao lưu có ${n} dự án, ${m} len. Dữ liệu hiện tại (${db.projects.length} dự án, ${db.yarns.length} len) sẽ bị thay thế.`, `The backup has ${n} projects, ${m} yarns. Your current data (${db.projects.length} projects, ${db.yarns.length} yarns) will be replaced.`), ok: t('Thay dữ liệu', 'Replace data'), word });
+  if (!ok) return;
+  closeAll();
+  doWithUndo(t('Đã nạp file sao lưu', 'Backup imported'), () => {
+    const keepLang = L;
+    db = normalize(clone(incoming));
+    db.settings.onboarded = true;
+    if (!db.settings.lang) db.settings.lang = keepLang;
+    L = db.settings.lang; shell();
+  });
+}
+
+/* =====================================================================
+   PATTERN STUDIO
+   ===================================================================== */
+function patDefaults(p) {
+  const sz = p.size && p.size !== '' ? lbl(SIZES, p.size) : '';
+  return {
+    title: String(p.name || '').replace(/\s*\((ví dụ|example)\)\s*/ig, ' ').trim(),
+    designer: db && db.settings ? db.settings.name : '',
+    diff: 'easy', ptype: p.sharedFrom ? 'notes' : (p.patternName && !p.design ? 'notes' : 'personal'), lang: L,
+    origName: p.patternName || '', origUrl: p.patternUrl || '', intro: '',
+    sizes: sz, gSts: p.myGaugeSts || p.pGaugeSts || '', gRows: p.myGaugeRows || p.pGaugeRows || '', gStitch: 'Stockinette',
+    measure: '', notions: '', sections: [], inclFormulas: true, abbrOff: [], abbrCustom: '', notes: p.notes || '', inclPhotos: true,
+    tool: { w: '', mult: '', edge: '' }
+  };
+}
+function ensurePat(p) {
+  if (!p.pat) p.pat = patDefaults(p);
+  p.pat = Object.assign(patDefaults(p), p.pat);
+  if (!Array.isArray(p.pat.sections)) p.pat.sections = [];
+  if (!Array.isArray(p.pat.abbrOff)) p.pat.abbrOff = [];
+  if (!p.pat.tool) p.pat.tool = { w: '', mult: '', edge: '' };
+  return p.pat;
+}
+const tpf = lang => (vi, en) => (lang === 'vi' ? vi : en);
+function patText(p) {
+  const a = p.pat;
+  return [a.intro, a.notions, a.notes, a.measure].concat(a.sections.map(s => s.title + '\n' + s.body)).concat(a.inclFormulas ? p.formulas.map(f => f.text) : []).join('\n');
+}
+function detectAbbr(text) { const s = stripVN(text); return ABBR.filter(x => x.re.test(s)); }
+function customAbbr(a) { return String(a.abbrCustom || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => { const i = l.indexOf('='); return i > 0 ? { k: l.slice(0, i).trim(), v: l.slice(i + 1).trim() } : { k: l, v: '' }; }); }
+function materials(p, lang) {
+  return materialsBase(p, lang).concat(String(p.pat.notions || '').split('\n').map(s => s.trim()).filter(Boolean));
+}
+function materialsBase(p, lang) {
+  const tp = tpf(lang);
+  const y = yarnOf(p) || p.yarnInfo;
+  const out = [];
+  if (y) {
+    const bits = [y.weight ? wName(y.weight) : '', y.fiber ? lbl(FIBERS, y.fiber, lang) : '', y.gramsPerSkein ? `${y.gramsPerSkein} g${y.metersPerSkein ? ' / ' + y.metersPerSkein + ' m' : ''}` : ''].filter(Boolean).join(', ');
+    let line = `${tp('Len', 'Yarn')}: ${yarnTitle(y)}${bits ? ' (' + bits + ')' : ''}`;
+    const gu = num(p.gramsUsed), gp = num(y.gramsPerSkein), mp = num(y.metersPerSkein);
+    if (gu) {
+      line += ` — ~${gu} g`;
+      if (gp) line += ` ≈ ${Math.ceil(gu / gp)} ${tp('cuộn', 'skeins')}`;
+      if (gp && mp) line += ` (~${Math.round(gu / gp * mp)} m)`;
+    }
+    out.push(line);
+  } else if (num(p.gramsUsed)) out.push(`${tp('Len', 'Yarn')}: ~${p.gramsUsed} g`);
+  if (p.needle) out.push(`${p.craft === 'crochet' ? tp('Kim móc', 'Crochet hook') : tp('Que đan', 'Needles')}: ${p.needle} mm`);
+  return out;
+}
+function sizeTool(p) {
+  const a = p.pat, g = num(a.gSts);
+  const ws = listNums(a.tool.w);
+  if (!g || !ws.length) return '';
+  const n = ws.map(w => roundMult(w / 10 * g, a.tool.mult, a.tool.edge));
+  return `CO ${n[0]}${n.length > 1 ? ' (' + n.slice(1).join(', ') + ')' : ''} sts`;
+}
+/* ---- Tạo nháp từ ghi chú row ---- */
+function formulaSentence(f, n, lang) {
+  const tp = tpf(lang);
+  const k = formulaLines(f).length; if (!k) return '';
+  const full = Math.floor(n / k), rem = n % k;
+  const nm = 'Stitch pattern ' + f.name;
+  const rr = rem === 1 ? 'row 1' : 'rows 1–' + rem;
+  const times = x => lang === 'vi' ? `${x} lần` : (x === 1 ? 'once' : `${x} times`);
+  if (full >= 1 && rem > 0) return tp(`Đan ${nm} ${times(full)}, rồi đan thêm ${rr} của ${nm} (${n} rows)`, `Work ${nm} ${times(full)}, then ${rr} once more (${n} rows)`);
+  if (full >= 1) return tp(`Đan ${nm} ${times(full)} (${n} rows)`, `Work ${nm} ${times(full)} (${n} rows)`);
+  return tp(`Đan ${rr} của ${nm} (${n} rows)`, `Work ${rr} of ${nm} (${n} rows)`);
+}
+function genDraft(p, lang) {
+  const groups = [], map = {};
+  p.rows.forEach(r => { const k = r.sec || 'other'; if (!map[k]) { map[k] = { k, rows: [] }; groups.push(map[k]); } map[k].rows.push(r); });
+  const secs = groups.map(g => {
+    let round = false;
+    const lines = g.rows.map(r => {
+      if (r.rtype === 'round') round = true;
+      const multi = r.to > r.from;
+      const word = round ? (multi ? 'Rnds' : 'Rnd') : (multi ? 'Rows' : 'Row');
+      let head = `${word} ${r.from}${multi ? '–' + r.to : ''}`;
+      if (r.rtype === 'rs') head += ' (RS)'; else if (r.rtype === 'ws') head += ' (WS)';
+      if (RTAG[r.rtype]) head += ` [${lb(RTAG[r.rtype], lang)}]`;
+      const parts = [];
+      const f = fOf(p, r.f);
+      if (f) { let s = formulaSentence(f, r.to - r.from + 1, lang); if (round) s = s.replace(/\brows\b/g, 'rnds').replace(/\brow 1\b/g, 'rnd 1'); if (s) parts.push(s); }
+      const note = String(r.t || '').split('\n').map(s => s.trim()).filter(Boolean).join(' ').replace(/[.。]\s*$/, '');
+      if (note) parts.push(note);
+      let line = head + ': ' + parts.join('. ') + (parts.length ? '.' : '');
+      if (r.sts && !new RegExp('\\b' + r.sts + '\\s*sts\\b').test(note)) line += ` (${r.sts} sts)`;
+      return line;
+    });
+    return { id: uid(), title: lbl(SECTIONS, g.k, lang), body: lines.join('\n') };
+  });
+  if (!map.finishing) secs.push({ id: uid(), title: lbl(SECTIONS, 'finishing', lang), body: lang === 'vi' ? 'Giấu đầu sợi. Blocking theo kích thước thành phẩm.' : 'Weave in all ends. Block to measurements.' });
+  return secs;
+}
+/* ---- Bản pattern (xem trước = xuất) ---- */
+function patternHTML(p) {
+  const a = p.pat, lang = a.lang, tp = tpf(lang);
+  const sizes = String(a.sizes || '').split(/[,;]/).map(s => s.trim()).filter(Boolean);
+  const photos = a.inclPhotos ? p.photos : [];
+  const abbr = detectAbbr(patText(p)).filter(x => !a.abbrOff.includes(x.k));
+  const cab = customAbbr(a);
+  const forms = a.inclFormulas ? p.formulas.filter(f => formulaLines(f).length) : [];
+  const mats = materials(p, lang);
+  const pills = [crIc(p.craft) + ' ' + lbl(CRAFTS, p.craft, lang), lbl(DIFFS, a.diff, lang),sizes.length ? 'Size ' + sizes.join(' / ') : ''].filter(Boolean);
+  const copy = a.ptype === 'credit'
+    ? tp(`© ${new Date().getFullYear()} ${a.designer || ''}. Được chia sẻ miễn phí — vui lòng ghi nguồn khi dùng hoặc đăng lại.`, `© ${new Date().getFullYear()} ${a.designer || ''}. Free to share — please credit the designer.`)
+    : a.ptype === 'notes'
+      ? tp(`Ghi chú cá nhân theo pattern "${a.origName || '…'}". Bản quyền pattern thuộc tác giả gốc — không đăng lại.`, `Personal notes on "${a.origName || '…'}". The pattern belongs to its original designer — do not republish.`)
+      : tp(`© ${new Date().getFullYear()} ${a.designer || ''}. Chỉ dùng cá nhân — không chia sẻ hoặc bán lại.`, `© ${new Date().getFullYear()} ${a.designer || ''}. Personal use only — do not share or resell.`);
+  const paras = s => String(s || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => `<p>${esc(l)}</p>`).join('');
+  let h = `<article class="yl-pat">
+    <h1>${esc(a.title || p.name)}</h1>
+    ${a.designer ? `<div class="by">${a.ptype === 'notes' ? tp('Ghi chú bởi', 'Notes by') : tp('Thiết kế', 'Design')}: ${esc(a.designer)}</div>` : ''}
+    <div class="pills">${pills.map(x => `<span>${esc(x)}</span>`).join('')}</div>
+    ${photos[0] ? `<img class="cover" src="${esc(photos[0])}" alt="">` : ''}
+    ${a.intro ? `<div class="intro">${paras(a.intro)}</div>` : ''}
+    ${a.ptype === 'notes' ? `<div class="orig">📌 ${tp('Pattern gốc', 'Original pattern')}: <b>${esc(a.origName || '—')}</b>${safeUrl(a.origUrl) ? ` — <a href="${esc(safeUrl(a.origUrl))}">${esc(safeUrl(a.origUrl))}</a>` : ''}<br>${tp('Đây là ghi chú cá nhân, lưu cho bản thân — không đăng lại.', 'These are personal notes for my own use — do not republish.')}</div>` : ''}`;
+  if (sizes.length || a.measure) {
+    h += `<h2>${tp('Size & kích thước', 'Sizes & measurements')}</h2>`;
+    if (sizes.length) h += `<p><b>Size:</b> ${esc(sizes[0])}${sizes.length > 1 ? ' (' + sizes.slice(1).map(esc).join(', ') + ')' : ''}</p>`;
+    if (sizes.length > 1) h += `<p class="note">${tp(`Số liệu viết theo thứ tự ${esc(sizes[0])} (${sizes.slice(1).map(esc).join(', ')}). Nếu chỉ có một số, dùng cho mọi size.`, `Figures are given for size ${esc(sizes[0])} (${sizes.slice(1).map(esc).join(', ')}). Where only one figure is given, it applies to all sizes.`)}</p>`;
+    h += paras(a.measure);
+  }
+  if (mats.length) h += `<h2>${tp('Nguyên liệu', 'Materials')}</h2><ul>${mats.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`;
+  if (a.gSts) h += `<h2>Gauge</h2><p>${esc(a.gSts)} sts${a.gRows ? ' × ' + esc(a.gRows) + ' rows' : ''} = 10 × 10 cm${a.gStitch ? tp(' trên ', ' in ') + esc(a.gStitch) : ''}${p.needle ? tp(', que ', ', on ') + esc(p.needle) + ' mm' : ''}.</p><p><i>${tp('Hãy đan swatch và đổi cỡ que nếu cần để đạt đúng gauge.', 'Knit a swatch and change needle size if necessary to obtain the correct gauge.')}</i></p>`;
+  if (abbr.length || cab.length) h += `<h2>${tp('Viết tắt', 'Abbreviations')}</h2><table>${abbr.map(x => `<tr><td>${esc(x.k)}</td><td>${esc(lang === 'vi' ? x.vi : x.en)}</td></tr>`).join('')}${cab.map(x => `<tr><td>${esc(x.k)}</td><td>${esc(x.v)}</td></tr>`).join('')}</table>`;
+  if (forms.length) h += `<h2>Stitch patterns</h2>${forms.map(f => { const ls = formulaLines(f); return `<h3>Stitch pattern ${esc(f.name)}</h3><p><i>${tp(`(lặp mỗi ${ls.length} rows)`, `(repeat every ${ls.length} rows)`)}</i></p><ol>${ls.map(l => `<li>${esc(l)}</li>`).join('')}</ol>`; }).join('')}`;
+  if (a.sections.length) h += `<h2>${tp('Hướng dẫn', 'Instructions')}</h2><div class="ins">${a.sections.map(s => `${s.title ? `<h3>${esc(s.title)}</h3>` : ''}${paras(s.body)}`).join('')}</div>`;
+  if (a.notes) h += `<h2>${tp('Ghi chú & mẹo', 'Notes & tips')}</h2>${paras(a.notes)}`;
+  if (photos.length > 1) h += `<h2>${tp('Ảnh', 'Photos')}</h2><div class="gal">${photos.slice(1, 7).map(s => `<img src="${esc(s)}" alt="">`).join('')}</div>`;
+  h += `<footer>${esc(copy)}<br>Made with YarnLoop · @lenmomam</footer></article>`;
+  return h;
+}
+function patternTXT(p) {
+  const a = p.pat, lang = a.lang, tp = tpf(lang);
+  const sizes = String(a.sizes || '').split(/[,;]/).map(s => s.trim()).filter(Boolean);
+  const abbr = detectAbbr(patText(p)).filter(x => !a.abbrOff.includes(x.k));
+  const cab = customAbbr(a);
+  const H = s => `\n\n== ${s.toUpperCase()} ==\n`;
+  let o = (a.title || p.name).toUpperCase();
+  if (a.designer) o += `\n${a.ptype === 'notes' ? tp('Ghi chú bởi', 'Notes by') : tp('Thiết kế', 'Design')}: ${a.designer}`;
+  o += `\n${lbl(CRAFTS, p.craft, lang)} · ${lbl(DIFFS, a.diff, lang)}${sizes.length ? ' · Size ' + sizes.join(' / ') : ''}`;
+  if (a.intro) o += '\n\n' + a.intro;
+  if (a.ptype === 'notes') o += `\n\n${tp('Pattern gốc', 'Original pattern')}: ${a.origName}${a.origUrl ? ' — ' + a.origUrl : ''}\n${tp('Ghi chú cá nhân — không đăng lại.', 'Personal notes — do not republish.')}`;
+  if (sizes.length || a.measure) { o += H(tp('Size & kích thước', 'Sizes & measurements')); if (sizes.length) o += `Size: ${sizes[0]}${sizes.length > 1 ? ' (' + sizes.slice(1).join(', ') + ')' : ''}\n`; if (a.measure) o += a.measure; }
+  const mats = materials(p, lang);
+  if (mats.length) o += H(tp('Nguyên liệu', 'Materials')) + mats.map(m => '- ' + m).join('\n');
+  if (a.gSts) o += H('Gauge') + `${a.gSts} sts${a.gRows ? ' x ' + a.gRows + ' rows' : ''} = 10 x 10 cm${a.gStitch ? tp(' trên ', ' in ') + a.gStitch : ''}.\n${tp('Hãy đan swatch để kiểm tra gauge.', 'Knit a swatch to check your gauge.')}`;
+  if (abbr.length || cab.length) o += H(tp('Viết tắt', 'Abbreviations')) + abbr.map(x => `${x.k} = ${lang === 'vi' ? x.vi : x.en}`).concat(cab.map(x => `${x.k} = ${x.v}`)).join('\n');
+  const forms = a.inclFormulas ? p.formulas.filter(f => formulaLines(f).length) : [];
+  if (forms.length) o += H('Stitch patterns') + forms.map(f => { const ls = formulaLines(f); return `Stitch pattern ${f.name} (${tp('lặp mỗi', 'repeat every')} ${ls.length} rows)\n` + ls.map((l, i) => `  ${i + 1}. ${l}`).join('\n'); }).join('\n\n');
+  if (a.sections.length) o += H(tp('Hướng dẫn', 'Instructions')) + a.sections.map(s => (s.title ? `-- ${s.title} --\n` : '') + s.body.trim()).join('\n\n');
+  if (a.notes) o += H(tp('Ghi chú & mẹo', 'Notes & tips')) + a.notes;
+  o += '\n\n---\n' + (a.ptype === 'notes' ? tp('Bản quyền thuộc tác giả pattern gốc.', 'Copyright belongs to the original designer.') : a.ptype === 'credit' ? tp('Chia sẻ miễn phí, vui lòng ghi nguồn.', 'Free to share with credit.') : tp('Chỉ dùng cá nhân.', 'Personal use only.')) + '\nMade with YarnLoop · @lenmomam\n';
+  return o;
+}
+let PAT_CSS = '';
+function patCss() {
+  return `.yl-pat{font-family:"Noto Serif","Source Serif 4",Cambria,"Times New Roman",Times,serif;color:#2D1B1E;line-height:1.6;font-size:15px;max-width:720px;margin:0 auto}
+.yl-pat h1{font-size:28px;color:#9B2335;margin:0 0 4px;line-height:1.2}
+.yl-pat h2{font-size:18px;color:#9B2335;border-bottom:1px solid #E8C5CB;padding-bottom:3px;margin:22px 0 8px}
+.yl-pat h3{font-size:15.5px;color:#7A1A28;margin:14px 0 4px}
+.yl-pat .by{color:#7A4A52;font-style:italic}
+.yl-pat .pills{margin:8px 0 12px}.yl-pat .pills span{display:inline-block;border:1px solid #E8C5CB;background:#FFF0F2;border-radius:999px;padding:1px 10px;font-size:12.5px;margin:0 4px 4px 0;font-family:system-ui,sans-serif;color:#7A4A52}
+.yl-pat img.cover{width:100%;max-height:440px;object-fit:cover;border-radius:10px;margin:6px 0 10px;display:block}
+.yl-pat .intro{font-size:16px}
+.yl-pat .orig,.yl-pat .note{background:#FFF0F2;border-left:3px solid #C4687A;padding:8px 12px;border-radius:6px;margin:10px 0}
+.yl-pat p{margin:4px 0}
+.yl-pat a{color:#9B2335;word-break:break-all}
+.yl-pat table{border-collapse:collapse;width:100%;font-size:14px}.yl-pat td{border-bottom:1px solid #F2D8DC;padding:4px 6px;vertical-align:top}.yl-pat td:first-child{font-weight:bold;white-space:nowrap;width:1%;padding-right:14px}
+.yl-pat ol,.yl-pat ul{margin:4px 0 8px;padding-left:22px}
+.yl-pat .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.yl-pat .gal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
+.yl-pat footer{margin-top:26px;padding-top:10px;border-top:1px solid #E8C5CB;font-size:12.5px;color:#A67880;text-align:center}
+@media print{.yl-pat{font-size:11.5pt;max-width:none}.yl-pat h2,.yl-pat h3{break-after:avoid}.yl-pat img,.yl-pat tr{break-inside:avoid}.noprint{display:none!important}}`;
+}
+function patternDoc(p) {
+  return `<!doctype html><html lang="${p.pat.lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(p.pat.title || p.name)}</title><style>body{margin:0;padding:24px 16px;background:#FDF6F7}main{background:#fff;max-width:780px;margin:0 auto;padding:28px 22px;border-radius:14px;border:1px solid #F2D8DC}.noprint{display:block;margin:0 auto 16px;padding:10px 18px;border:0;border-radius:10px;background:#9B2335;color:#fff;font:600 15px system-ui,sans-serif;cursor:pointer}@media print{body{background:#fff;padding:0}main{border:0;padding:0}}${patCss()}</style></head><body><button class="noprint" onclick="window.print()">🖨 ${p.pat.lang === 'vi' ? 'In / Lưu PDF' : 'Print / Save PDF'}</button><main>${patternHTML(p)}</main></body></html>`;
+}
+let prevT = null;
+function schedulePreview(p) {
+  clearTimeout(prevT);
+  prevT = setTimeout(() => {
+    const el = $('#patPrev'); if (el) el.innerHTML = patternHTML(p);
+    const ch = $('#abbrChips'); if (ch) ch.innerHTML = abbrChips(p);
+    const st = $('#sizeOut'); if (st) st.textContent = sizeTool(p) || '—';
+  }, 300);
+}
+function abbrChips(p) {
+  const found = detectAbbr(patText(p));
+  if (!found.length) return `<span class="small mut">${t('Chưa thấy viết tắt nào trong nội dung.', 'No abbreviations detected yet.')}</span>`;
+  return found.map(x => `<button type="button" class="chip ${p.pat.abbrOff.includes(x.k) ? 'off' : 'on'}" data-a="abbrTog" data-k="${esc(x.k)}" title="${esc(lb(x))}">${esc(x.k)}</button>`).join('');
+}
+VIEWS.studio = id => {
+  const p = P(id);
+  if (!p) return { title: 'Pattern Studio', nav: 'projects', html: `<div class="card">${emptyBox('🔍', t('Dự án không tồn tại.', 'Project not found.'), '<a class="btn" href="#/projects">←</a>')}</div>` };
+  const fresh = !p.pat;
+  const a = ensurePat(p);
+  if (fresh) save();
+  const pi = (f, ph, extra) => `<input class="inp" data-i="pat" data-f="${f}" value="${esc(a[f] == null ? '' : a[f])}" placeholder="${esc(ph || '')}" ${extra || ''}>`;
+  const pt = (f, ph, rows) => `<textarea class="inp" data-i="pat" data-f="${f}" rows="${rows || 3}" placeholder="${esc(ph || '')}">${esc(a[f] || '')}</textarea>`;
+  const ps = (f, list) => `<select class="inp" data-c="patSel" data-f="${f}">${list.map(o => `<option value="${esc(o.k)}" ${o.k === a[f] ? 'selected' : ''}>${esc(o.l != null ? o.l : lb(o))}</option>`).join('')}</select>`;
+  const mats = materialsBase(p, a.lang);
+  return { title: 'Pattern Studio', nav: 'projects', html: `
+  <div class="stbar">
+    <a class="btn sm" href="#/project/${p.id}">← ${esc(p.name)}</a>
+    <span class="grow"></span>
+    <button class="btn sm p" type="button" data-a="patPrint" data-id="${p.id}">🖨 ${t('In / Lưu PDF', 'Print / PDF')}</button>
+    <button class="btn sm" type="button" data-a="patHTML" data-id="${p.id}">⬇️ HTML</button>
+    <button class="btn sm" type="button" data-a="patTXT" data-id="${p.id}">⬇️ TXT</button>
+    <button class="btn sm" type="button" data-a="patCopy" data-id="${p.id}">📋 Copy</button>
+    <button class="btn sm mob" type="button" data-a="patPeek">👁 ${t('Xem trước', 'Preview')}</button>
+  </div>
+  <div class="studio">
+    <div class="stack">
+      <div class="card"><h3>📇 ${t('Thông tin', 'Info')}</h3>
+        ${fld(t('Tên pattern', 'Pattern title'), pi('title', p.name))}
+        <div class="f2">${fld(t('Người thiết kế', 'Designer'), pi('designer', ''))}${fld(t('Độ khó', 'Difficulty'), ps('diff', DIFFS))}</div>
+        <div class="f2">${fld(t('Loại pattern', 'Pattern type'), ps('ptype', PTYPES))}${fld(t('Ngôn ngữ file xuất', 'Export language'), ps('lang', [{ k: 'vi', l: 'Tiếng Việt' }, { k: 'en', l: 'English' }]))}</div>
+        ${a.ptype === 'notes' ? `<div class="alert amber small" style="margin-bottom:10px">⚠️ ${t('Ghi chú theo pattern của người khác: chỉ lưu cho bản thân, không đăng lại hay bán.', 'Notes on someone else’s pattern: keep them for yourself, do not republish or sell.')}</div>
+          <div class="f2">${fld(t('Pattern gốc', 'Original pattern'), pi('origName', ''))}${fld(t('Link pattern gốc', 'Original link'), pi('origUrl', 'https://', 'type="url" inputmode="url"'))}</div>` : ''}
+        ${fld(t('Giới thiệu ngắn', 'Short intro'), pt('intro', t('Mẫu áo cardigan dáng rộng, đan từ trên xuống…', 'A relaxed top-down cardigan…'), 3))}
+      </div>
+      <div class="card"><h3>📏 Size & Gauge</h3>
+        ${fld(t('Các size (cách nhau dấu phẩy)', 'Sizes (comma separated)'), pi('sizes', 'S, M, L'))}
+        <div class="f3">${fld('Gauge sts', pi('gSts', '22', 'type="number" inputmode="decimal" step="0.5"'))}${fld('Gauge rows', pi('gRows', '30', 'type="number" inputmode="decimal" step="0.5"'))}${fld(t('Đo trên mũi', 'Measured in'), pi('gStitch', 'Stockinette'))}</div>
+        ${fld(t('Kích thước thành phẩm (mỗi dòng 1 số đo)', 'Finished measurements (one per line)'), pt('measure', t('Vòng ngực: 96 (104, 112) cm\nDài áo: 58 cm', 'Chest: 96 (104, 112) cm\nLength: 58 cm'), 3))}
+        <details><summary>🧮 ${t('Tính số mũi cho từng size', 'Stitch count for each size')}</summary>
+          <div class="f3" style="margin-top:8px">${fld(t('Rộng (cm)', 'Widths (cm)'), `<input class="inp" data-i="patTool" data-f="w" value="${esc(a.tool.w)}" placeholder="45, 50, 55">`)}${fld(t('Bội số', 'Multiple'), `<input class="inp" type="number" inputmode="numeric" data-i="patTool" data-f="mult" value="${esc(a.tool.mult)}" placeholder="4">`)}${fld(t('Mũi biên', 'Edge sts'), `<input class="inp" type="number" inputmode="numeric" data-i="patTool" data-f="edge" value="${esc(a.tool.edge)}" placeholder="2">`)}</div>
+          <div class="row"><span class="out" id="sizeOut" style="flex:1">${esc(sizeTool(p) || '—')}</span><button class="btn sm" type="button" data-a="copySize">📋 Copy</button></div>
+          <p class="small mut">${t('Dùng gauge sts ở trên.', 'Uses the gauge sts above.')}</p></details>
+      </div>
+      <div class="card"><h3>🧺 ${t('Nguyên liệu', 'Materials')}</h3>
+        ${mats.length ? `<ul class="small sub" style="margin:0 0 8px;padding-left:18px">${mats.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
+        <p class="small mut">${t('Tự lấy từ dự án (len, que, gram đã dùng). Sửa ở dự án nếu cần.', 'Pulled from the project (yarn, needles, grams used). Edit the project to change.')}</p>
+        ${fld(t('Phụ kiện (notions) — mỗi dòng 1 món', 'Notions — one per line'), pt('notions', t('6 cúc gỗ 18 mm\n4 stitch marker\nKim khâu len', '6 wooden buttons 18 mm\n4 stitch markers\nTapestry needle'), 3))}
+      </div>
+      <div class="card"><div class="sec-h"><h3>📋 ${t('Các phần hướng dẫn', 'Instruction sections')}</h3><button class="btn sm p" type="button" data-a="secDraft" data-id="${p.id}">✨ ${t('Tạo nháp từ ghi chú row', 'Draft from row notes')}</button></div>
+        <label class="chk"><input type="checkbox" data-c="patChk" data-f="inclFormulas" ${a.inclFormulas ? 'checked' : ''}> ${t('Đưa công thức lặp vào pattern (mục Stitch patterns)', 'Include repeat formulas (Stitch patterns section)')}</label>
+        ${a.sections.map((s, i) => `<div class="secd"><div class="row"><input class="inp" data-i="secT" data-s="${i}" value="${esc(s.title)}" placeholder="${t('Tên phần', 'Section title')}"><button class="ib" type="button" data-a="secMove" data-s="${i}" data-d="-1" ${i === 0 ? 'disabled' : ''}>↑</button><button class="ib" type="button" data-a="secMove" data-s="${i}" data-d="1" ${i === a.sections.length - 1 ? 'disabled' : ''}>↓</button><button class="ib" type="button" data-a="secDel" data-s="${i}">✕</button></div><textarea class="inp" rows="6" data-i="secB" data-s="${i}">${esc(s.body)}</textarea></div>`).join('')}
+        <button class="btn sm" type="button" data-a="secAdd" style="margin-top:10px">+ ${t('Thêm phần', 'Add section')}</button>
+      </div>
+      <div class="card"><h3>🔤 ${t('Viết tắt', 'Abbreviations')}</h3>
+        <p class="small mut">${t('Tự nhận ra trong nội dung. Bấm để bật/tắt.', 'Detected automatically. Tap to toggle.')}</p>
+        <div class="chips" id="abbrChips" style="margin-bottom:10px">${abbrChips(p)}</div>
+        ${fld(t('Viết tắt riêng — mỗi dòng "C4F = cable 4 front"', 'Custom — one per line "C4F = cable 4 front"'), pt('abbrCustom', 'C4F = cable 4 front', 2))}
+      </div>
+      <div class="card"><h3>💡 ${t('Ghi chú & mẹo', 'Notes & tips')}</h3>
+        ${pt('notes', t('Mẹo blocking, chỉnh sửa…', 'Blocking tips, modifications…'), 4)}
+        <label class="chk"><input type="checkbox" data-c="patChk" data-f="inclPhotos" ${a.inclPhotos ? 'checked' : ''}> ${t('Kèm ảnh thành phẩm (ảnh đầu làm bìa, tối đa 6 ảnh ở cuối)', 'Include finished photos (first = cover, up to 6 more at the end)')} (${p.photos.length})</label>
+      </div>
+    </div>
+    <div class="st-prev" id="patPrevWrap"><div id="patPrev">${patternHTML(p)}</div></div>
+  </div>` };
+};
+
+/* =====================================================================
+   ACTIONS (click: data-a, change: data-c, input: data-i)
+   ===================================================================== */
+const curP = el => P((el && el.dataset.id) || state.route.id);
+const A = {
+  close: el => { const o = el.closest('.ov'); if (o) o._close(); },
+  setLang: el => setLang(el.dataset.l),
+  toggleLang: () => setLang(L === 'vi' ? 'en' : 'vi'),
+  settings: () => openSettings(),
+  newMenu: () => newMenu(),
+  newProject: () => { closeAll(); projectForm(null); },
+  newYarn: () => { closeAll(); yarnForm(null); },
+  design: () => {
+    closeAll();
+    const p = normProject({ name: t('Pattern mới', 'New pattern'), status: 'idea', design: true });
+    p.pat = patDefaults(p);
+    db.projects.push(p); addLog('✏️', t('Thiết kế pattern mới', 'New pattern design'));
+    save(); go('studio/' + p.id);
+  },
+  pf: el => { state.pf = el.dataset.f; if (state.route.name === 'projects') renderView(); },
+  wf: el => { state.wf = el.dataset.w; renderView(); },
+  editProject: el => projectForm(curP(el)),
+  delProject: async el => {
+    const p = curP(el); if (!p) return;
+    const parts = [];
+    if (p.rows.length) parts.push(t(`${p.rows.length} ghi chú row`, `${p.rows.length} row notes`));
+    if (p.formulas.length) parts.push(t(`${p.formulas.length} công thức`, `${p.formulas.length} formulas`));
+    const imgs = p.photos.length + p.patternImgs.length; if (imgs) parts.push(t(`${imgs} ảnh`, `${imgs} images`));
+    if (p.pat) parts.push('pattern');
+    const ok = await ask({ ic: '🗑', title: t(`Xoá dự án "${p.name}"?`, `Delete project "${p.name}"?`), desc: parts.length ? t('Mất luôn ', 'This also removes ') + esc(parts.join(', ')) + '.' : t('Dự án sẽ bị xoá.', 'The project will be deleted.'), ok: t('Xoá dự án', 'Delete project') });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá dự án', 'Project deleted'), () => { db.projects = db.projects.filter(x => x !== p); addLog('🗑', t('Xoá dự án: ', 'Deleted project: ') + p.name); location.hash = '#/projects'; });
+  },
+  reknit: el => {
+    const p = curP(el); const c = clone(p);
+    c.id = uid(); c.counter = 0; c.rows.forEach(r => { r.done = false; }); c.photos = []; c.startDate = ''; c.endDate = ''; c.status = 'wip'; c.example = false;
+    c.name = p.name.replace(/\s*\((ví dụ|example)\)\s*/ig, ' ').trim() + t(' (đan lại)', ' (again)');
+    touch(c); db.projects.push(normProject(c)); addLog('🔁', t('Đan lại: ', 'Making again: ') + p.name);
+    save(); go('project/' + c.id); toast(t('Đã tạo bản đan lại ✓', 'Copy created ✓'));
+  },
+  shareProject: el => shareForm(curP(el)),
+  addExample: () => {
+    if (db.projects.some(p => p.example)) { toast(t('Đã có dự án ví dụ', 'Example already added')); return; }
+    const ex = exampleProject(); db.projects.push(ex); save(); closeAll(); go('project/' + ex.id); toast(t('Đã thêm cardigan ví dụ 🧥', 'Example cardigan added 🧥'));
+  },
+  cnt: el => {
+    const p = curP(el); if (!p) return;
+    const d = +el.dataset.d; const nv = Math.max(0, p.counter + d); if (nv === p.counter) return;
+    (state.cUndo[p.id] = state.cUndo[p.id] || []).push(p.counter);
+    if (state.cUndo[p.id].length > 50) state.cUndo[p.id].shift();
+    p.counter = nv; touch(p);
+    addLog('🧶', t('Đếm row: ', 'Counted row: ') + p.name + ' → ' + nv, { k: 'count', pid: p.id });
+    try { if (navigator.vibrate) navigator.vibrate(8); } catch (e) {}
+    save(); renderView();
+  },
+  cntUndo: el => {
+    const p = curP(el); const st = state.cUndo[p.id];
+    if (!st || !st.length) { toast(t('Không còn bước để hoàn tác', 'Nothing to undo')); return; }
+    p.counter = st.pop(); touch(p); save(); renderView();
+  },
+  cntReset: async el => {
+    const p = curP(el); if (!p.counter) return;
+    const ok = await ask({ ic: '🔢', title: t('Đặt Row Counter về 0?', 'Reset Row Counter to 0?'), desc: t(`Đang ở row ${p.counter}.`, `Currently at row ${p.counter}.`), ok: t('Đặt lại', 'Reset') });
+    if (!ok) return;
+    doWithUndo(t('Đã đặt lại counter', 'Counter reset'), () => { (state.cUndo[p.id] = state.cUndo[p.id] || []).push(p.counter); p.counter = 0; touch(p); });
+  },
+  gaugeFrom: el => { const p = curP(el); Object.assign(state.g, { pS: p.pGaugeSts, pR: p.pGaugeRows, mS: p.myGaugeSts, mR: p.myGaugeRows, mode: 1 }); go('gauge'); },
+  rowNew: el => rowForm(curP(el)),
+  rowEdit: el => rowForm(curP(el), +el.dataset.i),
+  rowDel: async el => {
+    const p = curP(el), i = +el.dataset.i, r = p.rows[i];
+    const ok = await ask({ title: t(`Xoá ghi chú ${rowLabel(r)}?`, `Delete note ${rowLabel(r)}?`), desc: r.t ? '“' + esc(r.t.slice(0, 90)) + (r.t.length > 90 ? '…' : '') + '”' : '' });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá ghi chú row', 'Row note deleted'), () => { p.rows.splice(i, 1); touch(p); });
+  },
+  fNew: el => formulaForm(curP(el)),
+  fEdit: el => formulaForm(curP(el), el.dataset.f),
+  fDel: async el => {
+    const p = curP(el), f = fOf(p, el.dataset.f); if (!f) return;
+    const n = p.rows.filter(r => r.f === f.id).length;
+    const ok = await ask({ title: t(`Xoá công thức ${f.name}?`, `Delete formula ${f.name}?`), desc: n ? t(`${n} ghi chú row đang dùng sẽ chỉ bị bỏ liên kết — ghi chú vẫn giữ nguyên.`, `${n} row notes using it will just be unlinked — the notes stay.`) : t(`Mất ${formulaLines(f).length} dòng công thức.`, `Removes ${formulaLines(f).length} lines.`) });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá công thức', 'Formula deleted'), () => { p.rows.forEach(r => { if (r.f === f.id) r.f = ''; }); p.formulas = p.formulas.filter(x => x !== f); touch(p); });
+  },
+  imgDel: async el => {
+    const p = curP(el), kind = el.dataset.kind, i = +el.dataset.i;
+    const ok = await ask({ ic: '🖼', title: t('Xoá ảnh này?', 'Delete this image?'), desc: `<img src="${esc(p[kind][i])}" alt="" style="max-height:140px;border-radius:10px">` });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá ảnh', 'Image deleted'), () => { p[kind].splice(i, 1); touch(p); });
+  },
+  zoom: el => modal(`<img src="${esc(el.getAttribute('src'))}" alt="" data-a="close">`, { cls: 'lb' }),
+  /* yarn */
+  editYarn: el => yarnForm(Y(el.dataset.id)),
+  delYarn: async el => {
+    const y = Y(el.dataset.id); const used = db.projects.filter(p => p.yarnId === y.id);
+    const ok = await ask({ title: t(`Xoá len "${yarnTitle(y)}"?`, `Delete yarn "${yarnTitle(y)}"?`), desc: [y.ideas.length ? t(`Mất luôn ${y.ideas.length} ý tưởng.`, `Also removes ${y.ideas.length} ideas.`) : '', used.length ? t(`${used.length} dự án đang dùng len này sẽ bỏ liên kết.`, `${used.length} projects will be unlinked.`) : ''].filter(Boolean).join(' ') });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá len', 'Yarn deleted'), () => { used.forEach(p => { p.yarnId = ''; p.yarnInfo = { brand: y.brand, name: y.name, color: y.color, weight: y.weight, fiber: y.fiber, gramsPerSkein: y.gramsPerSkein, metersPerSkein: y.metersPerSkein }; }); db.yarns = db.yarns.filter(x => x !== y); location.hash = '#/stash'; });
+  },
+  newIdea: el => ideaForm(Y(el.dataset.id)),
+  editIdea: el => ideaForm(Y(el.dataset.id), +el.dataset.i),
+  delIdea: async el => {
+    const y = Y(el.dataset.id), i = +el.dataset.i, d = y.ideas[i];
+    const ok = await ask({ ic: '💡', title: t('Xoá ý tưởng này?', 'Delete this idea?'), desc: esc((d.t || d.u || '').slice(0, 90)) + (d.img ? t(' (kèm 1 ảnh)', ' (with 1 image)') : '') });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá ý tưởng', 'Idea deleted'), () => { y.ideas.splice(i, 1); });
+  },
+  ideaToProject: el => {
+    const y = Y(el.dataset.id), d = y.ideas[+el.dataset.i];
+    projectForm(null, { name: (d.t || '').split('\n')[0].slice(0, 80) || yarnTitle(y), status: 'idea', yarnId: y.id, patternUrl: safeUrl(d.u), patternImgs: d.img ? [d.img] : [], pGaugeSts: y.gaugeSts, needle: y.needle, startDate: '' });
+  },
+  newLib: () => libForm(),
+  libDel: async el => {
+    const x = db.customLib.find(c => c.id === el.dataset.l); if (!x) return;
+    const ok = await ask({ title: t(`Xoá "${x.brand} ${x.name}" khỏi thư viện?`, `Remove "${x.brand} ${x.name}" from the library?`), desc: t('Len trong kho không bị ảnh hưởng.', 'Yarn in your stash is not affected.') });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá len thư viện', 'Library yarn removed'), () => { db.customLib = db.customLib.filter(c => c !== x); });
+  },
+  libToStash: el => {
+    const x = allLib().find(c => c.id === el.dataset.l); if (!x) return;
+    const g = x.g[1] && x.g[1] !== x.g[0] ? Math.round((num(x.g[0]) + num(x.g[1])) / 2) : x.g[0];
+    yarnForm(null, { brand: x.brand, name: x.name, weight: x.weight, fiber: x.fiber, gramsPerSkein: x.gr, metersPerSkein: x.m, gaugeSts: g, needle: x.n[0], note: lb(x), skeins: 1 });
+  },
+  /* gauge */
+  gMode: el => { state.g.mode = +el.dataset.m; renderView(); },
+  /* backup & data */
+  backup: () => backupNow(),
+  install: async () => {
+    const dp = state.deferredPrompt;
+    if (!dp) { modal(`${mHead('📲 ' + t('Cài app', 'Install app'))}${installGuide()}`, { cls: 'sm' }); return; }
+    dp.prompt(); try { await dp.userChoice; } catch (e) {} state.deferredPrompt = null; updateInstallBtn();
+  },
+  wipeAll: async () => {
+    const word = t('XOA', 'DELETE');
+    const ok = await ask({ ic: '⚠️', title: t('Xoá HẾT dữ liệu?', 'Delete ALL data?'), desc: t(`Mất ${db.projects.length} dự án, ${db.yarns.length} len và mọi ảnh, ghi chú. Hãy xuất file sao lưu trước!`, `Removes ${db.projects.length} projects, ${db.yarns.length} yarns and all images and notes. Export a backup first!`), ok: t('Xoá hết', 'Delete everything'), word });
+    if (!ok) return;
+    closeAll();
+    doWithUndo(t('Đã xoá toàn bộ dữ liệu', 'All data deleted'), () => { const lang = db.settings.lang || L; db = emptyDB(); db.settings.lang = lang; shell(); });
+  },
+  startSample: async () => {
+    const n = $('#wName'); if (n) db.settings.name = n.value.trim();
+    if (db.projects.length || db.yarns.length) {
+      const ok = await ask({ ic: '🧶', title: t('Nạp dữ liệu mẫu?', 'Load sample data?'), desc: t('Dữ liệu mẫu sẽ được thêm vào cùng dữ liệu hiện có.', 'Sample data will be added to your existing data.'), ok: t('Nạp mẫu', 'Load sample'), safe: true });
+      if (!ok) return;
+    }
+    const s = sampleData();
+    db.yarns = db.yarns.concat(s.yarns);
+    db.projects = db.projects.filter(p => !p.example).concat(s.projects);
+    db.log = s.log.concat(db.log).slice(0, 30);
+    db.settings.onboarded = true; db.settings.lang = L;
+    save(); shell(); go('home'); toast(t('Đã nạp dữ liệu mẫu 🧶', 'Sample data loaded 🧶'));
+  },
+  startEmpty: () => {
+    const n = $('#wName'); if (n) db.settings.name = n.value.trim();
+    db.settings.onboarded = true; db.settings.lang = L; save(); shell(); go('home');
+  },
+  /* studio */
+  patPrint: el => {
+    const p = curP(el); const area = $('#print-area');
+    area.innerHTML = patternHTML(p);
+    document.body.classList.add('printing');
+    const done = () => { document.body.classList.remove('printing'); area.innerHTML = ''; window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done);
+    setTimeout(() => { window.print(); setTimeout(() => { if (!matchMedia('print').matches) done(); }, 1500); }, 60);
+  },
+  patHTML: async el => { const p = curP(el); await shareOrDownload(new Blob([patternDoc(p)], { type: 'text/html' }), `${slug(p.pat.title || p.name)}-pattern.html`, p.pat.title); },
+  patTXT: async el => { const p = curP(el); await shareOrDownload(new Blob([patternTXT(p)], { type: 'text/plain' }), `${slug(p.pat.title || p.name)}-pattern.txt`, p.pat.title); },
+  patCopy: async el => { const ok = await copyText(patternTXT(curP(el))); toast(ok ? t('Đã copy pattern ✓', 'Pattern copied ✓') : t('Không copy được', 'Could not copy')); },
+  patPeek: () => { const w = $('#patPrevWrap'); if (w) w.scrollIntoView({ behavior: 'smooth' }); },
+  copySize: async () => { const s = $('#sizeOut').textContent; if (s && s !== '—') { await copyText(s); toast(t('Đã copy ✓', 'Copied ✓')); } },
+  abbrTog: el => {
+    const p = curP(), k = el.dataset.k, off = p.pat.abbrOff;
+    const i = off.indexOf(k); if (i >= 0) off.splice(i, 1); else off.push(k);
+    el.classList.toggle('on', i >= 0); el.classList.toggle('off', i < 0);
+    save(); schedulePreview(p);
+  },
+  secAdd: () => { const p = curP(); p.pat.sections.push({ id: uid(), title: '', body: '' }); save(); renderView(); },
+  secMove: el => {
+    const p = curP(), i = +el.dataset.s, j = i + (+el.dataset.d), s = p.pat.sections;
+    if (j < 0 || j >= s.length) return; const tmp = s[i]; s[i] = s[j]; s[j] = tmp; save(); renderView();
+  },
+  secDel: async el => {
+    const p = curP(), i = +el.dataset.s, s = p.pat.sections[i];
+    const ok = await ask({ title: t(`Xoá phần "${s.title || '…'}"?`, `Delete section "${s.title || '…'}"?`), desc: s.body ? t(`Mất ${s.body.split('\n').filter(Boolean).length} dòng hướng dẫn.`, `Removes ${s.body.split('\n').filter(Boolean).length} lines of instructions.`) : '' });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá phần hướng dẫn', 'Section deleted'), () => { p.pat.sections.splice(i, 1); });
+  },
+  secDraft: async el => {
+    const p = curP(el);
+    if (!p.rows.length) { toast(t('Chưa có ghi chú row để tạo nháp', 'No row notes to draft from')); return; }
+    const has = p.pat.sections.some(s => s.title || s.body);
+    if (has) {
+      const ok = await ask({ ic: '✨', title: t('Thay bản nháp hiện tại?', 'Replace current draft?'), desc: t(`${p.pat.sections.length} phần hướng dẫn hiện có sẽ bị thay bằng bản nháp mới từ ${p.rows.length} ghi chú row.`, `The ${p.pat.sections.length} current sections will be replaced by a new draft from ${p.rows.length} row notes.`), ok: t('Thay bản nháp', 'Replace draft') });
+      if (!ok) return;
+      doWithUndo(t('Đã tạo nháp mới', 'New draft created'), () => { p.pat.sections = genDraft(p, p.pat.lang); });
+    } else { p.pat.sections = genDraft(p, p.pat.lang); save(); renderView(); }
+    toast(t('✨ Đã tạo nháp từ ghi chú row', '✨ Draft created from row notes'));
+  }
+};
+const C = {
+  rowDone: el => { const p = curP(el); p.rows[+el.dataset.i].done = el.checked; touch(p); save(); el.closest('.rn').classList.toggle('done', el.checked); },
+  addImg: async el => {
+    const p = curP(el), kind = el.dataset.kind;
+    const imgs = await readImages(el.files, kind === 'patternImgs' ? 1400 : 900);
+    el.value = '';
+    if (!imgs.length) { toast(t('Không đọc được ảnh', 'Could not read image')); return; }
+    p[kind] = p[kind].concat(imgs); touch(p); save(); renderView(); toast(t(`Đã thêm ${imgs.length} ảnh ✓`, `${imgs.length} image(s) added ✓`));
+  },
+  cntPick: el => go('counter/' + el.value),
+  gFromProj: el => { const p = P(el.value); if (p) { state.g.pS = p.pGaugeSts; state.g.pR = p.pGaugeRows; if (p.myGaugeSts) { state.g.mS = p.myGaugeSts; state.g.mR = p.myGaugeRows; } renderView(); } },
+  gFromYarn: el => { const y = Y(el.value); if (y) { state.g.mS = y.gaugeSts; renderView(); } },
+  importFile: el => { const f = el.files[0]; el.value = ''; if (f) importFile(f); },
+  patSel: el => { const p = curP(); p.pat[el.dataset.f] = el.value; save(); if (el.dataset.f === 'ptype' || el.dataset.f === 'lang') renderView(); else schedulePreview(p); },
+  patChk: el => { const p = curP(); p.pat[el.dataset.f] = el.checked; save(); schedulePreview(p); }
+};
+let notesT = null;
+const I = {
+  projNotes: el => { const p = curP(el); p.notes = el.value; clearTimeout(notesT); notesT = setTimeout(() => { touch(p); save(); }, 400); },
+  g: el => { state.g[el.dataset.f] = el.value; const r = $('#gRes'); if (r) r.innerHTML = gaugeResults(); const s = $('#gSug'); if (s) s.innerHTML = suggestBlock(num(state.g.mS) || num(state.g.pS)); },
+  findG: el => { state.findG = el.value; const r = $('#findRes'); if (r) r.innerHTML = suggestBlock(num(el.value)); },
+  search: el => { state.q = el.value; const ts = $('#topSearch'); if (ts) ts.value = el.value; const pos = el.selectionStart; renderView(); const m = $('#mSearch'); if (m) { m.focus(); try { m.setSelectionRange(pos, pos); } catch (e) {} } },
+  pat: el => { const p = curP(); p.pat[el.dataset.f] = el.value; save(); schedulePreview(p); },
+  patTool: el => { const p = curP(); p.pat.tool[el.dataset.f] = el.value; save(); schedulePreview(p); },
+  secT: el => { const p = curP(); p.pat.sections[+el.dataset.s].title = el.value; save(); schedulePreview(p); },
+  secB: el => { const p = curP(); p.pat.sections[+el.dataset.s].body = el.value; save(); schedulePreview(p); }
+};
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-a]');
+  if (!el || el.disabled) return;
+  const fn = A[el.dataset.a]; if (!fn) return;
+  if (el.tagName !== 'A' || !el.getAttribute('href') || /^javascript:/i.test(el.getAttribute('href'))) e.preventDefault();
+  Promise.resolve().then(() => fn(el, e)).catch(err => { console.error(err); toast('⚠️ ' + err.message); });
+});
+document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('a[role=button][data-a]')) { e.preventDefault(); e.target.click(); } });
+document.addEventListener('change', e => { const el = e.target.closest('[data-c]'); if (el && C[el.dataset.c]) C[el.dataset.c](el, e); });
+document.addEventListener('input', e => { const el = e.target.closest('[data-i]'); if (el && I[el.dataset.i]) I[el.dataset.i](el, e); });
+
+function setLang(l) {
+  if (l !== 'vi' && l !== 'en') return;
+  const wn = $('#wName'); if (wn) db.settings.name = wn.value.trim();
+  L = l; db.settings.lang = l; save();
+  const settingsOpen = !!$('#setName');
+  closeAll(); shell(); render();
+  if (settingsOpen) openSettings();
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); state.deferredPrompt = e; updateInstallBtn(); });
+window.addEventListener('appinstalled', () => { state.deferredPrompt = null; updateInstallBtn(); toast(t('Đã cài YarnLoop 🎉', 'YarnLoop installed 🎉')); });
+(async function init() {
+  const nj = document.getElementById('nojs'); if (nj) nj.remove();
+  const st = document.createElement('style'); st.textContent = patCss(); document.head.appendChild(st);
+  await storeInit();
+  db = normalize(await storeLoad());
+  if (db.settings.lang) L = db.settings.lang;
+  state.g = { mode: 1, pS: '', pR: '', mS: '', mR: '', sizes: '', rows: '', mult: '', edge: '', widths: '', lengths: '' };
+  state.route = parseHash();
+  shell(); render();
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW', e));
+  }
+})();
+</script>
+</body>
+</html>
