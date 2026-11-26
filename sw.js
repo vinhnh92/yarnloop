@@ -1,6 +1,6 @@
 /* YarnLoop service worker — network-first, fallback to cache when offline.
    Tăng số version của CACHE mỗi lần cập nhật app để người dùng nhận bản mới. */
-const CACHE = 'yarnloop-v1.0.0';
+const CACHE = 'yarnloop-v1.1.0';
 const FILES = [
   './',
   './index.html',

@@ -254,6 +254,12 @@ details>summary{cursor:pointer;font-weight:600;color:var(--tx2)}
 .chk input{width:18px;height:18px;accent-color:var(--p)}
 .out{background:var(--soft);border:1px dashed var(--bd);border-radius:10px;padding:8px 10px;font-weight:600;color:var(--pd)}
 #print-area{display:none}
+.chwrap{overflow:auto;-webkit-overflow-scrolling:touch;background:#fff;border:1px solid var(--bdl);border-radius:var(--r);padding:8px;max-height:72vh}
+.chwrap canvas{display:block;touch-action:none;cursor:crosshair}
+.chwrap.move canvas{touch-action:pan-x pan-y pinch-zoom;cursor:grab}
+.chip.pal{display:inline-flex;align-items:center;gap:6px}
+.yph{width:46px;height:46px;border-radius:12px;flex:none;object-fit:cover;border:1px solid var(--bdl)}
+.yph.lg{width:64px;height:64px;border-radius:16px;cursor:zoom-in}
 @media print{
   body.printing>*:not(#print-area){display:none!important}
   body.printing #print-area{display:block}
@@ -286,13 +292,13 @@ const BRAND = {
   tagVi: 'Nhật ký đan & móc len',
   tagEn: 'Your knit & crochet journal',
   tiktok: 'https://www.tiktok.com/@lenmomam',
-  version: '1.0.0'
+  version: '1.1.0'
 };
 
 /* =====================================================================
    CONSTANTS
    ===================================================================== */
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 const WEIGHTS = [
   { k: 'lace',       name: 'Lace (0)',             g: [33, 40], n: [1.5, 2.25] },
   { k: 'fingering',  name: 'Fingering / 4ply (1)', g: [27, 32], n: [2.25, 3.25] },
@@ -546,16 +552,16 @@ const P_DEF = () => ({
   id: uid(), name: '', craft: 'knit', status: 'wip', patternName: '', patternUrl: '', yarnId: '', needle: '', size: '',
   pGaugeSts: '', pGaugeRows: '', myGaugeSts: '', myGaugeRows: '', totalRows: '', gramsUsed: '', startDate: '', endDate: '',
   counter: 0, rows: [], formulas: [], notes: '', patternImgs: [], photos: [], updated: Date.now(),
-  design: false, example: false, pat: null, yarnInfo: null, sharedFrom: ''
+  design: false, example: false, pat: null, yarnInfo: null, sharedFrom: '', charts: [], ref: null, autoCount: true
 });
 const Y_DEF = () => ({
   id: uid(), brand: '', name: '', weight: '', fiber: '', color: '', hex: '#E8C5CB', skeins: '', gramsPerSkein: '',
-  metersPerSkein: '', gramsLeft: '', gaugeSts: '', needle: '', shop: '', note: '', ideas: []
+  metersPerSkein: '', gramsLeft: '', gaugeSts: '', needle: '', shop: '', note: '', ideas: [], photos: [], domHex: ''
 });
-const emptyDB = () => ({ v: DB_VERSION, settings: { name: '', lang: null, onboarded: false, lastBackup: null }, log: [], customLib: [], yarns: [], projects: [] });
+const emptyDB = () => ({ v: DB_VERSION, settings: { name: '', lang: null, onboarded: false, lastBackup: null }, log: [], customLib: [], yarns: [], projects: [], refs: [] });
 
 function normRow(r) {
-  r = Object.assign({ from: '', to: '', sec: '', sts: '', rtype: '', f: '', t: '', done: false }, r || {});
+  r = Object.assign({ from: '', to: '', sec: '', sts: '', rtype: '', f: '', t: '', done: false, ch: '', ms: '' }, r || {});
   if ((r.from === '' || r.from == null) && r.n != null) {
     const s = String(r.n);
     const m = s.match(/(\d+)\s*(?:[-–—]|to|đến|->)\s*(\d+)/i);
@@ -584,6 +590,9 @@ function normProject(p) {
   if (!findK(CRAFTS, p.craft)) p.craft = 'knit';
   p.patternImgs = p.patternImgs.filter(isImg); p.photos = p.photos.filter(isImg);
   p.design = !!p.design; p.example = !!p.example;
+  p.charts = (Array.isArray(p.charts) ? p.charts : []).map(normChart);
+  p.ref = p.ref && p.ref.id ? { id: String(p.ref.id), si: parseInt(p.ref.si) || 0 } : null;
+  p.autoCount = p.autoCount !== false;
   if (!p.updated) p.updated = Date.now();
   return p;
 }
@@ -591,6 +600,7 @@ function normYarn(y) {
   y = Object.assign(Y_DEF(), y || {});
   if (!Array.isArray(y.ideas)) y.ideas = [];
   y.ideas = y.ideas.map(i => Object.assign({ img: '', t: '', u: '' }, i));
+  y.photos = (Array.isArray(y.photos) ? y.photos : []).filter(isImg).slice(0, 4);
   return y;
 }
 function normalize(d) {
@@ -602,6 +612,7 @@ function normalize(d) {
   d.customLib = Array.isArray(d.customLib) ? d.customLib : [];
   d.yarns = (Array.isArray(d.yarns) ? d.yarns : []).map(normYarn);
   d.projects = (Array.isArray(d.projects) ? d.projects : []).map(normProject);
+  d.refs = (Array.isArray(d.refs) ? d.refs : []).map(normRef);
   return d;
 }
 
@@ -775,7 +786,10 @@ function sampleData() {
     { ts: now - 86400000 * 5, ic: '🧺', t: (vi ? 'Thêm len: ' : 'Added yarn: ') + 'Drops Baby Merino' },
     { ts: now - 86400000 * 20, ic: '✅', t: (vi ? 'Hoàn thành: ' : 'Finished: ') + p3.name }
   ];
-  return { yarns: [y1, y2, y3], projects: [p1, p2, p3, ex], log };
+  /* chart ví dụ: trái tim 13×11 */
+  const HEART = ['0000000000000','0011100011100','0111110111110','1111111111111','1111111111111','1111111111111','0111111111110','0011111111100','0001111111000','0000111110000','0000011100000'];
+  p1.charts = [normChart({ name: vi ? 'Chart A – trái tim' : 'Chart A – heart', w: 13, h: 11, pal: [{ hex: '#F4C2CC', n: vi ? 'Nền hồng' : 'Pink MC' }, { hex: '#9B2335', n: vi ? 'Đỏ rượu' : 'Wine' }], cells: HEART.join(''), start: 21, flat: true })];
+  return { yarns: [y1, y2, y3], projects: [p1, p2, p3, ex], log, refs: [exampleRef()] };
 }
 
 /* =====================================================================
@@ -871,6 +885,7 @@ const NAV = () => [
     { r: 'stash/lib', ic: '📚', l: t('Thư viện len', 'Yarn library') }] },
   { grp: t('Công cụ', 'Tools'), items: [
     { r: 'gauge', ic: '📐', l: 'Gauge Converter' },
+    { r: 'refs', ic: '📏', l: t('Mẫu áo tham chiếu', 'Reference patterns') },
     { act: 'design', ic: '✏️', l: t('Tự thiết kế pattern', 'Design a pattern') }] }
 ];
 function langSw() { return `<div class="langsw"><button type="button" class="${L === 'vi' ? 'on' : ''}" data-a="setLang" data-l="vi">Tiếng Việt</button><button type="button" class="${L === 'en' ? 'on' : ''}" data-a="setLang" data-l="en">English</button></div>`; }
@@ -1044,6 +1059,20 @@ VIEWS.projects = () => {
    VIEW: Chi tiết dự án
    ===================================================================== */
 function rowLabel(r) { return 'R' + r.from + (r.to > r.from ? '–' + r.to : ''); }
+function rowRef(p) { const r = p.ref && RF(p.ref.id); return r || null; }
+function rowExtraTags(p, r) {
+  let h = '';
+  const ref = r.ms ? rowRef(p) : null, m = ref && ref.ms.find(x => x.id === r.ms);
+  if (m) h += `<span class="tag">📏 ${esc(m.label)}</span>`;
+  const c = r.ch ? chartOf(p, r.ch) : null;
+  if (c) h += `<a class="tag dk" href="#/chart/${p.id}.${c.id}" style="text-decoration:none">🎨 ${esc(c.name)}</a>`;
+  return h;
+}
+function chartPosLine(p, r, X) {
+  const c = r.ch ? chartOf(p, r.ch) : null; if (!c) return '';
+  const cr = ((X - r.from) % c.h) + 1, rn = chartRowNotes(c)[cr];
+  return `<div class="posl">🎨 <b>Row ${X}</b> = ${t('hàng', 'row')} ${cr}/${c.h} ${t('của', 'of')} <a href="#/chart/${p.id}.${c.id}">${esc(c.name)}</a> · ${c.flat && cr % 2 === 0 ? t('đọc trái → phải', 'read left → right') : t('đọc phải → trái', 'read right → left')}${rn ? `<div>📝 ${esc(rn)}</div>` : ''}</div>`;
+}
 function nowBox(p) {
   const X = Math.max(1, p.counter);
   const rs = rowsAt(p, X);
@@ -1051,6 +1080,7 @@ function nowBox(p) {
     const fp = formulaPos(p, r, X);
     return `<div class="cn-i"><div class="small"><b>${rowLabel(r)}</b>${r.sec ? ` · ${esc(lbl(SECTIONS, r.sec))}` : ''}${r.rtype ? ` · ${esc(lbl(RTYPES, r.rtype))}` : ''}${r.sts ? ` · → ${r.sts} sts` : ''}</div>
       ${fp ? `<div class="posl">▶ <b>Row ${X}</b> = ${t('dòng', 'line')} ${fp.line}/${fp.k} ${t('của công thức', 'of stitch pattern')} ${esc(fp.f.name)} · ${t('lượt', 'repeat')} ${fp.rep}/${fp.total}<div>${esc(fp.text)}</div></div>` : ''}
+      ${chartPosLine(p, r, X)}
       ${r.t ? `<div class="rn-t">${nl2br(r.t)}</div>` : ''}</div>`;
   }).join('') : `<div class="mut small">${t('Chưa có ghi chú cho row này. Thêm ở mục "Ghi chú từng row".', 'No note for this row yet. Add one under "Row notes".')}</div>`;
   return `<div class="cnow"><h4>📌 Row ${X} ${t('làm gì', '— what to do')}</h4>${body}</div>`;
@@ -1107,7 +1137,7 @@ function rowNotes(p) {
     return `<div class="rn ${cur ? 'cur' : ''} ${r.done ? 'done' : ''}">
       <input type="checkbox" data-c="rowDone" data-i="${i}" data-id="${p.id}" ${r.done ? 'checked' : ''} aria-label="done">
       <div class="rn-b">
-        <div class="rn-h"><b>${rowLabel(r)}</b>${r.sec ? `<span class="tag">${esc(lbl(SECTIONS, r.sec))}</span>` : ''}${r.rtype ? `<span class="tag">${esc(lbl(RTYPES, r.rtype))}</span>` : ''}<span class="mut">${n} row${n > 1 ? 's' : ''}</span>${r.sts ? `<span class="b">→ ${r.sts} sts</span>` : ''}${f ? `<span class="tag dk">🔁 ${esc(f.name)}</span>` : ''}</div>
+        <div class="rn-h"><b>${rowLabel(r)}</b>${r.sec ? `<span class="tag">${esc(lbl(SECTIONS, r.sec))}</span>` : ''}${r.rtype ? `<span class="tag">${esc(lbl(RTYPES, r.rtype))}</span>` : ''}<span class="mut">${n} row${n > 1 ? 's' : ''}</span>${r.sts ? `<span class="b">→ ${r.sts} sts</span>` : ''}${f ? `<span class="tag dk">🔁 ${esc(f.name)}</span>` : ''}${rowExtraTags(p, r)}</div>
         ${fp ? `<div class="posl">▶ <b>Row ${X}</b> = ${t('dòng', 'line')} ${fp.line}/${fp.k} ${t('của công thức', 'of stitch pattern')} ${esc(fp.f.name)} · ${t('lượt', 'repeat')} ${fp.rep}/${fp.total}<div>${esc(fp.text)}</div></div>` : ''}
         ${r.t ? `<div class="rn-t">${nl2br(r.t)}</div>` : ''}
       </div>
@@ -1145,8 +1175,10 @@ VIEWS.project = id => {
       <div class="stack">
         <div class="card"><h3>ℹ️ ${t('Thông tin', 'Details')}</h3>${infoTable(p)}</div>
         <div class="card"><div class="sec-h"><h3>🔁 ${t('Công thức lặp', 'Repeat formulas')}</h3><button class="btn sm" type="button" data-a="fNew" data-id="${p.id}">+ ${t('Công thức', 'Formula')}</button></div>${formulaList(p)}</div>
+        ${projRefCard(p)}
       </div>
     </div>
+    ${chartsCard(p)}
     <div class="card"><div class="sec-h"><h3>📝 ${t('Ghi chú từng row', 'Row notes')}</h3><button class="btn sm p" type="button" data-a="rowNew" data-id="${p.id}">+ ${t('Ghi chú row', 'Row note')}</button></div>${rowNotes(p)}</div>
     <div class="g2">
       <div class="card"><div class="sec-h"><h3>📄 ${t('Ảnh pattern / sơ đồ', 'Pattern / chart images')}</h3>${fileBtn('+ ' + t('Ảnh', 'Image'), `multiple data-c="addImg" data-kind="patternImgs" data-id="${p.id}"`)}</div>${imgGrid(p.patternImgs, 'patternImgs', p.id) || `<p class="mut small">${t('Chụp trang pattern / sơ đồ để xem nhanh khi đan.', 'Snap your pattern pages or charts for quick reference.')}</p>`}</div>
@@ -1198,7 +1230,7 @@ function suggestBlock(g) {
 }
 function yarnCard(y) {
   const g = yarnGrams(y), m = yarnMeters(y);
-  return `<a class="card ycard" href="#/yarn/${y.id}"><span class="ysw" style="background:${safeHex(y.hex)}"></span><div style="min-width:0;flex:1">
+  return `<a class="card ycard" href="#/yarn/${y.id}">${y.photos && y.photos[0] ? `<img class="yph" src="${esc(y.photos[0])}" alt="" loading="lazy">` : `<span class="ysw" style="background:${safeHex(y.hex)}"></span>`}<div style="min-width:0;flex:1">
     <b>${esc(yarnTitle(y)) || t('(chưa đặt tên)', '(untitled)')}</b>
     <div class="small mut">${[y.fiber ? lbl(FIBERS, y.fiber) : '', wName(y.weight), y.metersPerSkein && y.gramsPerSkein ? `${y.gramsPerSkein}g/${y.metersPerSkein}m` : ''].filter(Boolean).map(esc).join(' · ')}</div>
     <div class="small sub">${y.gaugeSts ? `📐 ${esc(y.gaugeSts)} sts` : ''}${y.needle ? ` · 🪡 ${esc(y.needle)} mm` : ''}${y.ideas.length ? ` · 💡 ${y.ideas.length}` : ''}</div>
@@ -1251,13 +1283,15 @@ VIEWS.yarn = id => {
     [t('Mua ở', 'Shop'), esc(y.shop)], [t('Ghi chú', 'Note'), nl2br(y.note)]
   ].filter(r => r[1]);
   return { title: yarnTitle(y) || 'Yarn', nav: 'stash', html: `<div class="stack">
-    <div class="row between"><div class="row"><span class="ysw lg" style="background:${safeHex(y.hex)}"></span><div><h2 style="margin:0">${esc(yarnTitle(y))}</h2><div class="mut small">${esc(wName(y.weight))}</div></div></div>
+    <div class="row between"><div class="row">${y.photos[0] ? `<img class="yph lg" src="${esc(y.photos[0])}" alt="" data-a="zoom">` : `<span class="ysw lg" style="background:${safeHex(y.hex)}"></span>`}<div><h2 style="margin:0">${esc(yarnTitle(y))}</h2><div class="mut small">${esc(wName(y.weight))}</div></div></div>
       <div class="row"><button class="btn sm" type="button" data-a="editYarn" data-id="${y.id}">✏️ ${t('Sửa', 'Edit')}</button><button class="btn sm" type="button" data-a="delYarn" data-id="${y.id}">🗑 ${t('Xoá', 'Delete')}</button></div></div>
     ${w ? `<div class="alert soft">💡 ${t(`Len ${esc(w.name.split(' ')[0])} hợp pattern gauge ${w.g[0]}-${w.g[1]} sts, que ${w.n[0]}-${w.n[1]} mm.`, `${esc(w.name.split(' ')[0])} yarn suits patterns with gauge ${w.g[0]}-${w.g[1]} sts, needles ${w.n[0]}-${w.n[1]} mm.`)}</div>` : ''}
     <div class="g2">
       <div class="card"><h3>ℹ️ ${t('Thông tin', 'Details')}</h3><table class="tbl kv">${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table></div>
       <div class="card"><h3>🧶 ${t('Dự án đã dùng len này', 'Projects using this yarn')}</h3>${used.length ? used.map(p => `<div class="row" style="margin:6px 0"><a href="#/project/${p.id}">${esc(p.name)}</a>${badge(p.status)}</div>`).join('') : `<p class="mut small">${t('Chưa có.', 'None yet.')}</p>`}</div>
     </div>
+    <div class="card"><div class="sec-h"><h3>📷 ${t('Ảnh cuộn len', 'Yarn photos')} <span class="small mut">${y.photos.length}/4</span></h3><div class="row">${y.photos.length ? `<button class="btn sm" type="button" data-a="yDomHex" data-id="${y.id}">🎨 ${t('Lấy màu từ ảnh', 'Color from photo')}</button>` : ''}${y.photos.length < 4 ? fileBtn('+ ' + t('Ảnh', 'Photo'), `multiple data-c="yPhoto" data-id="${y.id}"`) : ''}</div></div>
+      ${y.photos.length ? `<div class="imgs">${y.photos.map((s, i) => `<div class="im"><img src="${esc(s)}" alt="" data-a="zoom" loading="lazy"><button type="button" data-a="yPhotoDel" data-id="${y.id}" data-i="${i}" aria-label="delete">✕</button>${i ? `<button type="button" data-a="yPhotoMain" data-id="${y.id}" data-i="${i}" style="left:4px;right:auto" title="${t('Làm ảnh đại diện', 'Make cover')}">★</button>` : ''}</div>`).join('')}</div><p class="small mut">${t('Ảnh đầu tiên hiện trong danh sách kho len.', 'The first photo shows in the stash list.')}${y.domHex ? ` ${t('Màu chủ đạo', 'Main color')}: <span class="ysw" style="display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:middle;background:${esc(safeHex(y.domHex))}"></span> ${esc(y.domHex)}` : ''}</p>` : `<p class="small mut">${t('Chụp cuộn len bạn đang có (tối đa 4 ảnh) — ảnh đầu làm hình đại diện cho dễ tìm.', 'Snap the yarn you own (up to 4 photos) — the first becomes its thumbnail.')}</p>`}</div>
     <div class="card"><div class="sec-h"><h3>💡 ${t('Ý tưởng cho len này', 'Ideas for this yarn')}</h3><button class="btn sm p" type="button" data-a="newIdea" data-id="${y.id}">+ ${t('Ý tưởng', 'Idea')}</button></div>
       ${y.ideas.length ? `<div class="ideas">${y.ideas.map((d, i) => `<div class="idea">${d.img ? `<img src="${esc(d.img)}" alt="" data-a="zoom" loading="lazy">` : ''}<div class="ib-b">${d.t ? `<div class="small">${nl2br(d.t)}</div>` : ''}${safeUrl(d.u) ? `<a class="small" href="${esc(safeUrl(d.u))}" target="_blank" rel="noopener">🔗 ${esc(safeUrl(d.u).replace(/^https?:\/\/(www\.)?/, '').slice(0, 34))}</a>` : ''}<div class="grow"></div><div class="row between"><button class="btn sm p" type="button" data-a="ideaToProject" data-id="${y.id}" data-i="${i}">→ ${t('Tạo dự án', 'Start project')}</button><span><button class="ib" type="button" data-a="editIdea" data-id="${y.id}" data-i="${i}">✏️</button><button class="ib" type="button" data-a="delIdea" data-id="${y.id}" data-i="${i}">✕</button></span></div></div></div>`).join('')}</div>`
       : `<p class="mut small">${t('Lưu ảnh, mô tả, link Pinterest / Ravelry / TikTok cho len này.', 'Save pictures, notes and Pinterest / Ravelry / TikTok links for this yarn.')}</p>`}</div>
@@ -1361,7 +1395,8 @@ VIEWS.search = () => {
   if (q) {
     const ps = db.projects.filter(p => has(p.name) || has(p.patternName) || has(p.notes) || p.rows.some(r => has(r.t)) || p.formulas.some(f => has(f.text) || has(f.name)) || (p.pat && (has(p.pat.title) || has(p.pat.intro) || has(p.pat.notes) || (p.pat.sections || []).some(s => has(s.title) || has(s.body)))));
     const ys = db.yarns.filter(y => has(y.brand) || has(y.name) || has(y.color) || has(y.fiber ? lbl(FIBERS, y.fiber) : '') || has(y.note) || y.ideas.some(i => has(i.t)));
-    res = `<div class="card"><h3>🧶 ${t('Dự án', 'Projects')} (${ps.length})</h3>${ps.length ? `<div class="grid">${ps.map(projCard).join('')}</div>` : `<p class="mut">—</p>`}</div>
+    const rfs = (db.refs || []).filter(r => has(r.name) || has(r.source) || has(r.yarn) || has(r.notes) || has(lbl(GARMENTS, r.garment)) || has(lb(consOf(r.cons))) || has(consOf(r.cons).k) || r.ms.some(m => has(m.label) || has(m.note)));
+    res = (rfs.length ? `<div class="card"><h3>📏 ${t('Mẫu áo tham chiếu', 'Reference patterns')} (${rfs.length})</h3><div class="grid">${rfs.map(refCardHTML).join('')}</div></div>` : '') + `<div class="card"><h3>🧶 ${t('Dự án', 'Projects')} (${ps.length})</h3>${ps.length ? `<div class="grid">${ps.map(projCard).join('')}</div>` : `<p class="mut">—</p>`}</div>
       <div class="card"><h3>🧺 ${t('Len', 'Yarn')} (${ys.length})</h3>${ys.length ? `<div class="grid">${ys.map(yarnCard).join('')}</div>` : `<p class="mut">—</p>`}</div>`;
   }
   return { title: t('Tìm kiếm', 'Search'), html: `<div class="stack">
@@ -1563,27 +1598,58 @@ function rowForm(p, i) {
   const d = isNew ? { from: maxTo + 1, to: '', sec: last ? last.sec : '', sts: '', rtype: '', f: '', t: '' } : Object.assign({}, p.rows[i]);
   if (!isNew && d.to === d.from) d.to = '';
   const fOpts = [{ k: '', l: '—' }].concat(p.formulas.map(f => ({ k: f.id, l: `${t('Công thức', 'Stitch pattern')} ${f.name} (${formulaLines(f).length} ${t('dòng', 'lines')})` })));
+  const ref = rowRef(p), my = myGauge(p), si = ref ? Math.min(p.ref.si || 0, Math.max(0, refSizes(ref).length - 1)) : 0;
+  const msList = ref ? ref.ms.filter(m => m.sts.length || m.cm.length) : [];
+  const cOpts = [{ k: '', l: '—' }].concat((p.charts || []).map(c => ({ k: c.id, l: `${c.name} (${c.w}×${c.h})` })));
+  const n0 = isNew ? '' : (d.to === '' ? 1 : d.to - d.from + 1);
   const ov = modal(`${mHead('📝 ' + (isNew ? t('Ghi chú row', 'Row note') : t('Sửa ghi chú row', 'Edit row note')))}
     <form novalidate>
-      <div class="f2">${fld(t('Từ row', 'From row') + ' *', inp('from', d.from, 'type="number" inputmode="numeric" min="1" autofocus'))}${fld(t('Đến row (trống = 1 row)', 'To row (empty = 1 row)'), inp('to', d.to, 'type="number" inputmode="numeric" min="1"'))}</div>
+      <div class="f3">${fld(t('Từ row', 'From row') + ' *', inp('from', d.from, 'type="number" inputmode="numeric" min="1" autofocus'))}${fld(t('Đến row', 'To row'), inp('to', d.to, 'type="number" inputmode="numeric" min="1"'))}${fld(t('Số row', 'Rows'), inp('n', n0, 'type="number" inputmode="numeric" min="1" placeholder="1"'))}</div>
+      <p class="small mut" style="margin:-4px 0 8px">${t('Nhập Từ–Đến → tự tính số row · nhập Số row → tự điền Đến (VD từ 1, số 3 → 1–3).', 'Enter From–To → row count fills in · enter Rows → To fills in (e.g. from 1, 3 rows → 1–3).')}</p>
       <div class="f2">${fld(t('Phần', 'Section'), sel('sec', [{ k: '', l: '—' }].concat(SECTIONS), d.sec))}${fld(t('Số mũi sau row', 'Stitch count after'), inp('sts', d.sts, 'type="number" inputmode="numeric" min="0" placeholder="sts"'))}</div>
+      ${ref ? `${fld(`📏 ${t('Mốc của mẫu', 'Milestone')} · ${esc(ref.name)} (${esc(refSizes(ref)[si] || '')})`, `<select class="inp" name="ms"><option value="">—</option>${msList.map(m => `<option value="${m.id}" ${m.id === d.ms ? 'selected' : ''}>${esc(m.label)}</option>`).join('')}</select>`)}<div class="out small" id="rSug" style="display:none;margin:-4px 0 10px"></div>` : ''}
       <div class="f2">${fld(t('Loại row', 'Row type'), sel('rtype', RTYPES, d.rtype))}${fld(t('Lặp công thức', 'Repeat formula'), sel('f', fOpts, d.f))}</div>
+      ${(p.charts || []).length ? fld('🎨 ' + t('Đan theo chart', 'Follow chart'), sel('ch', cOpts, d.ch)) : ''}
       ${fld(t('Ghi chú', 'Note'), `<textarea class="inp" name="t" rows="4" placeholder="${t('VD: K2, *P2, K2; rep from * — hoặc mô tả bằng lời', 'e.g. K2, *P2, K2; rep from * — or describe in words')}">${esc(d.t)}</textarea>`)}
       ${p.formulas.length ? '' : `<p class="small mut">${t('Chưa có công thức lặp — tạo ở mục "Công thức lặp" của dự án.', 'No repeat formulas yet — create one under "Repeat formulas".')}</p>`}
+      <label class="chk"><input type="checkbox" name="auto" ${p.autoCount !== false ? 'checked' : ''}> ${t('Tự cập nhật số hàng đã đan theo ghi chú (lấy row lớn nhất)', 'Update rows knitted from notes (largest noted row)')}</label>
       <div class="errm" id="rErr"></div>
       <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="submit">${t('Lưu', 'Save')}</button></div>
     </form>`);
-  ov.querySelector('form').onsubmit = e => {
+  const F = ov.querySelector('form'), fF = F.elements.from, fT = F.elements.to, fN = F.elements.n;
+  fF.addEventListener('input', () => { const a = parseInt(fF.value), n = parseInt(fN.value), b = parseInt(fT.value); if (a >= 1 && n >= 1) fT.value = a + n - 1; else if (a >= 1 && b >= a) fN.value = b - a + 1; });
+  fT.addEventListener('input', () => { const a = parseInt(fF.value), b = parseInt(fT.value); fN.value = a >= 1 && b >= a ? b - a + 1 : ''; });
+  fN.addEventListener('input', () => { const a = parseInt(fF.value), n = parseInt(fN.value); if (a >= 1 && n >= 1) fT.value = a + n - 1; });
+  const msSel = F.elements.ms;
+  const showSug = () => {
+    const box = ov.querySelector('#rSug'); if (!box) return;
+    const m = ref.ms.find(x => x.id === msSel.value); if (!m) { box.style.display = 'none'; return; }
+    const o = msSugg(ref, m, si, my);
+    box.innerHTML = suggText(o) + (o.sts != null ? ` <button class="btn sm" type="button" id="rUse">${t('Dùng', 'Use')} ${o.sts} sts</button>` : (my.s ? '' : `<div class="mut">${t('Nhập gauge của bạn để có số quy đổi.', 'Enter your gauge to get converted counts.')}</div>`)) + (m.note ? `<div class="mut">${esc(m.note)}</div>` : '');
+    box.style.display = '';
+    const u = box.querySelector('#rUse'); if (u) u.onclick = () => { F.elements.sts.value = o.sts; toast(t('Đã điền số mũi gợi ý — sửa tuỳ ý', 'Suggested count filled — adjust freely')); };
+  };
+  if (msSel) { msSel.onchange = showSug; showSug(); }
+  F.onsubmit = e => {
     e.preventDefault();
     const f = formData(e.target);
-    const from = parseInt(f.from), to = f.to === '' ? from : parseInt(f.to);
+    const from = parseInt(f.from), nn = parseInt(f.n);
+    const to = f.to !== '' ? parseInt(f.to) : nn >= 1 ? from + nn - 1 : from;
     const err = m => { ov.querySelector('#rErr').textContent = m; };
     if (!(from >= 1)) return err(t('"Từ row" phải ≥ 1.', '"From row" must be ≥ 1.'));
     if (!(to >= from)) return err(t('"Đến row" phải ≥ "Từ row".', '"To row" must be ≥ "From row".'));
-    if (!f.t && !f.f) return err(t('Cần có ghi chú hoặc chọn công thức.', 'Add a note or pick a formula.'));
-    const r = normRow({ from, to, sec: f.sec, sts: f.sts, rtype: f.rtype, f: f.f, t: f.t, done: isNew ? false : p.rows[i].done });
+    if (!f.t && !f.f && !f.ch && !f.ms) return err(t('Cần có ghi chú, công thức, chart hoặc mốc.', 'Add a note, a formula, a chart or a milestone.'));
+    const r = normRow({ from, to, sec: f.sec, sts: f.sts, rtype: f.rtype, f: f.f, t: f.t, ch: f.ch || '', ms: f.ms || '', done: isNew ? false : p.rows[i].done });
     if (isNew) p.rows.push(r); else p.rows[i] = r;
-    sortRows(p); touch(p); save(); ov._close(); render(); toast(t('Đã lưu ghi chú ✓', 'Note saved ✓'));
+    sortRows(p);
+    p.autoCount = !!f.auto;
+    let bumped = 0;
+    if (p.autoCount) { /* có khoảng hở vẫn lấy row lớn nhất đã ghi; bộ đếm lớn hơn thì giữ nguyên */
+      const mx = p.rows.reduce((m, x) => Math.max(m, x.to), 0);
+      if (mx > p.counter) { (state.cUndo[p.id] = state.cUndo[p.id] || []).push(p.counter); p.counter = mx; bumped = mx; }
+    }
+    touch(p); save(); ov._close(); render();
+    toast(bumped ? t(`Đã lưu ✓ · Số hàng đã đan → ${bumped} (↩ ở bộ đếm để hoàn tác)`, `Saved ✓ · Rows knitted → ${bumped} (↩ on the counter to undo)`) : t('Đã lưu ghi chú ✓', 'Note saved ✓'));
   };
 }
 
@@ -1614,6 +1680,7 @@ function newMenu() {
     <button type="button" data-a="newProject"><span class="mi">🧶</span><span>${t('Dự án mới', 'New project')}<small>${t('Bắt đầu đan / móc và đếm row', 'Start knitting / crocheting and count rows')}</small></span></button>
     <button type="button" data-a="newYarn"><span class="mi">🧺</span><span>${t('Thêm len vào kho', 'Add yarn to stash')}<small>${t('Lưu len bạn đang có', 'Keep track of yarn you own')}</small></span></button>
     <button type="button" data-a="design"><span class="mi">✏️</span><span>${t('Tự thiết kế pattern', 'Design a pattern')}<small>Pattern Studio</small></span></button>
+    <a href="#/refs"><span class="mi">📏</span><span>${t('Mẫu áo tham chiếu', 'Reference patterns')}<small>${t('Số mũi, số đo theo size, gauge của mẫu', 'Stitch counts, sizes and gauge of patterns')}</small></span></a>
     <label class="filebtn" style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--bdl);border-radius:12px;background:#fff;font-weight:600;cursor:pointer"><span class="mi">📂</span><span>${t('Mở file dự án bạn bè gửi', 'Open a project file from a friend')}<small style="display:block;font-weight:400;color:var(--mu)">.json</small></span><input type="file" accept=".json,application/json" data-c="importFile"></label>
   </div>`, { cls: 'sm' });
   return ov;
@@ -1642,9 +1709,10 @@ async function copyText(txt) {
     let ok = false; try { ok = document.execCommand('copy'); } catch (e2) {} ta.remove(); return ok;
   }
 }
-async function backupNow() {
-  const blob = new Blob([JSON.stringify({ type: 'yarnloop-backup', v: DB_VERSION, app: BRAND.display, exported: new Date().toISOString(), db })], { type: 'application/json' });
-  const ok = await shareOrDownload(blob, `yarnloop-backup-${today()}.json`, 'YarnLoop backup');
+async function backupNow(withImg) {
+  const data = withImg === false ? stripImages(db) : db;
+  const blob = new Blob([JSON.stringify({ type: 'yarnloop-backup', v: DB_VERSION, app: BRAND.display, exported: new Date().toISOString(), images: withImg !== false, db: data })], { type: 'application/json' });
+  const ok = await shareOrDownload(blob, `yarnloop-backup-${today()}${withImg === false ? '-no-images' : ''}.json`, 'YarnLoop backup');
   if (ok) { db.settings.lastBackup = Date.now(); save(); render(); toast(t('Đã xuất file sao lưu ✓', 'Backup exported ✓')); }
 }
 function shareForm(p) {
@@ -1832,6 +1900,8 @@ function patternHTML(p) {
   if (a.gSts) h += `<h2>Gauge</h2><p>${esc(a.gSts)} sts${a.gRows ? ' × ' + esc(a.gRows) + ' rows' : ''} = 10 × 10 cm${a.gStitch ? tp(' trên ', ' in ') + esc(a.gStitch) : ''}${p.needle ? tp(', que ', ', on ') + esc(p.needle) + ' mm' : ''}.</p><p><i>${tp('Hãy đan swatch và đổi cỡ que nếu cần để đạt đúng gauge.', 'Knit a swatch and change needle size if necessary to obtain the correct gauge.')}</i></p>`;
   if (abbr.length || cab.length) h += `<h2>${tp('Viết tắt', 'Abbreviations')}</h2><table>${abbr.map(x => `<tr><td>${esc(x.k)}</td><td>${esc(lang === 'vi' ? x.vi : x.en)}</td></tr>`).join('')}${cab.map(x => `<tr><td>${esc(x.k)}</td><td>${esc(x.v)}</td></tr>`).join('')}</table>`;
   if (forms.length) h += `<h2>Stitch patterns</h2>${forms.map(f => { const ls = formulaLines(f); return `<h3>Stitch pattern ${esc(f.name)}</h3><p><i>${tp(`(lặp mỗi ${ls.length} rows)`, `(repeat every ${ls.length} rows)`)}</i></p><ol>${ls.map(l => `<li>${esc(l)}</li>`).join('')}</ol>`; }).join('')}`;
+  const charts = (p.charts || []).filter(c => c.cells.replace(/0/g, '').length);
+  if (charts.length) h += `<h2>Charts</h2>${charts.map(c => `<h3>${esc(c.name)} <small>(${c.w} × ${c.h})</small></h3><img class="chartimg" src="${esc(chartPNG(p, c))}" alt=""><p class="note">${chartLegend(c, decCells(c)).filter(l => l.n).map(l => `■ ${esc(l.name)}`).join(' · ')} — ${tp('hàng 1 ở dưới, mũi 1 bên phải; ô trống = K, • = P', 'row 1 at the bottom, stitch 1 on the right; blank = K, • = P')}${c.flat ? '' : tp(' · đan vòng: đọc mọi hàng từ phải sang trái', ' · in the round: read every row right to left')}</p>${c.notes ? `<p>${esc(c.notes)}</p>` : ''}`).join('')}`;
   if (a.sections.length) h += `<h2>${tp('Hướng dẫn', 'Instructions')}</h2><div class="ins">${a.sections.map(s => `${s.title ? `<h3>${esc(s.title)}</h3>` : ''}${paras(s.body)}`).join('')}</div>`;
   if (a.notes) h += `<h2>${tp('Ghi chú & mẹo', 'Notes & tips')}</h2>${paras(a.notes)}`;
   if (photos.length > 1) h += `<h2>${tp('Ảnh', 'Photos')}</h2><div class="gal">${photos.slice(1, 7).map(s => `<img src="${esc(s)}" alt="">`).join('')}</div>`;
@@ -1869,6 +1939,7 @@ function patCss() {
 .yl-pat h3{font-size:15.5px;color:#7A1A28;margin:14px 0 4px}
 .yl-pat .by{color:#7A4A52;font-style:italic}
 .yl-pat .pills{margin:8px 0 12px}.yl-pat .pills span{display:inline-block;border:1px solid #E8C5CB;background:#FFF0F2;border-radius:999px;padding:1px 10px;font-size:12.5px;margin:0 4px 4px 0;font-family:system-ui,sans-serif;color:#7A4A52}
+.yl-pat img.chartimg{max-width:100%;display:block;margin:6px 0;border:1px solid #eee;border-radius:6px}
 .yl-pat img.cover{width:100%;max-height:440px;object-fit:cover;border-radius:10px;margin:6px 0 10px;display:block}
 .yl-pat .intro{font-size:16px}
 .yl-pat .orig,.yl-pat .note{background:#FFF0F2;border-left:3px solid #C4687A;padding:8px 12px;border-radius:6px;margin:10px 0}
@@ -2086,7 +2157,7 @@ const A = {
   /* gauge */
   gMode: el => { state.g.mode = +el.dataset.m; renderView(); },
   /* backup & data */
-  backup: () => backupNow(),
+  backup: () => backupForm(),
   install: async () => {
     const dp = state.deferredPrompt;
     if (!dp) { modal(`${mHead('📲 ' + t('Cài app', 'Install app'))}${installGuide()}`, { cls: 'sm' }); return; }
@@ -2108,6 +2179,7 @@ const A = {
     const s = sampleData();
     db.yarns = db.yarns.concat(s.yarns);
     db.projects = db.projects.filter(p => !p.example).concat(s.projects);
+    if (!db.refs.some(r => r.example)) db.refs = db.refs.concat(s.refs);
     db.log = s.log.concat(db.log).slice(0, 30);
     db.settings.onboarded = true; db.settings.lang = L;
     save(); shell(); go('home'); toast(t('Đã nạp dữ liệu mẫu 🧶', 'Sample data loaded 🧶'));
@@ -2196,6 +2268,709 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('a[role=button][data-a]')) { e.preventDefault(); e.target.click(); } });
 document.addEventListener('change', e => { const el = e.target.closest('[data-c]'); if (el && C[el.dataset.c]) C[el.dataset.c](el, e); });
 document.addEventListener('input', e => { const el = e.target.closest('[data-i]'); if (el && I[el.dataset.i]) I[el.dataset.i](el, e); });
+
+/* =====================================================================
+   v1.1 — MẪU ÁO THAM CHIẾU · CHART MÀU · ẢNH LEN · SAO LƯU KÈM ẢNH
+   ===================================================================== */
+const GARMENTS = [
+  { k: 'cardigan', vi: 'Áo khoác (cardigan)', en: 'Cardigan' },
+  { k: 'pullover', vi: 'Áo chui đầu (pullover)', en: 'Pullover' },
+  { k: 'vest', vi: 'Áo gile (vest)', en: 'Vest' },
+  { k: 'tee', vi: 'Áo cộc tay', en: 'Tee / short sleeve' },
+  { k: 'dress', vi: 'Váy', en: 'Dress' },
+  { k: 'other', vi: 'Khác', en: 'Other' }
+];
+/* Bộ mốc chuẩn theo kiểu dựng: [key, vi, en] */
+const CONS = [
+  { k: 'bottomup', vi: 'Đan từ dưới lên (thân + tay nhặt mũi)', en: 'Bottom-up (body + picked-up sleeves)', ms: [
+    ['co', 'Bắt mũi (CO) / gấu', 'Cast on / hem'], ['afterRib', 'Sau bo gấu', 'After hem rib'], ['waist', 'Eo', 'Waist'],
+    ['neckStart', 'Bắt đầu tạo cổ', 'Neck shaping starts'], ['armhole', 'Chia nách (chốt mũi nách)', 'Divide for armholes (underarm BO)'],
+    ['back', 'Thân sau sau khi chia', 'Back after dividing'], ['front', 'Thân trước sau khi tạo cổ', 'Front after neck shaping'],
+    ['backNeck', 'Cổ sau (chốt mũi giữa)', 'Back neck (centre BO)'], ['shoulder', 'Vai', 'Shoulder'], ['length', 'Hết thân (dài áo)', 'Body finished (length)'],
+    ['sleevePick', 'Tay: nhặt mũi', 'Sleeve: pick up'], ['sleeveDec', 'Tay: sau khi giảm', 'Sleeve: after decreases'], ['cuff', 'Bo cổ tay', 'Cuff'], ['sleeveLen', 'Hết tay (dài tay)', 'Sleeve finished']] },
+  { k: 'raglan', vi: 'Top-down raglan', en: 'Top-down raglan', ms: [
+    ['co', 'Bắt mũi cổ (CO)', 'Neck cast on'], ['raglanEnd', 'Hết tăng raglan', 'Raglan increases done'], ['split', 'Chia thân / tay', 'Divide body / sleeves'],
+    ['body', 'Thân sau khi chia (gồm mũi nách)', 'Body after dividing (incl. underarm)'], ['waist', 'Eo', 'Waist'], ['hem', 'Gấu / bo', 'Hem / rib'], ['length', 'Hết thân', 'Body finished'],
+    ['sleeveTop', 'Tay: sau khi chia (gồm mũi nách)', 'Sleeve: after dividing (incl. underarm)'], ['sleeveDec', 'Tay: sau khi giảm', 'Sleeve: after decreases'], ['cuff', 'Bo cổ tay', 'Cuff'], ['sleeveLen', 'Hết tay', 'Sleeve finished'], ['neckband', 'Cổ / nẹp', 'Neckband / bands']] },
+  { k: 'yoke', vi: 'Top-down round / European yoke', en: 'Top-down round / European yoke', ms: [
+    ['co', 'Bắt mũi cổ (CO)', 'Neck cast on'], ['shortRows', 'Short rows (nâng cổ sau)', 'Short rows (back neck)'], ['yoke1', 'Yoke: lần tăng 1', 'Yoke: increase 1'],
+    ['yoke2', 'Yoke: lần tăng 2', 'Yoke: increase 2'], ['yoke3', 'Yoke: lần tăng 3', 'Yoke: increase 3'], ['yokeEnd', 'Hết yoke', 'Yoke finished'], ['shoulder', 'Vai (European yoke)', 'Shoulders (European yoke)'],
+    ['split', 'Chia thân / tay', 'Divide body / sleeves'], ['body', 'Thân sau khi chia', 'Body after dividing'], ['hem', 'Gấu / bo', 'Hem / rib'], ['length', 'Hết thân', 'Body finished'],
+    ['sleeveTop', 'Tay: sau khi chia', 'Sleeve: after dividing'], ['sleeveDec', 'Tay: sau khi giảm', 'Sleeve: after decreases'], ['cuff', 'Bo cổ tay', 'Cuff'], ['sleeveLen', 'Hết tay', 'Sleeve finished']] },
+  { k: 'drop', vi: 'Drop shoulder (đan mảnh rồi may)', en: 'Drop shoulder (pieces, seamed)', ms: [
+    ['backCo', 'Thân sau: CO', 'Back: cast on'], ['backBody', 'Thân sau: sau bo', 'Back: after rib'], ['armMark', 'Đánh dấu nách', 'Armhole marker'], ['backNeck', 'Thân sau: cổ', 'Back: neck'],
+    ['shoulder', 'Vai', 'Shoulder'], ['frontCo', 'Thân trước: CO', 'Front: cast on'], ['frontNeck', 'Thân trước: bắt đầu cổ', 'Front: neck shaping'], ['length', 'Hết thân (dài áo)', 'Body finished (length)'],
+    ['sleeveCo', 'Tay: CO', 'Sleeve: cast on'], ['sleeveInc', 'Tay: sau khi tăng', 'Sleeve: after increases'], ['sleeveTop', 'Tay: chốt (vòng nách)', 'Sleeve: bind off (armhole)'], ['neckband', 'Cổ / nẹp', 'Neckband / bands']] },
+  { k: 'custom', vi: 'Khác (tự đặt mốc)', en: 'Other (your own milestones)', ms: [] }
+];
+const consOf = k => CONS.find(c => c.k === k) || CONS[CONS.length - 1];
+
+/* "195-215-227", "195 (215, 227)", "195/215/227", "195, 215" → [195,215,227] */
+function parseSeq(s) {
+  s = String(s == null ? '' : s).trim();
+  if (!s) return [];
+  return s.replace(/[()]/g, ' ').split(/\s*[-–\/;,]\s*|\s+/).filter(x => x !== '').map(x => num(x)).map(x => (x === '' ? '' : x));
+}
+const seqStr = a => (Array.isArray(a) ? a.map(x => (x === '' || x == null ? '?' : fmt(x, 2))).join('-') : '');
+function refSizes(r) { return String(r.sizes || '').split(/[,;\s]+/).map(s => s.trim()).filter(Boolean); }
+
+const R_DEF = () => ({ id: uid(), name: '', source: '', url: '', garment: 'pullover', cons: 'raglan', sizes: 'S, M, L', gSts: '', gRows: '', yarn: '', weight: '', needles: '', notes: '', diagram: [], meas: [], ms: [], updated: Date.now() });
+function msPreset(cons) { return consOf(cons).ms.map(m => ({ id: uid(), k: m[0], label: L === 'vi' ? m[1] : m[2], sts: [], cm: [], fixed: '', note: '' })); }
+function normRef(r) {
+  r = Object.assign(R_DEF(), r || {});
+  if (!Array.isArray(r.diagram)) r.diagram = []; r.diagram = r.diagram.filter(isImg).slice(0, 4);
+  r.meas = (Array.isArray(r.meas) ? r.meas : []).map(m => Object.assign({ id: uid(), label: '', v: [] }, m));
+  r.ms = (Array.isArray(r.ms) ? r.ms : []).map(m => Object.assign({ id: uid(), k: 'custom', label: '', sts: [], cm: [], fixed: '', note: '' }, m));
+  r.meas.forEach(m => { if (!Array.isArray(m.v)) m.v = parseSeq(m.v); });
+  r.ms.forEach(m => { ['sts', 'cm'].forEach(k => { if (!Array.isArray(m[k])) m[k] = parseSeq(m[k]); }); });
+  return r;
+}
+const RF = id => (db.refs || []).find(r => r.id === id);
+function myGauge(p) { return { s: num(p.myGaugeSts) || '', r: num(p.myGaugeRows) || '' }; }
+/* Quy đổi 1 mốc của mẫu sang gauge của tôi (mũi cố định như nẹp/i-cord không nhân tỉ lệ) */
+function msSugg(ref, m, si, my) {
+  const rs = num(ref.gSts), rr = num(ref.gRows);
+  const sts = m.sts[si], cm = m.cm[si], fx = num(m.fixed) || 0;
+  const o = { has: false };
+  if (sts !== '' && sts != null) {
+    o.has = true; o.refSts = sts;
+    if (rs) o.wcm = Math.max(0, sts - fx) / rs * 10;
+    if (rs && my.s) o.sts = Math.round(Math.max(0, sts - fx) * my.s / rs) + fx;
+  }
+  if (cm !== '' && cm != null) {
+    o.has = true; o.cm = cm;
+    if (my.r) o.rows = Math.round(cm * my.r / 10);
+    else if (rr) o.refRows = Math.round(cm * rr / 10);
+  }
+  return o;
+}
+function suggText(o) {
+  const a = [];
+  if (o.refSts != null) a.push(t('Mẫu', 'Pattern') + `: ${fmt(o.refSts, 1)} sts${o.wcm != null ? ` (≈${fmt(o.wcm, 1)} cm)` : ''}`);
+  if (o.sts != null) a.push(`→ <b>${o.sts} sts</b> ${t('cho bạn', 'for you')}`);
+  if (o.cm != null) a.push(`📏 ${fmt(o.cm, 1)} cm${o.rows != null ? ` ≈ <b>${o.rows} ${t('hàng', 'rows')}</b>` : ''}`);
+  return a.join(' · ');
+}
+
+/* ---------- VIEW: thư viện mẫu áo ---------- */
+VIEWS.refs = () => {
+  const rs = (db.refs || []).slice().sort((a, b) => b.updated - a.updated);
+  return { title: t('Mẫu áo tham chiếu', 'Reference patterns'), nav: 'refs', html: `<div class="stack">
+    <div class="alert soft small">📏 ${t('Lưu số mũi, số đo theo size, len và gauge của các mẫu bạn có. Khi đan dự án mới, chọn mẫu tương tự → app quy đổi số mũi theo gauge của bạn ở từng mốc. Thư viện chỉ lưu trên máy bạn.', 'Store stitch counts, per-size measurements, yarn and gauge of patterns you own. When starting a new project, pick a similar one → the app converts stitch counts to your gauge at each milestone. Stored on your device only.')}</div>
+    <div class="row between"><b>${rs.length} ${t('mẫu', 'patterns')}</b><div class="row">${rs.some(r => r.example) ? '' : `<button class="btn sm" type="button" data-a="refExample">🧥 ${t('Mẫu ví dụ', 'Example')}</button>`}<button class="btn sm p" type="button" data-a="refNew">+ ${t('Mẫu mới', 'New pattern')}</button></div></div>
+    ${rs.length ? `<div class="grid">${rs.map(refCardHTML).join('')}</div>` : `<div class="card">${emptyBox('📏', t('Chưa có mẫu tham chiếu nào.', 'No reference patterns yet.'), `<button class="btn p" type="button" data-a="refNew">+ ${t('Mẫu mới', 'New pattern')}</button>`)}</div>`}
+  </div>` };
+};
+function refCardHTML(r) {
+  const filled = r.ms.filter(m => m.sts.length || m.cm.length).length;
+  const used = db.projects.filter(p => p.ref && p.ref.id === r.id).length;
+  return `<a class="card pcard" href="#/ref/${r.id}">${r.diagram[0] ? `<img class="pimg" src="${esc(r.diagram[0])}" alt="" loading="lazy" style="object-fit:contain;background:#fff">` : `<div class="pimg">📏</div>`}
+    <div class="pbody"><b>${esc(r.name || t('(chưa đặt tên)', '(untitled)'))}</b>
+    <div class="meta"><span>${esc(lbl(GARMENTS, r.garment))}</span><span>${esc(lb(consOf(r.cons)))}</span></div>
+    <div class="meta"><span>Size ${esc(refSizes(r).join(' / ') || '—')}</span>${r.gSts ? `<span>📐 ${esc(r.gSts)}${r.gRows ? '×' + esc(r.gRows) : ''}</span>` : ''}</div>
+    <div class="small mut">${filled} ${t('mốc có số liệu', 'milestones filled')}${used ? ' · ' + used + ' ' + t('dự án dùng', 'projects') : ''}</div></div></a>`;
+}
+VIEWS.ref = id => {
+  const r = RF(id);
+  if (!r) return { title: t('Không tìm thấy', 'Not found'), nav: 'refs', html: `<div class="card">${emptyBox('🔍', t('Mẫu không tồn tại.', 'Pattern not found.'), '<a class="btn" href="#/refs">←</a>')}</div>` };
+  const sz = refSizes(r), n = sz.length;
+  const fi = (f, ph, extra) => `<input class="inp" data-c="refF" data-f="${f}" value="${esc(r[f] == null ? '' : r[f])}" placeholder="${esc(ph || '')}" ${extra || ''}>`;
+  const fs = (f, list) => `<select class="inp" data-c="refF" data-f="${f}">${list.map(o => `<option value="${esc(o.k)}" ${o.k === r[f] ? 'selected' : ''}>${esc(o.l != null ? o.l : lb(o))}</option>`).join('')}</select>`;
+  const bad = a => a.length && a.length !== n ? ` <span class="warn small" title="${t('Số giá trị khác số size', 'Count differs from number of sizes')}">⚠ ${a.length}/${n}</span>` : '';
+  const msRows = r.ms.map((m, i) => {
+    const w = r.gSts && m.sts.length ? m.sts.map(s => (s === '' ? '?' : fmt(Math.max(0, s - (num(m.fixed) || 0)) / num(r.gSts) * 10, 1))).join('-') : '';
+    return `<div class="secd"><div class="row"><input class="inp" data-c="refMs" data-mi="${i}" data-f="label" value="${esc(m.label)}" placeholder="${t('Tên mốc', 'Milestone')}" style="flex:2"><button class="ib" type="button" data-a="refMsMove" data-mi="${i}" data-d="-1" ${i ? '' : 'disabled'}>↑</button><button class="ib" type="button" data-a="refMsDel" data-mi="${i}" aria-label="delete">✕</button></div>
+      <div class="f3">${fld(t('Số mũi theo size', 'Stitches per size') + bad(m.sts), `<input class="inp" data-c="refMs" data-mi="${i}" data-f="sts" value="${esc(seqStr(m.sts))}" placeholder="195-215-227">`)}${fld(t('Ở độ dài (cm)', 'At length (cm)') + bad(m.cm), `<input class="inp" data-c="refMs" data-mi="${i}" data-f="cm" value="${esc(seqStr(m.cm))}" placeholder="33-34-35">`)}${fld(t('Mũi cố định (nẹp…)', 'Fixed sts (bands…)'), `<input class="inp" type="number" inputmode="numeric" data-c="refMs" data-mi="${i}" data-f="fixed" value="${esc(m.fixed)}" placeholder="0">`)}</div>
+      ${w ? `<div class="small mut">≈ ${t('rộng', 'width')} ${esc(w)} cm</div>` : ''}
+      <input class="inp" data-c="refMs" data-mi="${i}" data-f="note" value="${esc(m.note)}" placeholder="${t('Ghi chú (VD: giảm 2 mũi mỗi 4 cm, 9 lần)', 'Note (e.g. dec 2 sts every 4 cm, 9 times)')}" style="margin-top:6px"></div>`;
+  }).join('');
+  const measRows = r.meas.map((m, i) => `<div class="row" style="margin-bottom:6px"><input class="inp" data-c="refMeas" data-mi="${i}" data-f="label" value="${esc(m.label)}" placeholder="${t('VD: ½ vòng ngực', 'e.g. ½ chest')}" style="flex:1;min-width:120px"><input class="inp" data-c="refMeas" data-mi="${i}" data-f="v" value="${esc(seqStr(m.v))}" placeholder="48-53-56" style="flex:1;min-width:110px">${bad(m.v)}<button class="ib" type="button" data-a="refMeasDel" data-mi="${i}">✕</button></div>`).join('');
+  const used = db.projects.filter(p => p.ref && p.ref.id === r.id);
+  return { title: r.name || t('Mẫu tham chiếu', 'Reference pattern'), nav: 'refs', html: `<div class="stack">
+    <div class="row between"><a class="btn sm" href="#/refs">← ${t('Mẫu áo tham chiếu', 'Reference patterns')}</a><button class="btn sm" type="button" data-a="refDel" data-id="${r.id}">🗑 ${t('Xoá', 'Delete')}</button></div>
+    <div class="g2">
+      <div class="card"><h3>📇 ${t('Thông tin mẫu', 'Pattern info')}</h3>
+        ${fld(t('Tên mẫu', 'Name') + ' *', fi('name', 'DROPS 259-32'))}
+        <div class="f2">${fld(t('Nguồn / tác giả', 'Source / designer'), fi('source', 'DROPS Design'))}${fld('Link', fi('url', 'https://', 'type="url" inputmode="url"'))}</div>
+        <div class="f2">${fld(t('Loại áo', 'Garment'), fs('garment', GARMENTS))}${fld(t('Kiểu dựng', 'Construction'), fs('cons', CONS))}</div>
+        ${fld(t('Các size (cách nhau dấu phẩy)', 'Sizes (comma separated)'), fi('sizes', 'XS, S, M, L, XL, XXL'))}
+        <div class="f2">${fld(t('Gauge mẫu: mũi / 10 cm', 'Pattern gauge: sts / 10 cm'), fi('gSts', '16', 'type="number" inputmode="decimal" step="0.5"'))}${fld(t('Hàng / 10 cm', 'Rows / 10 cm'), fi('gRows', '21', 'type="number" inputmode="decimal" step="0.5"'))}</div>
+        <div class="f2">${fld(t('Len (có thể chập nhiều sợi)', 'Yarn (may be held double)'), fi('yarn', 'Fabel + Brushed Alpaca Silk'))}${fld('Weight', fs('weight', [{ k: '', l: '—' }].concat(WEIGHTS.map(w => ({ k: w.k, l: w.name })))))}</div>
+        ${fld(t('Kim / que', 'Needles'), fi('needles', t('3.5 mm bo, 5 mm thân', '3.5 mm rib, 5 mm body')))}
+        ${fld(t('Ghi chú', 'Notes'), `<textarea class="inp" data-c="refF" data-f="notes" rows="3">${esc(r.notes)}</textarea>`)}
+        ${used.length ? `<div class="small sub">🧶 ${t('Dùng ở', 'Used in')}: ${used.map(p => `<a href="#/project/${p.id}">${esc(p.name)}</a>`).join(', ')}</div>` : ''}
+      </div>
+      <div class="stack">
+        <div class="card"><div class="sec-h"><h3>🖼 ${t('Sơ đồ kích thước', 'Schematic')}</h3>${r.diagram.length < 4 ? fileBtn('+ ' + t('Ảnh', 'Image'), `multiple data-c="refImg" data-id="${r.id}"`) : ''}</div>
+          ${r.diagram.length ? `<div class="imgs">${r.diagram.map((s, i) => `<div class="im"><img src="${esc(s)}" alt="" data-a="zoom"><button type="button" data-a="refImgDel" data-i="${i}" aria-label="delete">✕</button></div>`).join('')}</div>` : `<p class="small mut">${t('Chụp sơ đồ kích thước của mẫu (tối đa 4 ảnh).', 'Snap the pattern schematic (up to 4 images).')}</p>`}</div>
+        <div class="card"><div class="sec-h"><h3>📐 ${t('Số đo theo size (cm)', 'Measurements per size (cm)')}</h3><button class="btn sm" type="button" data-a="refMeasAdd">+ ${t('Số đo', 'Measurement')}</button></div>
+          ${measRows || `<p class="small mut">${t('VD: "½ vòng ngực" 48-53-56-60-64-71 · "Dài áo" 52-54-56-58-60-62. Dùng để chọn size gần nhất.', 'E.g. "½ chest" 48-53-56-60-64-71 · "Length" 52-54-56-58-60-62. Used to pick the nearest size.')}</p>`}</div>
+      </div>
+    </div>
+    <div class="card"><div class="sec-h"><h3>📍 ${t('Các mốc', 'Milestones')} <span class="small mut">· ${n} size: ${esc(sz.join(' / '))}</span></h3><div class="row"><button class="btn sm" type="button" data-a="refPreset">⟳ ${t('Thêm mốc chuẩn', 'Add standard milestones')}</button><button class="btn sm p" type="button" data-a="refMsAdd">+ ${t('Mốc', 'Milestone')}</button></div></div>
+      <p class="small mut">${t('Nhập dãy số theo thứ tự size, cách nhau dấu "-" (dán thẳng từ pattern được). "Mũi cố định" = mũi nẹp/i-cord/biên không nhân theo gauge.', 'Enter one value per size separated by "-" (paste straight from the pattern). "Fixed sts" = band/i-cord/edge stitches that are not scaled by gauge.')}</p>
+      ${msRows || `<p class="mut small">—</p>`}</div>
+    <div class="card"><h3>📋 ${t('Dán text pattern để lấy số', 'Paste pattern text to extract numbers')}</h3>
+      <textarea class="inp" id="refPaste" rows="5" placeholder="Cast on 195-215-227-243-257-285 stitches…">${esc(state.refPasteFor === r.id ? state.refPasteTxt || '' : '')}</textarea>
+      <div class="row" style="margin-top:8px"><button class="btn sm p" type="button" data-a="refParse">🔎 ${t('Tìm các dãy số', 'Find number sequences')}</button><span class="small mut">${t('Chỉ lấy số liệu, không lưu lời hướng dẫn.', 'Only numbers are taken; the wording is not stored.')}</span></div>
+      <div id="refParseOut"></div></div>
+  </div>` };
+};
+function parseRefText(txt, n) {
+  const out = [];
+  const re = /(\d+(?:[.,]\d+)?(?:\s*-\s*\d+(?:[.,]\d+)?)+)\s*(stitches|stitch|sts|st|mũi|mui|cm|times|lần|lan|rows|hàng|hang)?/gi;
+  let m;
+  while ((m = re.exec(txt))) {
+    const v = parseSeq(m[1]);
+    if (v.length < 2 || (n > 1 && v.length !== n)) continue;
+    const u = stripVN(m[2] || '').toLowerCase();
+    const kind = /cm/.test(u) ? 'cm' : /st|mui/.test(u) ? 'sts' : /time|lan/.test(u) ? 'times' : /row|hang/.test(u) ? 'rows' : '';
+    const ctx = txt.slice(Math.max(0, m.index - 60), m.index).split(/[.\n]/).pop().trim();
+    out.push({ v, kind, ctx: ctx.slice(-60), raw: m[0] });
+  }
+  return out;
+}
+
+/* ---------- Card "Mẫu tham chiếu" trong dự án ---------- */
+function projRefCard(p) {
+  const refs = db.refs || [];
+  const head = `<div class="sec-h"><h3>📏 ${t('Mẫu áo tham chiếu', 'Reference pattern')}</h3><a class="btn sm" href="#/refs">${t('Thư viện', 'Library')} →</a></div>`;
+  if (!refs.length) return `<div class="card">${head}<p class="small mut">${t('Chưa có mẫu tham chiếu. Thêm mẫu bạn có vào thư viện để được gợi ý số mũi theo gauge của bạn.', 'No reference patterns yet. Add patterns you own to get stitch counts converted to your gauge.')}</p></div>`;
+  const pr = p.ref || {};
+  const r = pr.id ? RF(pr.id) : null;
+  let body = `<select class="inp" data-c="pRef" data-id="${p.id}"><option value="">— ${t('Chọn mẫu tương tự', 'Pick a similar pattern')} —</option>${refs.map(x => `<option value="${x.id}" ${x.id === pr.id ? 'selected' : ''}>${esc(x.name || '…')} · ${esc(lbl(GARMENTS, x.garment))}</option>`).join('')}</select>`;
+  if (r) {
+    const sz = refSizes(r), si = Math.min(pr.si || 0, Math.max(0, sz.length - 1));
+    const my = myGauge(p);
+    body += `<div class="f2" style="margin-top:8px">${fld(t('Size của mẫu', 'Pattern size'), `<select class="inp" data-c="pRefSize" data-id="${p.id}">${sz.map((s, i) => `<option value="${i}" ${i === si ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>`)}
+      ${fld(t('Gauge mẫu → của bạn', 'Pattern → your gauge'), `<div class="out small">${esc(r.gSts || '?')}×${esc(r.gRows || '?')} → ${my.s ? esc(my.s) : '?'}×${my.r ? esc(my.r) : '?'}</div>`)}</div>`;
+    if (r.meas.length) body += `<details><summary>🎯 ${t('Chọn size gần nhất theo số đo', 'Pick the nearest size by measurement')}</summary><div class="row" style="margin-top:8px"><select class="inp" id="nearM" style="flex:1;min-width:120px">${r.meas.map((m, i) => `<option value="${i}">${esc(m.label || '…')} (${esc(seqStr(m.v))})</option>`).join('')}</select><input class="inp" id="nearV" type="number" inputmode="decimal" placeholder="cm" style="width:90px"><button class="btn sm" type="button" data-a="pRefNear" data-id="${p.id}">OK</button></div></details>`;
+    if (!my.s || !my.r) body += `<div class="alert amber small" style="margin-top:8px">⚠️ ${t('Nhập gauge của bạn (mũi × hàng) trong ✏️ Sửa dự án để có số gợi ý quy đổi.', 'Enter your gauge (sts × rows) via ✏️ Edit project to get converted suggestions.')}</div>`;
+    const rows = r.ms.map(m => ({ m, o: msSugg(r, m, si, my) })).filter(x => x.o.has);
+    body += rows.length ? `<div class="scrollx" style="margin-top:8px"><table class="tbl small"><tr><th>${t('Mốc', 'Milestone')}</th><th class="num">${t('Mẫu', 'Pattern')}</th><th class="num">${t('Gợi ý cho bạn', 'For you')}</th></tr>${rows.map(({ m, o }) => `<tr><td>${esc(m.label)}${m.note ? `<div class="mut">${esc(m.note)}</div>` : ''}</td><td class="num">${o.refSts != null ? fmt(o.refSts, 1) + ' sts' : ''}${o.cm != null ? `<div class="mut">@ ${fmt(o.cm, 1)} cm</div>` : ''}</td><td class="num"><b>${o.sts != null ? o.sts + ' sts' : ''}</b>${o.wcm != null ? `<div class="mut">≈${fmt(o.wcm, 1)} cm</div>` : ''}${o.rows != null ? `<div class="mut">≈${o.rows} ${t('hàng', 'rows')}</div>` : ''}</td></tr>`).join('')}</table></div><p class="small mut">${t('Gợi ý chỉ để tham khảo — khi thêm ghi chú row, chọn "Mốc" để dùng hoặc sửa tuỳ ý.', 'Suggestions are for reference — pick a "Milestone" in a row note to use or adjust them.')}</p>` : `<p class="small mut">${t('Mẫu này chưa có số liệu ở size đã chọn.', 'This pattern has no figures for the chosen size.')}</p>`;
+  }
+  return `<div class="card">${head}${body}</div>`;
+}
+
+/* =====================================================================
+   CHART MÀU (pixel) — 1 ô = 1 mũi
+   ===================================================================== */
+const CH_MAX = 200, PAL_MAX = 16;
+const B36 = '0123456789abcdefghijklmnopqrstuvwxyz';
+function normChart(c) {
+  c = Object.assign({ id: uid(), name: 'Chart', w: 20, h: 20, pal: [{ hex: '#FFFFFF', n: '' }, { hex: '#9B2335', n: '' }], cells: '', sym: '', start: 1, flat: true, sq: false, rep: '', notes: '', rowNotes: '', updated: Date.now() }, c || {});
+  c.w = Math.min(CH_MAX, Math.max(1, parseInt(c.w) || 20)); c.h = Math.min(CH_MAX, Math.max(1, parseInt(c.h) || 20));
+  if (!Array.isArray(c.pal) || !c.pal.length) c.pal = [{ hex: '#FFFFFF', n: '' }];
+  c.pal = c.pal.slice(0, PAL_MAX).map(x => ({ hex: safeHex(x.hex), n: String(x.n || '') }));
+  const N = c.w * c.h;
+  if (typeof c.cells !== 'string' || c.cells.length !== N) c.cells = (String(c.cells || '') + '0'.repeat(N)).slice(0, N);
+  if (typeof c.sym !== 'string' || (c.sym && c.sym.length !== N)) c.sym = '';
+  c.start = Math.max(1, parseInt(c.start) || 1); c.flat = c.flat !== false; c.sq = !!c.sq;
+  return c;
+}
+const chartOf = (p, cid) => (p.charts || []).find(c => c.id === cid);
+function decCells(c) { const a = new Uint8Array(c.w * c.h); for (let i = 0; i < a.length; i++) { const v = B36.indexOf(c.cells[i]); a[i] = v > 0 && v < c.pal.length ? v : 0; } return a; }
+function encCells(a) { let s = ''; for (let i = 0; i < a.length; i++) s += B36[a[i]]; return s; }
+function decSym(c) { const a = new Uint8Array(c.w * c.h); if (c.sym) for (let i = 0; i < a.length; i++) a[i] = c.sym[i] === '1' ? 1 : 0; return a; }
+function encSym(a) { let any = false, s = ''; for (let i = 0; i < a.length; i++) { s += a[i] ? '1' : '0'; if (a[i]) any = true; } return any ? s : ''; }
+const palName = (c, i) => c.pal[i] && c.pal[i].n ? c.pal[i].n : (i === 0 ? t('Nền', 'MC') : String.fromCharCode(64 + i));
+function chartRatio(p, c) {
+  if (c.sq) return 1;
+  const s = num(p.myGaugeSts) || num(p.pGaugeSts), r = num(p.myGaugeRows) || num(p.pGaugeRows);
+  return s && r ? Math.min(1.3, Math.max(0.5, s / r)) : 1;
+}
+/* Hàng chart đang đan theo Row Counter (ưu tiên ghi chú row có gắn chart) */
+function chartCurRow(p, c) {
+  const X = p.counter; if (!X) return 0;
+  const r = p.rows.find(r => r.ch === c.id && X >= r.from && X <= r.to);
+  if (r) return ((X - r.from) % c.h) + 1;
+  if (X < c.start) return 0;
+  return ((X - c.start) % c.h) + 1;
+}
+function hexRGB(h) { h = safeHex(h).slice(1); if (h.length === 3) h = h.split('').map(x => x + x).join(''); const n = parseInt(h.slice(0, 6), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+const rgbHex = a => '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+const lum = h => { const [r, g, b] = hexRGB(h); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; };
+function parseRep(s) { const m = String(s || '').match(/(\d+)\s*[-–]\s*(\d+)/); if (!m) return null; const a = +m[1], b = +m[2]; return a && b ? [Math.min(a, b), Math.max(a, b)] : null; }
+
+/* Vẽ chart lên canvas. o: { cs, ratio, cur, showSym, title } */
+function chartLayout(c, cs, ratio) { const cw = cs, chh = Math.max(3, cs * ratio); const fs = Math.max(8, Math.min(12, cs * 0.7)); const ml = Math.ceil(fs * 2.4), mr = Math.ceil(fs * 2.6), mb = Math.ceil(fs * 1.8), mt = 4; return { cw, chh, fs, ml, mr, mb, mt, W: ml + c.w * cw + mr, H: mt + c.h * chh + mb }; }
+function drawChart(cv, c, cells, sym, o) {
+  const Lt = chartLayout(c, o.cs, o.ratio), dpr = o.dpr || 1;
+  cv.width = Math.round(Lt.W * dpr); cv.height = Math.round(Lt.H * dpr);
+  if (!o.noCss) { cv.style.width = Lt.W + 'px'; cv.style.height = Lt.H + 'px'; }
+  const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+  x.fillStyle = '#fff'; x.fillRect(0, 0, Lt.W, Lt.H);
+  const ox = Lt.ml, oy = Lt.mt, cw = Lt.cw, ch = Lt.chh;
+  for (let yy = 0; yy < c.h; yy++) for (let xx = 0; xx < c.w; xx++) {
+    const i = yy * c.w + xx; x.fillStyle = c.pal[cells[i]] ? c.pal[cells[i]].hex : '#fff'; x.fillRect(ox + xx * cw, oy + yy * ch, cw + 0.5, ch + 0.5);
+  }
+  if (o.showSym && cw >= 6) {
+    x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `bold ${Math.max(7, Math.min(cw, ch) * 0.75)}px sans-serif`;
+    for (let i = 0; i < sym.length; i++) if (sym[i]) { const xx = i % c.w, yy = (i / c.w) | 0; x.fillStyle = lum(c.pal[cells[i]].hex) > 0.55 ? '#2D1B1E' : '#fff'; x.fillText('•', ox + xx * cw + cw / 2, oy + yy * ch + ch / 2 + 0.5); }
+  }
+  /* lưới: mảnh mỗi ô, đậm hơn mỗi 5, đậm mỗi 10 (đếm từ phải/dưới như chart đan) */
+  const line = (x1, y1, x2, y2, col, lw) => { x.strokeStyle = col; x.lineWidth = lw; x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.stroke(); };
+  for (let k = 0; k <= c.w; k++) { const sn = c.w - k; const col = sn % 10 === 0 ? 'rgba(45,27,30,.75)' : sn % 5 === 0 ? 'rgba(45,27,30,.4)' : 'rgba(45,27,30,.14)'; if (cw >= 4 || sn % 5 === 0) line(ox + k * cw + .5, oy, ox + k * cw + .5, oy + c.h * ch, col, sn % 10 === 0 ? 1.4 : 1); }
+  for (let k = 0; k <= c.h; k++) { const rn = c.h - k; const col = rn % 10 === 0 ? 'rgba(45,27,30,.75)' : rn % 5 === 0 ? 'rgba(45,27,30,.4)' : 'rgba(45,27,30,.14)'; if (ch >= 4 || rn % 5 === 0) line(ox, oy + k * ch + .5, ox + c.w * cw, oy + k * ch + .5, col, rn % 10 === 0 ? 1.4 : 1); }
+  const rep = parseRep(c.rep);
+  if (rep && rep[1] <= c.w) { x.save(); x.setLineDash([5, 3]); x.strokeStyle = '#B85C5C'; x.lineWidth = 2; const x1 = ox + (c.w - rep[1]) * cw, x2 = ox + (c.w - rep[0] + 1) * cw; x.strokeRect(x1 + 1, oy + 1, x2 - x1 - 2, c.h * ch - 2); x.restore(); }
+  if (o.cur) { const yy = c.h - o.cur; x.strokeStyle = '#9B2335'; x.lineWidth = 3; x.strokeRect(ox - 1, oy + yy * ch - 1, c.w * cw + 2, ch + 2); }
+  /* số hàng: đan đi đan lại → hàng lẻ bên phải, hàng chẵn bên trái; đan vòng → tất cả bên phải */
+  x.fillStyle = '#7A4A52'; x.font = `${Lt.fs}px sans-serif`; x.textBaseline = 'middle';
+  const step = ch < Lt.fs ? (ch * 2 < Lt.fs ? 5 : 2) : 1;
+  for (let rn = 1; rn <= c.h; rn++) {
+    if (rn % step && rn !== 1) continue;
+    const cy = oy + (c.h - rn) * ch + ch / 2; const right = !c.flat || rn % 2 === 1;
+    x.fillStyle = o.cur === rn ? '#9B2335' : '#7A4A52';
+    if (right) { x.textAlign = 'left'; x.fillText(String(rn), ox + c.w * cw + 4, cy); } else { x.textAlign = 'right'; x.fillText(String(rn), ox - 4, cy); }
+  }
+  x.fillStyle = '#7A4A52'; x.textAlign = 'center'; x.textBaseline = 'top';
+  const sstep = cw < Lt.fs * 1.3 ? (cw * 3 < Lt.fs * 1.3 ? 10 : 5) : 1;
+  for (let sn = 1; sn <= c.w; sn++) { if (sn % sstep && sn !== 1) continue; x.fillText(String(sn), ox + (c.w - sn) * cw + cw / 2, oy + c.h * ch + 3); }
+  return Lt;
+}
+const _chartImgCache = {};
+function chartPNG(p, c) {
+  const key = c.id + ':' + c.updated + ':' + chartRatio(p, c);
+  if (_chartImgCache[c.id] && _chartImgCache[c.id].k === key) return _chartImgCache[c.id].u;
+  const cv = document.createElement('canvas');
+  const cs = Math.max(6, Math.min(16, Math.floor(640 / c.w)));
+  drawChart(cv, c, decCells(c), decSym(c), { cs, ratio: chartRatio(p, c), showSym: true, dpr: 2, noCss: true });
+  const u = cv.toDataURL('image/png'); _chartImgCache[c.id] = { k: key, u }; return u;
+}
+function chartLegend(c, cells, lang) {
+  const cnt = new Array(c.pal.length).fill(0); for (let i = 0; i < cells.length; i++) cnt[cells[i]]++;
+  return c.pal.map((pc, i) => ({ i, hex: pc.hex, name: palName(c, i), n: cnt[i], pct: cells.length ? cnt[i] / cells.length * 100 : 0 }));
+}
+/* Sợi nổi (float) dài hơn `lim` mũi ở mặt trái, chỉ tính màu đang dùng trong hàng */
+function chartFloats(c, cells, lim) {
+  const out = [];
+  for (let yy = 0; yy < c.h; yy++) {
+    const row = cells.subarray(yy * c.w, yy * c.w + c.w);
+    const used = new Set(row); if (used.size < 2) continue;
+    used.forEach(col => {
+      let last = -1;
+      for (let xx = 0; xx < c.w; xx++) if (row[xx] === col) { if (last >= 0 && xx - last - 1 > lim) out.push({ r: c.h - yy, col, len: xx - last - 1, a: c.w - xx + 1, b: c.w - last - 1 }); last = xx; }
+    });
+  }
+  return out;
+}
+function chartsCard(p) {
+  const cs = p.charts || [];
+  return `<div class="card"><div class="sec-h"><h3>🎨 ${t('Chart màu', 'Colorwork charts')}</h3><button class="btn sm" type="button" data-a="chartNew" data-id="${p.id}">+ Chart</button></div>
+    ${cs.length ? `<div class="ideas">${cs.map(c => { const cur = chartCurRow(p, c); return `<a class="idea" href="#/chart/${p.id}.${c.id}" style="text-decoration:none;color:inherit"><img src="${esc(chartPNG(p, c))}" alt="" style="object-fit:contain;background:#fff;cursor:pointer"><div class="ib-b"><b>${esc(c.name)}</b><span class="small mut">${c.w}×${c.h} · ${c.pal.length} ${t('màu', 'colors')}${cur ? ` · ▶ ${t('hàng', 'row')} ${cur}` : ''}</span></div></a>`; }).join('')}</div>`
+    : `<p class="small mut">${t('Vẽ hình gài màu kiểu pixel: 1 ô = 1 mũi. Có thể nhập ảnh để tự chuyển thành chart.', 'Draw colorwork like pixel art: 1 cell = 1 stitch. You can also import a picture and convert it.')}</p>`}</div>`;
+}
+
+/* ---------- Trình vẽ chart ---------- */
+const CH = { ed: null };
+VIEWS.chart = id => {
+  const [pid, cid] = String(id || '').split('.');
+  const p = P(pid), c = p && chartOf(p, cid);
+  if (!c) return { title: 'Chart', nav: 'projects', html: `<div class="card">${emptyBox('🔍', t('Chart không tồn tại.', 'Chart not found.'), '<a class="btn" href="#/projects">←</a>')}</div>` };
+  const ed = CH.ed && CH.ed.c === c ? CH.ed : (CH.ed = { p, c, cells: decCells(c), sym: decSym(c), tool: 'pen', col: Math.min(1, c.pal.length - 1), cs: Math.max(6, Math.min(26, Math.floor((Math.min(innerWidth, 1180) - (innerWidth > 820 ? 330 : 90)) / c.w))), undo: [], redo: [], mode: 'draw', showSym: true });
+  const tools = [['pen', '✏️', t('Bút', 'Pen')], ['erase', '🧽', t('Tẩy', 'Eraser')], ['fill', '🪣', t('Đổ màu', 'Fill')], ['line', '📏', t('Đường thẳng', 'Line')], ['rect', '▭', t('Hình chữ nhật', 'Rectangle')], ['pick', '💧', t('Lấy màu', 'Pick')], ['purl', '•', t('Mũi P (xuống)', 'Purl (P)')]];
+  const floats = chartFloats(c, ed.cells, 5);
+  const leg = chartLegend(c, ed.cells);
+  const cur = chartCurRow(p, c);
+  const rnMap = chartRowNotes(c);
+  return { title: c.name, nav: 'projects', html: `<div class="stack">
+    <div class="stbar"><a class="btn sm" href="#/project/${p.id}">← ${esc(p.name)}</a><span class="grow"></span>
+      <button class="btn sm" type="button" data-a="chUndo" title="Undo">↩</button><button class="btn sm" type="button" data-a="chRedo" title="Redo">↪</button>
+      <button class="btn sm" type="button" data-a="chZoom" data-d="-1">−</button><button class="btn sm" type="button" data-a="chZoom" data-d="1">+</button>
+      <button class="btn sm ${ed.mode === 'move' ? 'p' : ''}" type="button" data-a="chMode" id="chModeBtn">${ed.mode === 'move' ? '✋ ' + t('Di chuyển', 'Move') : '🖌 ' + t('Vẽ', 'Draw')}</button>
+      <button class="btn sm" type="button" data-a="chImport">🖼 ${t('Nhập ảnh', 'Import image')}</button>
+      <button class="btn sm" type="button" data-a="chPNG">⬇️ PNG</button>
+      <button class="btn sm" type="button" data-a="chDel">🗑</button></div>
+    <div class="chips" id="chTools">${tools.map(x => `<button type="button" class="chip ${ed.tool === x[0] ? 'on' : ''}" data-a="chTool" data-t="${x[0]}" title="${esc(x[2])}">${x[1]} ${esc(x[2])}</button>`).join('')}</div>
+    <div class="chips" id="chPal">${c.pal.map((pc, i) => `<button type="button" class="chip pal ${ed.col === i ? 'on' : ''}" data-a="chCol" data-i="${i}"><span class="ysw" style="width:16px;height:16px;border-radius:4px;background:${esc(pc.hex)}"></span>${esc(palName(c, i))}</button>`).join('')}<button type="button" class="chip" data-a="chPalEdit">🎨 ${t('Bảng màu', 'Palette')}</button></div>
+    ${cur ? `<div class="alert soft small">▶ Row Counter ${p.counter} = <b>${t('hàng chart', 'chart row')} ${cur}/${c.h}</b> · ${c.flat ? (cur % 2 ? t('đọc phải → trái', 'read right → left') : t('đọc trái → phải', 'read left → right')) : t('đọc phải → trái', 'read right → left')}${rnMap[cur] ? ' · 📝 ' + esc(rnMap[cur]) : ''}</div>` : ''}
+    <div class="chwrap ${ed.mode === 'move' ? 'move' : ''}" id="chWrap"><canvas id="chCv"></canvas></div>
+    <div class="g2">
+      <div class="card"><h3>⚙️ ${t('Cài đặt chart', 'Chart settings')}</h3>
+        ${fld(t('Tên', 'Name'), `<input class="inp" data-c="chF" data-f="name" value="${esc(c.name)}">`)}
+        <div class="f3">${fld(t('Số mũi (rộng)', 'Stitches (wide)'), `<input class="inp" type="number" inputmode="numeric" min="1" max="${CH_MAX}" data-c="chSize" data-f="w" value="${c.w}">`)}${fld(t('Số hàng (cao)', 'Rows (high)'), `<input class="inp" type="number" inputmode="numeric" min="1" max="${CH_MAX}" data-c="chSize" data-f="h" value="${c.h}">`)}${fld(t('Bắt đầu ở row', 'Starts at row'), `<input class="inp" type="number" inputmode="numeric" min="1" data-c="chF" data-f="start" value="${c.start}">`)}</div>
+        <div class="f2">${fld(t('Kiểu đan', 'Worked'), `<select class="inp" data-c="chF" data-f="flat"><option value="1" ${c.flat ? 'selected' : ''}>${t('Đan đi đan lại (flat)', 'Flat (back and forth)')}</option><option value="0" ${c.flat ? '' : 'selected'}>${t('Đan vòng (in the round)', 'In the round')}</option></select>`)}${fld(t('Vùng lặp (mũi)', 'Repeat (stitches)'), `<input class="inp" data-c="chF" data-f="rep" value="${esc(c.rep)}" placeholder="1-8">`)}</div>
+        <label class="chk"><input type="checkbox" data-c="chChk" data-f="sq" ${c.sq ? 'checked' : ''}> ${t('Ô vuông (bỏ tỉ lệ thật của mũi đan)', 'Square cells (ignore real stitch proportions)')}</label>
+        <label class="chk"><input type="checkbox" data-c="chChk" data-f="showSym" ${ed.showSym ? 'checked' : ''}> ${t('Hiện ký hiệu mũi P (•) — ô trống = K', 'Show purl symbols (•) — blank = K')}</label>
+        <p class="small mut">${t('Hàng 1 ở dưới cùng, mũi 1 ở bên phải. Tỉ lệ ô theo gauge của dự án.', 'Row 1 is at the bottom, stitch 1 on the right. Cell proportions follow the project gauge.')}</p>
+      </div>
+      <div class="card"><h3>📊 ${t('Thống kê màu', 'Color usage')}</h3>
+        <table class="tbl small">${leg.map(l => `<tr><td><span class="ysw" style="display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:middle;background:${esc(l.hex)}"></span> ${esc(l.name)}</td><td class="num">${l.n} ${t('mũi', 'sts')}</td><td class="num">${fmt(l.pct, 1)}%</td></tr>`).join('')}</table>
+        <h3 style="margin-top:12px">${floats.length ? '⚠️' : '✓'} ${t('Sợi nổi dài hơn 5 mũi', 'Floats longer than 5 stitches')}</h3>
+        ${floats.length ? `<div class="small" style="max-height:160px;overflow:auto">${floats.slice(0, 40).map(f => `<div>${t('Hàng', 'Row')} ${f.r}: <b>${esc(palName(c, f.col))}</b> ${t('nổi', 'floats')} ${f.len} ${t('mũi', 'sts')} (${t('mũi', 'sts')} ${f.a}–${f.b})</div>`).join('')}${floats.length > 40 ? `<div class="mut">+${floats.length - 40}…</div>` : ''}</div><p class="small mut">${t('Nên bắt sợi (catch float) ở giữa đoạn nổi.', 'Catch long floats halfway.')}</p>` : `<p class="small ok">${t('Không có sợi nổi dài.', 'No long floats.')}</p>`}
+      </div>
+    </div>
+    <div class="card"><h3>📝 ${t('Ghi chú', 'Notes')}</h3>
+      ${fld(t('Ghi chú chung', 'General notes'), `<textarea class="inp" rows="3" data-c="chF" data-f="notes">${esc(c.notes)}</textarea>`)}
+      ${fld(t('Ghi chú theo hàng — mỗi dòng "12: đổi màu nền"', 'Per-row notes — one per line "12: change MC"'), `<textarea class="inp" rows="3" data-c="chF" data-f="rowNotes" placeholder="5: ${t('bắt đầu hoạ tiết', 'start motif')}">${esc(c.rowNotes)}</textarea>`)}
+    </div>
+  </div>`, after: () => chartMount() };
+};
+function chartRowNotes(c) { const o = {}; String(c.rowNotes || '').split('\n').forEach(l => { const m = l.match(/^\s*(?:h|r|hàng|row)?\s*(\d+)\s*[:.)\-–]\s*(.+)$/i); if (m) o[+m[1]] = m[2].trim(); }); return o; }
+function chartRedraw() {
+  const ed = CH.ed, cv = $('#chCv'); if (!ed || !cv) return;
+  ed.Lt = drawChart(cv, ed.c, ed.cells, ed.sym, { cs: ed.cs, ratio: chartRatio(ed.p, ed.c), cur: chartCurRow(ed.p, ed.c), showSym: ed.showSym, dpr: Math.min(2, devicePixelRatio || 1), preview: ed.preview });
+  if (ed.preview) { /* vẽ xem trước đường thẳng / hình chữ nhật */
+    const x = cv.getContext('2d'); x.fillStyle = 'rgba(155,35,53,.45)';
+    ed.preview.forEach(i => { const xx = i % ed.c.w, yy = (i / ed.c.w) | 0; x.fillRect(ed.Lt.ml + xx * ed.Lt.cw, ed.Lt.mt + yy * ed.Lt.chh, ed.Lt.cw, ed.Lt.chh); });
+  }
+}
+function chartCellAt(e) {
+  const ed = CH.ed, cv = $('#chCv'), Lt = ed.Lt; const b = cv.getBoundingClientRect();
+  const px = e.clientX - b.left - Lt.ml, py = e.clientY - b.top - Lt.mt;
+  const xx = Math.floor(px / Lt.cw), yy = Math.floor(py / Lt.chh);
+  if (xx < 0 || yy < 0 || xx >= ed.c.w || yy >= ed.c.h) return -1;
+  return yy * ed.c.w + xx;
+}
+function cellsLine(c, a, b) {
+  const out = []; let x0 = a % c.w, y0 = (a / c.w) | 0; const x1 = b % c.w, y1 = (b / c.w) | 0;
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1; let er = dx + dy;
+  for (;;) { out.push(y0 * c.w + x0); if (x0 === x1 && y0 === y1) break; const e2 = 2 * er; if (e2 >= dy) { er += dy; x0 += sx; } if (e2 <= dx) { er += dx; y0 += sy; } }
+  return out;
+}
+function cellsRect(c, a, b) { const out = []; const x0 = Math.min(a % c.w, b % c.w), x1 = Math.max(a % c.w, b % c.w), y0 = Math.min((a / c.w) | 0, (b / c.w) | 0), y1 = Math.max((a / c.w) | 0, (b / c.w) | 0); for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (y === y0 || y === y1 || x === x0 || x === x1) out.push(y * c.w + x); return out; }
+function chartSnap() { const ed = CH.ed; ed.undo.push({ cells: ed.cells.slice(), sym: ed.sym.slice() }); if (ed.undo.length > 60) ed.undo.shift(); ed.redo = []; }
+function chartCommit() { const ed = CH.ed; ed.c.cells = encCells(ed.cells); ed.c.sym = encSym(ed.sym); ed.c.updated = Date.now(); touch(ed.p); save(); }
+function chartPaint(i) {
+  const ed = CH.ed; if (i < 0) return;
+  if (ed.tool === 'purl') ed.sym[i] = ed.purlVal; else ed.cells[i] = ed.tool === 'erase' ? 0 : ed.col;
+}
+function chartFill(i) {
+  const ed = CH.ed, c = ed.c, from = ed.cells[i], to = ed.col; if (from === to) return;
+  const st = [i]; while (st.length) { const k = st.pop(); if (ed.cells[k] !== from) continue; ed.cells[k] = to; const x = k % c.w, y = (k / c.w) | 0; if (x > 0) st.push(k - 1); if (x < c.w - 1) st.push(k + 1); if (y > 0) st.push(k - c.w); if (y < c.h - 1) st.push(k + c.w); }
+}
+function chartMount() {
+  const ed = CH.ed, cv = $('#chCv'); if (!ed || !cv) return;
+  chartRedraw();
+  let down = false, last = -1, start = -1; const ptrs = new Map(); let pinch0 = 0, cs0 = 0;
+  cv.onpointerdown = e => {
+    if (ed.mode === 'move') return;
+    ptrs.set(e.pointerId, e);
+    if (ptrs.size === 2) { /* 2 ngón: huỷ nét vẽ, chuyển sang phóng to/thu nhỏ */
+      if (down && ed.undo.length) { const s = ed.undo.pop(); ed.cells = s.cells; ed.sym = s.sym; } down = false; ed.preview = null;
+      const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); cs0 = ed.cs; chartRedraw(); return;
+    }
+    const i = chartCellAt(e); if (i < 0) return;
+    e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+    if (ed.tool === 'pick') { ed.col = ed.cells[i]; ed.tool = 'pen'; renderView(); return; }
+    chartSnap();
+    if (ed.tool === 'fill') { chartFill(i); chartRedraw(); chartCommit(); return; }
+    down = true; start = last = i;
+    if (ed.tool === 'purl') ed.purlVal = ed.sym[i] ? 0 : 1;
+    if (ed.tool === 'line' || ed.tool === 'rect') { ed.preview = [i]; chartRedraw(); return; }
+    chartPaint(i); chartRedraw();
+  };
+  cv.onpointermove = e => {
+    if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, e);
+    if (ptrs.size === 2 && pinch0) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); const ncs = Math.max(4, Math.min(48, Math.round(cs0 * d / pinch0))); if (ncs !== ed.cs) { ed.cs = ncs; chartRedraw(); } return; }
+    if (!down) return;
+    const i = chartCellAt(e); if (i < 0 || i === last) return;
+    if (ed.tool === 'line') { ed.preview = cellsLine(ed.c, start, i); last = i; chartRedraw(); return; }
+    if (ed.tool === 'rect') { ed.preview = cellsRect(ed.c, start, i); last = i; chartRedraw(); return; }
+    cellsLine(ed.c, last, i).forEach(chartPaint); last = i; chartRedraw();
+  };
+  const up = e => {
+    ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch0 = 0;
+    if (!down) return; down = false;
+    if (ed.preview) { ed.preview.forEach(k => { ed.cells[k] = ed.col; }); ed.preview = null; }
+    chartRedraw(); chartCommit();
+  };
+  cv.onpointerup = up; cv.onpointercancel = up;
+}
+function chartResize(c, ed, nw, nh) {
+  nw = Math.min(CH_MAX, Math.max(1, nw)); nh = Math.min(CH_MAX, Math.max(1, nh));
+  const nc = new Uint8Array(nw * nh), ns = new Uint8Array(nw * nh);
+  /* giữ nguyên góc dưới-phải (hàng 1, mũi 1) */
+  for (let y = 0; y < nh; y++) for (let x = 0; x < nw; x++) {
+    const oy = y - (nh - c.h), ox = x - (nw - c.w);
+    if (oy >= 0 && ox >= 0 && oy < c.h && ox < c.w) { nc[y * nw + x] = ed.cells[oy * c.w + ox]; ns[y * nw + x] = ed.sym[oy * c.w + ox]; }
+  }
+  c.w = nw; c.h = nh; ed.cells = nc; ed.sym = ns; ed.undo = []; ed.redo = [];
+  chartCommit();
+}
+/* k-means đơn giản để giảm ảnh về k màu */
+function kmeans(px, k, it) {
+  const n = px.length / 3; if (!n) return { cent: [], lab: new Uint8Array(0) };
+  const cent = [];
+  cent.push([px[0], px[1], px[2]]);
+  const dist = new Float32Array(n).fill(1e12);
+  while (cent.length < k) {
+    const c = cent[cent.length - 1]; let best = -1, bi = 0;
+    for (let i = 0; i < n; i++) { const d = (px[i * 3] - c[0]) ** 2 + (px[i * 3 + 1] - c[1]) ** 2 + (px[i * 3 + 2] - c[2]) ** 2; if (d < dist[i]) dist[i] = d; if (dist[i] > best) { best = dist[i]; bi = i; } }
+    if (best <= 0) break; cent.push([px[bi * 3], px[bi * 3 + 1], px[bi * 3 + 2]]);
+  }
+  const lab = new Uint8Array(n);
+  for (let r = 0; r < (it || 8); r++) {
+    const sum = cent.map(() => [0, 0, 0, 0]);
+    for (let i = 0; i < n; i++) { let bd = 1e12, b = 0; for (let j = 0; j < cent.length; j++) { const c = cent[j]; const d = (px[i * 3] - c[0]) ** 2 + (px[i * 3 + 1] - c[1]) ** 2 + (px[i * 3 + 2] - c[2]) ** 2; if (d < bd) { bd = d; b = j; } } lab[i] = b; const s = sum[b]; s[0] += px[i * 3]; s[1] += px[i * 3 + 1]; s[2] += px[i * 3 + 2]; s[3]++; }
+    sum.forEach((s, j) => { if (s[3]) cent[j] = [s[0] / s[3], s[1] / s[3], s[2] / s[3]]; });
+  }
+  return { cent, lab };
+}
+function loadImg(file) {
+  return new Promise((res, rej) => { const fr = new FileReader(); fr.onerror = () => rej(fr.error); fr.onload = () => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('decode')); im.src = fr.result; }; fr.readAsDataURL(file); });
+}
+function imgPixels(src, w, h, crop) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const x = cv.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
+  if (crop) { const s = Math.min(src.width, src.height) * crop; x.drawImage(src, (src.width - s) / 2, (src.height - s) / 2, s, s, 0, 0, w, h); } else x.drawImage(src, 0, 0, w, h);
+  const d = x.getImageData(0, 0, w, h).data, px = new Float32Array(w * h * 3);
+  for (let i = 0; i < w * h; i++) { px[i * 3] = d[i * 4]; px[i * 3 + 1] = d[i * 4 + 1]; px[i * 3 + 2] = d[i * 4 + 2]; }
+  return px;
+}
+/* màu chủ đạo của ảnh len: phần giữa ảnh, cụm lớn nhất */
+async function dominantHex(dataUrl) {
+  const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = dataUrl; });
+  const px = imgPixels(im, 36, 36, 0.6); const { cent, lab } = kmeans(px, 3, 6);
+  const cnt = cent.map(() => 0); lab.forEach(l => cnt[l]++);
+  let b = 0; cnt.forEach((v, i) => { if (v > cnt[b]) b = i; });
+  return rgbHex(cent[b] || [200, 200, 200]);
+}
+function chartImportForm() {
+  const ed = CH.ed, c = ed.c; let img = null;
+  const ov = modal(`${mHead('🖼 ' + t('Nhập ảnh → chart', 'Image → chart'))}
+    <p class="small sub">${t('Ảnh được thu về số mũi × số hàng và giảm còn vài màu. Sau đó bạn chỉnh tay. Chart hiện tại sẽ bị thay (có thể ↩ hoàn tác).', 'The picture is resized to stitches × rows and reduced to a few colors. Then touch it up by hand. Replaces the current chart (undo available).')}</p>
+    <div class="row">${fileBtn('📷 ' + t('Chọn ảnh', 'Pick image'), 'id="ciFile"')}<img id="ciPrev" alt="" style="max-height:70px;border-radius:8px;display:none"></div>
+    <div class="f3" style="margin-top:10px">${fld(t('Số mũi', 'Stitches'), `<input class="inp" id="ciW" type="number" inputmode="numeric" min="2" max="${CH_MAX}" value="${c.w}">`)}${fld(t('Số hàng', 'Rows'), `<input class="inp" id="ciH" type="number" inputmode="numeric" min="2" max="${CH_MAX}" value="${c.h}">`)}${fld(t('Số màu', 'Colors'), `<select class="inp" id="ciK">${[2, 3, 4, 5, 6, 7, 8].map(k => `<option ${k === 3 ? 'selected' : ''}>${k}</option>`).join('')}</select>`)}</div>
+    <label class="chk"><input type="checkbox" id="ciAuto" checked> ${t('Tự tính số hàng theo tỉ lệ ảnh và gauge', 'Auto rows from picture proportions and gauge')}</label>
+    <div class="errm" id="ciErr"></div>
+    <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="button" id="ciGo">${t('Chuyển thành chart', 'Convert')}</button></div>`);
+  const W = ov.querySelector('#ciW'), H = ov.querySelector('#ciH'), auto = ov.querySelector('#ciAuto');
+  const recalc = () => { if (img && auto.checked) H.value = Math.max(2, Math.min(CH_MAX, Math.round((parseInt(W.value) || c.w) * img.height / img.width / chartRatio(ed.p, Object.assign({}, c, { sq: false }))))); };
+  W.oninput = recalc; auto.onchange = recalc;
+  ov.querySelector('#ciFile').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { img = await loadImg(f); const pv = ov.querySelector('#ciPrev'); pv.src = img.src; pv.style.display = ''; recalc(); } catch (er) { ov.querySelector('#ciErr').textContent = t('Không đọc được ảnh', 'Could not read image'); } };
+  ov.querySelector('#ciGo').onclick = () => {
+    if (!img) { ov.querySelector('#ciErr').textContent = t('Hãy chọn ảnh.', 'Pick an image.'); return; }
+    const w = Math.min(CH_MAX, Math.max(2, parseInt(W.value) || c.w)), h = Math.min(CH_MAX, Math.max(2, parseInt(H.value) || c.h)), k = parseInt(ov.querySelector('#ciK').value) || 3;
+    const { cent, lab } = kmeans(imgPixels(img, w, h), k, 10);
+    const order = cent.map((cc, i) => ({ i, l: 0.299 * cc[0] + 0.587 * cc[1] + 0.114 * cc[2] })).sort((a, b) => b.l - a.l); /* màu sáng nhất = nền */
+    const map = new Uint8Array(cent.length); order.forEach((o, j) => { map[o.i] = j; });
+    chartSnap();
+    c.w = w; c.h = h; c.pal = order.map((o, j) => ({ hex: rgbHex(cent[o.i]), n: '' }));
+    ed.cells = new Uint8Array(w * h); for (let i = 0; i < lab.length; i++) ed.cells[i] = map[lab[i]];
+    ed.sym = new Uint8Array(w * h); ed.col = Math.min(1, c.pal.length - 1); ed.undo = []; ed.redo = [];
+    chartCommit(); ov._close(); renderView(); toast(t('Đã tạo chart từ ảnh ✓', 'Chart created from image ✓'));
+  };
+}
+function chartPalForm() {
+  const ed = CH.ed, c = ed.c;
+  const stash = db.yarns.flatMap(y => [{ hex: safeHex(y.hex), n: yarnTitle(y) }].concat(y.domHex ? [{ hex: safeHex(y.domHex), n: yarnTitle(y) + ' 📷' }] : []));
+  const draw = () => `<div id="palList">${c.pal.map((pc, i) => `<div class="row" style="margin-bottom:6px"><input type="color" class="inp" data-pi="${i}" data-pf="hex" value="${esc(safeHex(pc.hex).length === 7 ? pc.hex : '#ffffff')}" style="width:52px;padding:3px;height:40px"><input class="inp" data-pi="${i}" data-pf="n" value="${esc(pc.n)}" placeholder="${esc(palName(c, i))}" style="flex:1">${i ? `<button class="ib" type="button" data-pdel="${i}">✕</button>` : `<span class="small mut">${t('nền', 'bg')}</span>`}</div>`).join('')}</div>`;
+  const ov = modal(`${mHead('🎨 ' + t('Bảng màu', 'Palette'))}${draw()}
+    ${c.pal.length < PAL_MAX ? `<button class="btn sm" type="button" id="palAdd">+ ${t('Màu', 'Color')}</button>` : ''}
+    ${stash.length ? `<p class="small b" style="margin-top:12px">🧺 ${t('Màu từ kho len (bấm để thêm)', 'Colors from your stash (tap to add)')}</p><div class="chips">${stash.map((s, i) => `<button type="button" class="chip" data-sadd="${i}"><span class="ysw" style="width:14px;height:14px;border-radius:4px;background:${esc(s.hex)}"></span>${esc(s.n.slice(0, 26))}</button>`).join('')}</div>` : ''}
+    <div class="acts"><button class="btn p" type="button" data-a="close">${t('Xong', 'Done')}</button></div>`, { onClose: () => { c.updated = Date.now(); touch(ed.p); save(); renderView(); } });
+  const reopen = () => { ov._close(); chartPalForm(); };
+  ov.addEventListener('input', e => { const el = e.target; if (el.dataset.pi == null) return; c.pal[+el.dataset.pi][el.dataset.pf] = el.dataset.pf === 'hex' ? safeHex(el.value) : el.value; });
+  ov.addEventListener('click', async e => {
+    const add = e.target.closest('#palAdd'), del = e.target.closest('[data-pdel]'), sa = e.target.closest('[data-sadd]');
+    if (add) { c.pal.push({ hex: '#C4687A', n: '' }); reopen(); }
+    if (sa && c.pal.length < PAL_MAX) { const s = stash[+sa.dataset.sadd]; c.pal.push({ hex: s.hex, n: s.n.slice(0, 30) }); reopen(); }
+    if (del) {
+      const i = +del.dataset.pdel; const used = ed.cells.some(v => v === i);
+      if (used && !(await ask({ title: t(`Xoá màu "${palName(c, i)}"?`, `Delete color "${palName(c, i)}"?`), desc: t('Các ô màu này sẽ thành màu nền.', 'Cells of this color become background.') }))) return;
+      chartSnap();
+      for (let k = 0; k < ed.cells.length; k++) { if (ed.cells[k] === i) ed.cells[k] = 0; else if (ed.cells[k] > i) ed.cells[k]--; }
+      c.pal.splice(i, 1); if (ed.col >= c.pal.length) ed.col = c.pal.length - 1; chartCommit(); reopen();
+    }
+  });
+}
+async function chartExportPNG() {
+  const ed = CH.ed, c = ed.c, p = ed.p;
+  const cs = Math.max(10, Math.min(24, Math.floor(1400 / c.w)));
+  const tmp = document.createElement('canvas');
+  const Lt = drawChart(tmp, c, ed.cells, ed.sym, { cs, ratio: chartRatio(p, c), showSym: true, dpr: 1, noCss: true });
+  const leg = chartLegend(c, ed.cells); const lh = 22, top = 34;
+  const out = document.createElement('canvas'); out.width = Math.max(Lt.W, 360) + 20; out.height = top + Lt.H + 16 + leg.length * lh + 30;
+  const x = out.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, out.width, out.height);
+  x.fillStyle = '#9B2335'; x.font = 'bold 18px sans-serif'; x.textBaseline = 'top'; x.fillText(c.name + `  (${c.w} × ${c.h})`, 10, 8);
+  x.drawImage(tmp, 10, top);
+  let y = top + Lt.H + 12; x.font = '14px sans-serif';
+  leg.forEach(l => { x.fillStyle = l.hex; x.fillRect(10, y, 16, 16); x.strokeStyle = '#ccc'; x.strokeRect(10, y, 16, 16); x.fillStyle = '#2D1B1E'; x.fillText(`${l.name} — ${l.n} sts (${fmt(l.pct, 1)}%)`, 34, y + 1); y += lh; });
+  x.fillStyle = '#A67880'; x.font = '12px sans-serif'; x.fillText((c.sym ? '• = P, ' : '') + t('ô trống = K · Hàng 1 ở dưới · YarnLoop', 'blank = K · Row 1 at bottom · YarnLoop'), 10, y + 4);
+  const blob = await new Promise(res => out.toBlob(res, 'image/png'));
+  await shareOrDownload(blob, `${slug(c.name)}-chart.png`, c.name);
+}
+
+/* =====================================================================
+   SAO LƯU — có ô "Kèm ảnh"
+   ===================================================================== */
+function stripImages(d) {
+  d = clone(d);
+  (d.projects || []).forEach(p => { p.photos = []; p.patternImgs = []; });
+  (d.yarns || []).forEach(y => { y.photos = []; (y.ideas || []).forEach(i => { i.img = ''; }); });
+  (d.refs || []).forEach(r => { r.diagram = []; });
+  return d;
+}
+function backupForm() {
+  const full = JSON.stringify(db).length, lite = JSON.stringify(stripImages(db)).length;
+  const mb = b => fmt(b / 1048576, 2) + ' MB';
+  const ov = modal(`${mHead('💾 ' + t('Xuất file sao lưu', 'Export backup'))}
+    <label class="chk"><input type="checkbox" id="bkImg" checked> ${t('Kèm ảnh', 'Include images')} <span class="mut small">(${mb(full)} · ${t('không ảnh', 'without')}: ${mb(lite)})</span></label>
+    <p class="small mut">${t('Bỏ ảnh giúp file nhẹ, nhưng khi nạp lại sẽ mất ảnh dự án, ảnh len, ảnh sơ đồ.', 'Without images the file is small, but restoring it loses project, yarn and schematic images.')}</p>
+    <div class="acts"><button class="btn" type="button" data-a="close">${t('Huỷ', 'Cancel')}</button><button class="btn p" type="button" id="bkGo">⬇️ ${t('Xuất file', 'Export')}</button></div>`, { cls: 'sm' });
+  ov.querySelector('#bkGo').onclick = async () => { const withImg = ov.querySelector('#bkImg').checked; ov._close(); await backupNow(withImg); };
+}
+
+/* =====================================================================
+   ACTIONS v1.1
+   ===================================================================== */
+Object.assign(A, {
+  refNew: () => { const r = normRef({ name: '', ms: msPreset('raglan') }); db.refs.push(r); save(); go('ref/' + r.id); },
+  refExample: () => { if (db.refs.some(r => r.example)) return; const r = exampleRef(); db.refs.push(r); save(); go('ref/' + r.id); toast(t('Đã thêm mẫu ví dụ ✓', 'Example added ✓')); },
+  refDel: async el => {
+    const r = RF(el.dataset.id); if (!r) return;
+    const used = db.projects.filter(p => p.ref && p.ref.id === r.id);
+    const ok = await ask({ title: t(`Xoá mẫu "${r.name || '…'}"?`, `Delete "${r.name || '…'}"?`), desc: t(`Mất ${r.ms.length} mốc, ${r.meas.length} số đo, ${r.diagram.length} ảnh.`, `Removes ${r.ms.length} milestones, ${r.meas.length} measurements, ${r.diagram.length} images.`) + (used.length ? ' ' + t(`${used.length} dự án sẽ bỏ liên kết.`, `${used.length} projects will be unlinked.`) : '') });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá mẫu tham chiếu', 'Reference deleted'), () => { used.forEach(p => { p.ref = null; }); db.refs = db.refs.filter(x => x !== r); location.hash = '#/refs'; });
+  },
+  refPreset: () => {
+    const r = RF(state.route.id); const have = new Set(r.ms.map(m => m.k));
+    const add = msPreset(r.cons).filter(m => !have.has(m.k));
+    if (!add.length) { toast(t('Đã có đủ mốc chuẩn', 'All standard milestones are there')); return; }
+    r.ms = r.ms.concat(add); r.updated = Date.now(); save(); renderView(); toast(t(`Đã thêm ${add.length} mốc`, `${add.length} milestones added`));
+  },
+  refMsAdd: () => { const r = RF(state.route.id); r.ms.push({ id: uid(), k: 'custom', label: '', sts: [], cm: [], fixed: '', note: '' }); save(); renderView(); },
+  refMsDel: async el => {
+    const r = RF(state.route.id), i = +el.dataset.mi, m = r.ms[i];
+    if (m.sts.length || m.cm.length) { const ok = await ask({ title: t(`Xoá mốc "${m.label || '…'}"?`, `Delete milestone "${m.label || '…'}"?`), desc: esc(seqStr(m.sts)) }); if (!ok) return; }
+    doWithUndo(t('Đã xoá mốc', 'Milestone deleted'), () => { r.ms.splice(i, 1); });
+  },
+  refMsMove: el => { const r = RF(state.route.id), i = +el.dataset.mi, j = i + (+el.dataset.d); if (j < 0 || j >= r.ms.length) return; const s = r.ms; [s[i], s[j]] = [s[j], s[i]]; save(); renderView(); },
+  refMeasAdd: () => { const r = RF(state.route.id); r.meas.push({ id: uid(), label: '', v: [] }); save(); renderView(); },
+  refMeasDel: el => { const r = RF(state.route.id); doWithUndo(t('Đã xoá số đo', 'Measurement deleted'), () => { r.meas.splice(+el.dataset.mi, 1); }); },
+  refImgDel: async el => {
+    const r = RF(state.route.id), i = +el.dataset.i;
+    const ok = await ask({ ic: '🖼', title: t('Xoá ảnh này?', 'Delete this image?'), desc: `<img src="${esc(r.diagram[i])}" alt="" style="max-height:140px;border-radius:10px">` });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá ảnh', 'Image deleted'), () => { r.diagram.splice(i, 1); });
+  },
+  refParse: () => {
+    const r = RF(state.route.id), txt = ($('#refPaste') || {}).value || '', n = refSizes(r).length;
+    const res = parseRefText(txt, n); state.refParse = res;
+    if (state.refPasteFor !== r.id || state.refPasteTxt !== txt) state.refDone = [];
+    state.refPasteFor = r.id; state.refPasteTxt = txt;
+    const out = $('#refParseOut'); if (!out) return;
+    if (!res.length) { out.innerHTML = `<p class="small mut" style="margin-top:8px">${t(`Không thấy dãy ${n} số nào (theo ${n} size). Kiểm tra lại danh sách size.`, `No sequence of ${n} numbers found (for ${n} sizes). Check the size list.`)}</p>`; return; }
+    const msOpts = `<option value="new">+ ${t('Mốc mới', 'New milestone')}</option>` + r.ms.map((m, i) => `<option value="${i}">${esc(m.label || '…')}</option>`).join('');
+    out.innerHTML = `<div style="margin-top:10px">${res.map((x, i) => `<div class="secd"><div class="small mut">…${esc(x.ctx)} <b class="sub">${esc(x.raw)}</b></div>
+      <div class="row" style="margin-top:6px"><select class="inp" id="rpM${i}" style="flex:2;min-width:140px">${msOpts}</select><select class="inp" id="rpK${i}" style="flex:1;min-width:90px"><option value="sts" ${x.kind !== 'cm' ? 'selected' : ''}>${t('số mũi', 'stitches')}</option><option value="cm" ${x.kind === 'cm' ? 'selected' : ''}>cm</option><option value="note">${t('ghi chú', 'note')}</option></select>${(state.refDone || []).includes(i) ? '<span class="ok b">✓</span>' : `<button class="btn sm p" type="button" data-a="refPasteAdd" data-i="${i}">+</button>`}</div></div>`).join('')}</div>`;
+  },
+  refPasteAdd: el => {
+    const r = RF(state.route.id), i = +el.dataset.i, x = (state.refParse || [])[i]; if (!x) return;
+    const mv = $('#rpM' + i).value, kind = $('#rpK' + i).value;
+    let m; if (mv === 'new') { m = { id: uid(), k: 'custom', label: x.ctx.split(/[,:;]/).pop().trim().slice(0, 40) || t('Mốc', 'Milestone'), sts: [], cm: [], fixed: '', note: '' }; r.ms.push(m); } else m = r.ms[+mv];
+    if (kind === 'note') m.note = (m.note ? m.note + '; ' : '') + x.raw; else m[kind] = x.v.slice();
+    r.updated = Date.now(); save();
+    (state.refDone = state.refDone || []).push(i);
+    const sy = window.scrollY; renderView(); A.refParse(); window.scrollTo(0, sy); toast(t(`Đã gán cho "${m.label}"`, `Assigned to "${m.label}"`));
+  },
+  pRefNear: el => {
+    const p = curP(el), r = RF(p.ref.id); const m = r.meas[+$('#nearM').value], v = num($('#nearV').value);
+    if (!m || v === '') return;
+    let b = 0; m.v.forEach((x, i) => { if (x !== '' && Math.abs(x - v) < Math.abs((m.v[b] === '' ? 1e9 : m.v[b]) - v)) b = i; });
+    p.ref.si = b; touch(p); save(); renderView(); toast(t(`Size gần nhất: ${refSizes(r)[b]} (${fmt(m.v[b])} cm)`, `Nearest size: ${refSizes(r)[b]} (${fmt(m.v[b])} cm)`));
+  },
+  chartNew: el => {
+    const p = curP(el); p.charts = p.charts || [];
+    const used = p.charts.map(c => c.name);
+    const nm = 'Chart ' + ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').find(ch => !used.includes('Chart ' + ch)) || p.charts.length + 1);
+    const c = normChart({ name: nm, w: 20, h: 20 }); p.charts.push(c); touch(p); save(); CH.ed = null; go('chart/' + p.id + '.' + c.id);
+  },
+  chTool: el => { CH.ed.tool = el.dataset.t; $$('#chTools .chip').forEach(b => b.classList.toggle('on', b === el)); },
+  chCol: el => { const ed = CH.ed; ed.col = +el.dataset.i; if (ed.tool === 'erase' || ed.tool === 'purl' || ed.tool === 'pick') { ed.tool = 'pen'; $$('#chTools .chip').forEach(b => b.classList.toggle('on', b.dataset.t === 'pen')); } $$('#chPal .pal').forEach(b => b.classList.toggle('on', b === el)); },
+  chZoom: el => { const ed = CH.ed; ed.cs = Math.max(4, Math.min(48, ed.cs + (+el.dataset.d) * Math.max(1, Math.round(ed.cs * 0.2)))); chartRedraw(); },
+  chMode: () => { const ed = CH.ed; ed.mode = ed.mode === 'move' ? 'draw' : 'move'; const w = $('#chWrap'); if (w) w.classList.toggle('move', ed.mode === 'move'); const b = $('#chModeBtn'); if (b) { b.classList.toggle('p', ed.mode === 'move'); b.textContent = ed.mode === 'move' ? '✋ ' + t('Di chuyển', 'Move') : '🖌 ' + t('Vẽ', 'Draw'); } },
+  chUndo: () => { const ed = CH.ed; const s = ed.undo.pop(); if (!s) { toast(t('Không còn bước để hoàn tác', 'Nothing to undo')); return; } ed.redo.push({ cells: ed.cells, sym: ed.sym }); ed.cells = s.cells; ed.sym = s.sym; chartCommit(); renderView(); },
+  chRedo: () => { const ed = CH.ed; const s = ed.redo.pop(); if (!s) return; ed.undo.push({ cells: ed.cells, sym: ed.sym }); ed.cells = s.cells; ed.sym = s.sym; chartCommit(); renderView(); },
+  chImport: () => chartImportForm(),
+  chPalEdit: () => chartPalForm(),
+  chPNG: () => chartExportPNG(),
+  chDel: async () => {
+    const ed = CH.ed, p = ed.p, c = ed.c;
+    const ok = await ask({ title: t(`Xoá "${c.name}"?`, `Delete "${c.name}"?`), desc: t(`Chart ${c.w}×${c.h} sẽ bị xoá.`, `The ${c.w}×${c.h} chart will be deleted.`) });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá chart', 'Chart deleted'), () => { p.charts = p.charts.filter(x => x !== c); p.rows.forEach(r => { if (r.ch === c.id) r.ch = ''; }); CH.ed = null; location.hash = '#/project/' + p.id; });
+  },
+  yPhotoDel: async el => {
+    const y = Y(el.dataset.id), i = +el.dataset.i;
+    const ok = await ask({ ic: '🖼', title: t('Xoá ảnh này?', 'Delete this image?'), desc: `<img src="${esc(y.photos[i])}" alt="" style="max-height:140px;border-radius:10px">` });
+    if (!ok) return;
+    doWithUndo(t('Đã xoá ảnh', 'Image deleted'), () => { y.photos.splice(i, 1); });
+  },
+  yPhotoMain: el => { const y = Y(el.dataset.id), i = +el.dataset.i; const [im] = y.photos.splice(i, 1); y.photos.unshift(im); save(); renderView(); },
+  yDomHex: async el => {
+    const y = Y(el.dataset.id); if (!y.photos[0]) return;
+    try { const h = await dominantHex(y.photos[0]); y.domHex = h; y.hex = h; save(); renderView(); toast(t('Đã lấy màu từ ảnh ✓ ', 'Color taken from photo ✓ ') + h); } catch (e) { toast(t('Không đọc được ảnh', 'Could not read image')); }
+  }
+});
+Object.assign(C, {
+  refF: el => {
+    const r = RF(state.route.id); if (!r) return; const f = el.dataset.f;
+    r[f] = ['gSts', 'gRows'].includes(f) ? num(el.value) : el.value.trim(); r.updated = Date.now(); save();
+    if (['cons', 'sizes', 'gSts', 'name'].includes(f)) softRender();
+  },
+  refMs: el => {
+    const r = RF(state.route.id), m = r.ms[+el.dataset.mi], f = el.dataset.f; if (!m) return;
+    m[f] = f === 'sts' || f === 'cm' ? parseSeq(el.value) : f === 'fixed' ? num(el.value) : el.value.trim();
+    r.updated = Date.now(); save(); if (f !== 'note' && f !== 'label') softRender();
+  },
+  refMeas: el => { const r = RF(state.route.id), m = r.meas[+el.dataset.mi]; if (!m) return; m[el.dataset.f] = el.dataset.f === 'v' ? parseSeq(el.value) : el.value.trim(); r.updated = Date.now(); save(); if (el.dataset.f === 'v') softRender(); },
+  refImg: async el => {
+    const r = RF(state.route.id); const room = 4 - r.diagram.length;
+    const imgs = await readImages(Array.from(el.files).slice(0, room), 1400); el.value = '';
+    if (!imgs.length) { toast(t('Không đọc được ảnh', 'Could not read image')); return; }
+    r.diagram = r.diagram.concat(imgs).slice(0, 4); r.updated = Date.now(); save(); renderView();
+  },
+  pRef: el => { const p = curP(el); p.ref = el.value ? { id: el.value, si: 0 } : null; touch(p); save(); softRender(); },
+  pRefSize: el => { const p = curP(el); p.ref.si = +el.value; touch(p); save(); softRender(); },
+  chF: el => {
+    const ed = CH.ed, c = ed.c, f = el.dataset.f;
+    c[f] = f === 'flat' ? el.value === '1' : f === 'start' ? Math.max(1, parseInt(el.value) || 1) : el.value; c.updated = Date.now(); touch(ed.p); save();
+    if (f !== 'notes' && f !== 'rowNotes' && f !== 'name') softRender();
+  },
+  chChk: el => { const ed = CH.ed; if (el.dataset.f === 'showSym') ed.showSym = el.checked; else { ed.c.sq = el.checked; ed.c.updated = Date.now(); save(); } chartRedraw(); },
+  chSize: async el => {
+    const ed = CH.ed, c = ed.c; const v = Math.min(CH_MAX, Math.max(1, parseInt(el.value) || 1));
+    const nw = el.dataset.f === 'w' ? v : c.w, nh = el.dataset.f === 'h' ? v : c.h;
+    if (nw < c.w || nh < c.h) { const ok = await ask({ ic: '✂️', title: t('Thu nhỏ chart?', 'Shrink chart?'), desc: t('Phần ô nằm ngoài (bên trái / phía trên) sẽ bị cắt bỏ.', 'Cells outside (left / top) will be cut off.'), ok: t('Thu nhỏ', 'Shrink') }); if (!ok) { renderView(); return; } }
+    chartResize(c, ed, nw, nh); softRender();
+  },
+  yPhoto: async el => {
+    const y = Y(el.dataset.id); const room = 4 - y.photos.length;
+    const imgs = await readImages(Array.from(el.files).slice(0, room), 1200); el.value = '';
+    if (!imgs.length) { toast(t('Không đọc được ảnh', 'Could not read image')); return; }
+    const first = !y.photos.length;
+    y.photos = y.photos.concat(imgs).slice(0, 4);
+    if (first) { try { y.domHex = await dominantHex(y.photos[0]); } catch (e) {} }
+    save(); renderView(); toast(t(`Đã thêm ${imgs.length} ảnh ✓`, `${imgs.length} photo(s) added ✓`));
+  }
+});
+
+/* Vẽ lại sau sự kiện change (tránh vẽ lại giữa lúc blur) và giữ ô đang nhập */
+function softRender() {
+  setTimeout(() => {
+    const a = document.activeElement, ds = a && a.dataset ? a.dataset : {};
+    const sel = ['c', 'f', 'mi', 'id'].filter(k => ds[k] != null).map(k => `[data-${k}="${String(ds[k]).replace(/["\\]/g, '')}"]`).join('');
+    const sy = window.scrollY; renderView(); window.scrollTo(0, sy);
+    if (sel && (ds.c || ds.i)) { const n = $(sel); if (n && n.focus) n.focus({ preventScroll: true }); }
+  }, 0);
+}
+/* mẫu tham chiếu ví dụ (số liệu tự dựng, không lấy từ pattern có bản quyền) */
+function exampleRef() {
+  const vi = L === 'vi';
+  const r = normRef({ example: true, name: vi ? 'Áo len raglan cổ tròn (mẫu ví dụ)' : 'Round-neck raglan sweater (example)', source: 'YarnLoop', garment: 'pullover', cons: 'raglan', sizes: 'S, M, L', gSts: 20, gRows: 28, yarn: 'DK merino', weight: 'dk', needles: vi ? '3.5 mm bo, 4 mm thân' : '3.5 mm rib, 4 mm body', notes: vi ? 'Số liệu tự dựng để thử tính năng.' : 'Made-up figures for trying the feature.' });
+  const S = (k, sts, cm, note) => { const m = msPreset('raglan').find(x => x.k === k); m.sts = sts; m.cm = cm; m.note = note || ''; return m; };
+  r.ms = [S('co', [88, 96, 104], [], vi ? 'Bo gân 2x2 cổ 3 cm' : '2x2 rib neck 3 cm'), S('raglanEnd', [296, 320, 348], [20, 21, 23], vi ? 'Tăng 8 mũi mỗi 2 hàng' : 'Inc 8 sts every 2nd row'),
+    S('split', [296, 320, 348], [20, 21, 23]), S('body', [184, 200, 216], [], vi ? 'Gồm 8-8-10 mũi nách mỗi bên' : 'Incl. 8-8-10 underarm sts each side'),
+    S('waist', [176, 192, 208], [15, 15, 16]), S('hem', [184, 200, 216], [6, 6, 6], vi ? 'Bo gân 2x2' : '2x2 rib'), S('length', [], [36, 37, 38], vi ? 'Tính từ nách' : 'From underarm'),
+    S('sleeveTop', [72, 76, 86], []), S('sleeveDec', [48, 52, 56], [38, 39, 40]), S('cuff', [48, 52, 56], [6, 6, 6]), S('sleeveLen', [], [44, 45, 46])];
+  r.meas = [{ id: uid(), label: vi ? 'Vòng ngực' : 'Chest', v: [92, 100, 108] }, { id: uid(), label: vi ? 'Dài áo' : 'Length', v: [56, 58, 61] }];
+  return r;
+}
+
 
 function setLang(l) {
   if (l !== 'vi' && l !== 'en') return;
